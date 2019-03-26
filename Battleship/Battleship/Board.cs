@@ -30,29 +30,12 @@ namespace Battleship
         public bool PlaceShips(Ship ship, char orientation, int x, int y) 
         {
             //out of bounds check/overlap check
-            bool error = CheckIfError(ship, orientation, x, y);
-            if (error == true)
+            
+            if (CheckIfError(ship, orientation, x, y) == true)
             {
                 return false;
             }
-
-            ships.Add(ship);
-            if (orientation == 'H')
-            {
-                for (int i = 0; i < ship.length; i++)
-                {
-                    gameBoard[y][x + i].SetShip(ship);
-                }
-
-            }
-            else if (orientation == 'V')
-            {
-                for (int i = 0; i < ship.length; i++)
-                {
-                    gameBoard[y+i][x].SetShip(ship);
-                }
-            }
-
+            PlaceShips(ship, orientation, x, y);
             return true;
 
         }
@@ -104,6 +87,25 @@ namespace Battleship
                 }
             }
             return false;
+        }
+        private void Place(Ship ship, char orientation, int x, int y)
+        {
+            ships.Add(ship);
+            if (orientation == 'H')
+            {
+                for (int i = 0; i < ship.length; i++)
+                {
+                    gameBoard[y][x + i].SetShip(ship);
+                }
+
+            }
+            else if (orientation == 'V')
+            {
+                for (int i = 0; i < ship.length; i++)
+                {
+                    gameBoard[y + i][x].SetShip(ship);
+                }
+            }
         }
         public string FireAt(int x, int y)
         {
