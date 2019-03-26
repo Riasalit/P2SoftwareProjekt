@@ -11,6 +11,5 @@ namespace Battleship
         void InterActWithUser();
         Ship GetShip();
         Char[] GetData(); 
-
     }
 }
