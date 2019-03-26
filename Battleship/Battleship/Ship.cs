@@ -11,7 +11,7 @@ namespace Battleship
         
         public int length { get;  private set; }
         private int hits;
-        private string name;
+        public string name { get; private set; }
 
         public Ship(string name, int length)
         {

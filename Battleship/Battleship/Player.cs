@@ -12,6 +12,7 @@ namespace Battleship
         private Player opponent;
         private string playerName { get; }
         private int hitCount;
+
         public Player(string name)
         {
             playerName = name;
