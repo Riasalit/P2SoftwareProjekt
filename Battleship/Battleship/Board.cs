@@ -14,11 +14,14 @@ namespace Battleship
 
         public Board()
         {
+            gameBoard = new Tile[10][];
             for (int i = 0; i < 10; i++)
             {
+                gameBoard[i] = new Tile[10];
                 for (int j = 0; j < 10; j++)
                 {
                     gameBoard[i][j] = new Tile();
+                    
                     
                 }
             }
@@ -26,9 +29,13 @@ namespace Battleship
         }
         public bool PlaceShips(Ship ship, char orientation, int x, int y) 
         {
-            //if (orientation == 'H' && x+ship.length >= 10 ||
-            //    orientation == 'V' && y+ship.length >= 10 || 
-            //    ) 
+            //out of bounds check/overlap check
+            bool error = CheckIfError(ship, orientation, x, y);
+            if (error == true)
+            {
+                return false;
+            }
+
             ships.Add(ship);
             if (orientation == 'H')
             {
@@ -48,6 +55,55 @@ namespace Battleship
 
             return true;
 
+        }
+        private bool CheckIfError(Ship ship, char orientation, int x, int y)
+        {
+            if (ShipOutOfBoundsCheck(ship, orientation, x, y) ||
+                ShipOverlapCheck(ship, orientation, x, y))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        private bool ShipOutOfBoundsCheck(Ship ship, char orientation, int x, int y)
+        {
+            if ((orientation == 'H' && x + ship.length - 1 >= 10) ||
+                (orientation == 'V' && y + ship.length - 1 >= 10))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private bool ShipOverlapCheck(Ship ship, char orientation, int x, int y)
+        {
+            if (orientation == 'H')
+            {
+                for (int i = 0; i < ship.length; i++)
+                {
+                    if (gameBoard[y][x + i].CheckShip() == true)
+                    {
+                        return true;
+                    }
+                }
+
+            }
+            else if (orientation == 'V')
+            {
+                for (int i = 0; i < ship.length; i++)
+                {
+                    if (gameBoard[y+1][x].CheckShip() == true)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         public string FireAt(int x, int y)
         {
