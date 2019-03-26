@@ -14,8 +14,10 @@ namespace Battleship
 
         public Board()
         {
+            gameBoard = new Tile[10][];
             for (int i = 0; i < 10; i++)
             {
+                gameBoard[i] = new Tile[10];
                 for (int j = 0; j < 10; j++)
                 {
                     gameBoard[i][j] = new Tile();

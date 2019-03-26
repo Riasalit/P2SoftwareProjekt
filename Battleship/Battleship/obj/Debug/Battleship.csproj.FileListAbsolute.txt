@@ -5,3 +5,10 @@ C:\Users\jalle\source\repos\Battleship\Battleship\obj\Debug\Battleship.csprojAss
 C:\Users\jalle\source\repos\Battleship\Battleship\obj\Debug\Battleship.csproj.CoreCompileInputs.cache
 C:\Users\jalle\source\repos\Battleship\Battleship\obj\Debug\Battleship.exe
 C:\Users\jalle\source\repos\Battleship\Battleship\obj\Debug\Battleship.pdb
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\bin\Debug\Battleship.exe.config
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\bin\Debug\Battleship.exe
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\bin\Debug\Battleship.pdb
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\obj\Debug\Battleship.csprojAssemblyReference.cache
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\obj\Debug\Battleship.csproj.CoreCompileInputs.cache
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\obj\Debug\Battleship.exe
+C:\Users\danie\source\repos\uni_software2\Projekt\P2SoftwareProjekt-TestBranch\Battleship\Battleship\obj\Debug\Battleship.pdb
