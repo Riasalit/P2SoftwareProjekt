@@ -10,6 +10,7 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
+            Console.ReadLine();
         }
     }
 }
