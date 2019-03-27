@@ -109,11 +109,7 @@ namespace Battleship
         }
         public string FireAt(int x, int y)
         {
-            return gameBoard[x][y].GetHit();
+            return gameBoard[y][x].GetHit();
         }
-
-
-
-
     }
 }

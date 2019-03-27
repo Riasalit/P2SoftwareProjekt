@@ -32,7 +32,22 @@ namespace Battleship
         }
         public string GetHit()
         {
-            return "wow";
+            isHit = true;
+
+            //Runs if ship is hit and sunken
+            if(ship != null && ship.IsSunken())
+            {
+                return "You sunk" + ship.name;
+            }
+            //Runs if ship is hit but not sunken
+            else if (ship != null && !ship.IsSunken())
+            {
+                return "You hit a ship";
+            }
+            else
+            {
+                return "You missed";
+            }
         }
     }
 }
