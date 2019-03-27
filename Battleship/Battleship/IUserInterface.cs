@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Battleship
 {
-    class Program
+    interface IUserInterface
     {
-        static void Main(string[] args)
-        {
-            Human ole = new Human("ole");
-            ole.SetShips();
-        }
+        void InterActWithUser();
+        Ship GetShip();
+        Char[] GetData(); 
     }
 }
