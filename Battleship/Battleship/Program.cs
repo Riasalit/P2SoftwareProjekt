@@ -11,7 +11,7 @@ namespace Battleship
         static void Main(string[] args)
         {
             AI ole = new AI("ole");
-            ole.SetShips();
+            ole.SetShips(new TestUI());
         }
     }
 }
