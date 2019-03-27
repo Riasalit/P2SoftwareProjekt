@@ -28,10 +28,11 @@ namespace Battleship
                 new Ship("Carrier", 5)
             };
 
-            foreach(Ship ship in ships)
+            //Places all the ships in the list at random positions
+            foreach (Ship ship in ships)
             {
                 bool correctlyPlaced = false;
-                while (correctlyPlaced)
+                while (!correctlyPlaced)
                 {
                     x = new Random().Next(0, 10);
                     y = new Random().Next(0, 10);

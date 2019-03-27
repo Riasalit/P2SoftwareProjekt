@@ -8,7 +8,7 @@ namespace Battleship
 {
     public class Tile
     {
-        private bool isHit;
+        public bool isHit { get; private set; }
         private Ship ship;
 
         public Tile()
@@ -17,14 +17,7 @@ namespace Battleship
         }
         public bool CheckShip()
         {
-            if (ship == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return !(ship == null);
         }
         public void SetShip(Ship ship)
         {
@@ -33,14 +26,13 @@ namespace Battleship
         public string GetHit()
         {
             isHit = true;
-
             //Runs if ship is hit and sunken
-            if(ship != null && ship.IsSunken())
+            if (ship != null && ship.IsSunken())
             {
-                return "You sunk" + ship.name;
+                return "You sunk " + ship.name + "!";
             }
             //Runs if ship is hit but not sunken
-            else if (ship != null && !ship.IsSunken())
+            else if (ship != null)
             {
                 return "You hit a ship";
             }

@@ -8,21 +8,20 @@ namespace Battleship
 {
     public class Board
     {
-        private Tile[][] gameBoard;
+        private Tile[,] gameBoard;
         private List<Ship> ships;
         public int sunkenShips { get; private set; }
 
         public Board()
         {
-            gameBoard = new Tile[10][];
+            ships = new List<Ship>();
+            //Creates game board
+            gameBoard = new Tile[10, 10];
             for (int i = 0; i < 10; i++)
             {
-                gameBoard[i] = new Tile[10];
                 for (int j = 0; j < 10; j++)
                 {
-                    gameBoard[i][j] = new Tile();
-                    
-                    
+                    gameBoard[i, j] = new Tile();
                 }
             }
             sunkenShips = 0;
@@ -30,57 +29,62 @@ namespace Battleship
         public bool PlaceShips(Ship ship, char orientation, int x, int y) 
         {
             //out of bounds check/overlap check
-            
-            if (CheckIfError(ship, orientation, x, y) == true)
+            //returns false if something fail
+            if (CheckIfError(ship, orientation, x, y))
             {
                 return false;
             }
-            PlaceShips(ship, orientation, x, y);
-            return true;
-
+            else
+            {
+                ships.Add(ship);
+                //Places ships in their respective directions
+                if (orientation == 'H')
+                {
+                    for (int i = 0; i < ship.length; i++)
+                    {
+                        gameBoard[y, x + i].SetShip(ship);
+                    }
+                }
+                else if (orientation == 'V')
+                {
+                    for (int i = 0; i < ship.length; i++)
+                    {
+                        gameBoard[y + i, x].SetShip(ship);
+                    }
+                }
+                return true;
+            }
         }
         private bool CheckIfError(Ship ship, char orientation, int x, int y)
         {
-            if (ShipOutOfBoundsCheck(ship, orientation, x, y) ||
-                ShipOverlapCheck(ship, orientation, x, y))
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            //Returns true if a ship is being placed out of bounds or is being placed on an existing ship
+            return (ShipOutOfBounds(ship, orientation, x, y) ||
+                    ShipsOverlap(ship, orientation, x, y));
         }
-        private bool ShipOutOfBoundsCheck(Ship ship, char orientation, int x, int y)
+        private bool ShipOutOfBounds(Ship ship, char orientation, int x, int y)
         {
-            if ((orientation == 'H' && x + ship.length - 1 >= 10) ||
-                (orientation == 'V' && y + ship.length - 1 >= 10))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            //Returns true if a ship is out of bounds
+            return ((orientation == 'H' && x + ship.length - 1 >= 10) ||
+                    (orientation == 'V' && y + ship.length - 1 >= 10));
         }
-        private bool ShipOverlapCheck(Ship ship, char orientation, int x, int y)
+        private bool ShipsOverlap(Ship ship, char orientation, int x, int y)
         {
+            //Returns true if a ship already exists where the new ship is being placed
             if (orientation == 'H')
             {
                 for (int i = 0; i < ship.length; i++)
                 {
-                    if (gameBoard[y][x + i].CheckShip() == true)
+                    if (gameBoard[y, x + i].CheckShip())
                     {
                         return true;
                     }
                 }
-
             }
             else if (orientation == 'V')
             {
                 for (int i = 0; i < ship.length; i++)
                 {
-                    if (gameBoard[y+1][x].CheckShip() == true)
+                    if (gameBoard[y+1, x].CheckShip())
                     {
                         return true;
                     }
@@ -88,28 +92,17 @@ namespace Battleship
             }
             return false;
         }
-        private void Place(Ship ship, char orientation, int x, int y)
-        {
-            ships.Add(ship);
-            if (orientation == 'H')
-            {
-                for (int i = 0; i < ship.length; i++)
-                {
-                    gameBoard[y][x + i].SetShip(ship);
-                }
-
-            }
-            else if (orientation == 'V')
-            {
-                for (int i = 0; i < ship.length; i++)
-                {
-                    gameBoard[y + i][x].SetShip(ship);
-                }
-            }
-        }
         public string FireAt(int x, int y)
         {
-            return gameBoard[y][x].GetHit();
+            //Shoots at x, y on the board if not already shot
+            if (!gameBoard[y, x].isHit)
+            {
+                return gameBoard[y, x].GetHit();
+            }
+            else
+            {
+                return "Already hit";
+            }
         }
     }
 }

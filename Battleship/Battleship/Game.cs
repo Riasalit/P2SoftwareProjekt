@@ -15,19 +15,19 @@ namespace Battleship
         public Game()
         {
             players = new Player[2];
-            // Random who starts
+            //Random player starts
             turn = new Random().Next(0,2);
             running = true;
         }
         public void Start()
         {
-            //Make Players
+            //Makes Players
             GetPlayers(1); GetPlayers(2);
             players[0].SetOpponent(players[1]);
             players[1].SetOpponent(players[0]);
-            //Place Ships
+            //Places Ships
             players[0].SetShips(); players[1].SetShips();
-            //Swap turns and shoot until all ships are gone
+            //Swaps turns and shoot until all ships are gone
             while (running)
             {
                 RunningGame();
@@ -36,7 +36,7 @@ namespace Battleship
         }
         private void RunningGame()
         {
-            //Shoot enemy ship locations
+            //Runs the game and swaps turns between players
             players[turn].YourTurn();
             if (players[(turn + 1) % 2].board.sunkenShips == 5)
             {
@@ -47,18 +47,21 @@ namespace Battleship
         
         private void GetPlayers(int player)
         {
+            /*
+             * FIX MEEEEEE, NO USERINTERACTION IN GAME CODE
+             */
             Console.WriteLine($"Is player{player} a human or an AI?");
             Console.WriteLine();
-            Console.WriteLine("Press 1 for human");
-            Console.WriteLine("Press 0 for AI");
+            Console.WriteLine("Press 0 for human");
+            Console.WriteLine("Press 1 for AI");
             int playerRace = int.Parse(Console.ReadLine());
             Console.WriteLine("What's your name?");
             string playerName = Console.ReadLine();
-            if (playerRace == 0)
+            if (playerRace == 1)
             {
                 players[player - 1] = new AI(playerName);
             }
-            else if (playerRace == 1)
+            else if (playerRace == 0)
             {
                 players[player - 1] = new Human(playerName);
             }

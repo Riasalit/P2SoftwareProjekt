@@ -10,7 +10,7 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
-            Human ole = new Human("ole");
+            AI ole = new AI("ole");
             ole.SetShips();
         }
     }

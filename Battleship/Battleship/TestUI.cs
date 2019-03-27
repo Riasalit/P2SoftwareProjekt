@@ -10,12 +10,19 @@ namespace Battleship
 {
     class TestUI : IUserInterface
     {
-        Ship ship = new Ship("ole", 1);
-        Char placementOrientation = 'H';
-        int x = 3, y = 5;
-        public void InterActWithUser()
+        Ship ship;
+        Char orientation;
+        int x, y;
+        public void getPlayers()
         {
-            //set randomizing here
+            
+        }
+        public void InteractWithUser()
+        {
+            ship = new Ship("Submarine", 3);
+            orientation = 'H';
+            x = 9;
+            y = 0;
         }
         public Ship GetShip()
         {
@@ -23,9 +30,8 @@ namespace Battleship
         }
         public Char[] GetData()
         {
-            //The ascii value for numbers is 48 to 57 
             //Makes a Char[3] array with [Orientation, X-coordinat]
-            Char[] returnArray= {placementOrientation, Convert.ToChar(x + 48), Convert.ToChar(y + 48)};
+            Char[] returnArray = {orientation, Convert.ToChar(x + '0'), Convert.ToChar(y + '0')};
             return returnArray;
         }
     }
