@@ -15,7 +15,17 @@ namespace Battleship
         {
             isHit = false;
         }
-
+        public bool CheckShip()
+        {
+            if (ship == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
         public void SetShip(Ship ship)
         {
             this.ship = ship;

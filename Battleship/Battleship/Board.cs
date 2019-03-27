@@ -22,15 +22,74 @@ namespace Battleship
                 {
                     gameBoard[i][j] = new Tile();
                     
+                    
                 }
             }
             sunkenShips = 0;
         }
         public bool PlaceShips(Ship ship, char orientation, int x, int y) 
         {
-            //if (orientation == 'H' && x+ship.length >= 10 ||
-            //    orientation == 'V' && y+ship.length >= 10 || 
-            //    ) 
+            //out of bounds check/overlap check
+            
+            if (CheckIfError(ship, orientation, x, y) == true)
+            {
+                return false;
+            }
+            PlaceShips(ship, orientation, x, y);
+            return true;
+
+        }
+        private bool CheckIfError(Ship ship, char orientation, int x, int y)
+        {
+            if (ShipOutOfBoundsCheck(ship, orientation, x, y) ||
+                ShipOverlapCheck(ship, orientation, x, y))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        private bool ShipOutOfBoundsCheck(Ship ship, char orientation, int x, int y)
+        {
+            if ((orientation == 'H' && x + ship.length - 1 >= 10) ||
+                (orientation == 'V' && y + ship.length - 1 >= 10))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private bool ShipOverlapCheck(Ship ship, char orientation, int x, int y)
+        {
+            if (orientation == 'H')
+            {
+                for (int i = 0; i < ship.length; i++)
+                {
+                    if (gameBoard[y][x + i].CheckShip() == true)
+                    {
+                        return true;
+                    }
+                }
+
+            }
+            else if (orientation == 'V')
+            {
+                for (int i = 0; i < ship.length; i++)
+                {
+                    if (gameBoard[y+1][x].CheckShip() == true)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        private void Place(Ship ship, char orientation, int x, int y)
+        {
             ships.Add(ship);
             if (orientation == 'H')
             {
@@ -44,12 +103,9 @@ namespace Battleship
             {
                 for (int i = 0; i < ship.length; i++)
                 {
-                    gameBoard[y+i][x].SetShip(ship);
+                    gameBoard[y + i][x].SetShip(ship);
                 }
             }
-
-            return true;
-
         }
         public string FireAt(int x, int y)
         {
