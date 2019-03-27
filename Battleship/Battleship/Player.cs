@@ -23,8 +23,7 @@ namespace Battleship
             this.opponent = opponent;
         }
         public abstract void YourTurn();
-
         public abstract void SetShips(IUserInterface UI);
-        public abstract void SetShips();
+        
     }
 }

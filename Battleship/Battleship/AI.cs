@@ -16,7 +16,7 @@ namespace Battleship
         {
 
         }
-        public override void SetShips()
+        public override void SetShips(IUserInterface UI) //UI isnt used, but it was either this or to not have this in Player
         {
             int x, y, orientation;
             List<Ship> ships = new List<Ship>

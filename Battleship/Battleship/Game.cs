@@ -11,6 +11,7 @@ namespace Battleship
         Player[] players;
         int turn;
         bool running;
+        TestUI UI;
 
         public Game()
         {
@@ -18,6 +19,7 @@ namespace Battleship
             //Random player starts
             turn = new Random().Next(0,2);
             running = true;
+            UI = new TestUI();
         }
         public void Start()
         {
@@ -26,7 +28,8 @@ namespace Battleship
             players[0].SetOpponent(players[1]);
             players[1].SetOpponent(players[0]);
             //Places Ships
-            players[0].SetShips(); players[1].SetShips();
+            players[0].SetShips(UI);
+            players[1].SetShips(UI);
             //Swaps turns and shoot until all ships are gone
             while (running)
             {
