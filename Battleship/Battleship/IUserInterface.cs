@@ -17,9 +17,7 @@ namespace Battleship
 {
     public interface IUserInterface
     {
-        void getPlayers();
-        void InteractWithUser();
-        Ship GetShip();
-        Char[] GetData(); 
+        Player[] InitializePlayers(IUserInterface UI);
+        Ship GetShips();
     }
 }

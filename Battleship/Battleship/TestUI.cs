@@ -10,29 +10,38 @@ namespace Battleship
 {
     class TestUI : IUserInterface
     {
-        Ship ship;
-        Char orientation;
-        int x, y;
-        public void getPlayers()
+
+        int increment = 0;
+        public Player[] InitializePlayers(IUserInterface UI)
         {
-            
+            Player[] players = new Player[2];
+
+            for (int i = 0; i < players.Length; i++)
+            {
+                Console.WriteLine("AI or Human (0 or 1)");
+                int answer = int.Parse(Console.ReadLine());
+                Console.WriteLine("What is your name");
+                string playername = Console.ReadLine();
+
+                if (answer == 1)
+                {
+                    players[i] = new Human(playername, UI);
+                }
+                else if (answer == 0)
+                {
+                    players[i] = new AI(playername);
+                }
+                else
+                {
+                    Console.WriteLine("Type again - you dun goofed capri son");
+                    i--;
+                }
+            }
+            return players;
         }
-        public void InteractWithUser()
+        public Ship GetShips()
         {
-            ship = new Ship("Submarine", 3);
-            orientation = 'H';
-            x = 9;
-            y = 0;
-        }
-        public Ship GetShip()
-        {
-            return ship;
-        }
-        public Char[] GetData()
-        {
-            //Makes a Char[3] array with [Orientation, X-coordinat]
-            Char[] returnArray = {orientation, Convert.ToChar(x + '0'), Convert.ToChar(y + '0')};
-            return returnArray;
+            return new Ship("Carrier", 5, increment++, 0, 'V');
         }
     }
 }

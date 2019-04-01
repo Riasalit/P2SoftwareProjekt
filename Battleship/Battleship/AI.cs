@@ -16,20 +16,14 @@ namespace Battleship
         {
 
         }
-        public override void SetShips(IUserInterface UI) //UI isnt used, but it was either this or to not have this in Player
+        public override void SetShips()
         {
             int x, y, orientation;
-            List<Ship> ships = new List<Ship>
-            {
-                new Ship("Destroyer", 2),
-                new Ship("Submarine", 3),
-                new Ship("Cruiser", 3),
-                new Ship("Battleship", 4),
-                new Ship("Carrier", 5)
-            };
+            string[] shipNames = new string[5] {"Destroyer", "Submarine",
+                                                "Cruiser", "Battleship", "Carrier"};
+            int[] shipLengths = new int[5] { 2, 3, 3, 4, 5 };
 
-            //Places all the ships in the list at random positions
-            foreach (Ship ship in ships)
+            for (int i = 0; i < 5; i++)
             {
                 bool correctlyPlaced = false;
                 while (!correctlyPlaced)
@@ -37,8 +31,8 @@ namespace Battleship
                     x = new Random().Next(0, 10);
                     y = new Random().Next(0, 10);
                     orientation = new Random().Next(0, 2);
-
-                    correctlyPlaced = (orientation == 0 ? board.PlaceShips(ship, 'H', x, y) : board.PlaceShips(ship, 'V', x, y));
+                    correctlyPlaced = board.PlaceShips(new Ship(shipNames[i], shipLengths[i], x, y, 
+                                                       orientation == 0 ? 'H' : 'V'));
                 }
             }
         }

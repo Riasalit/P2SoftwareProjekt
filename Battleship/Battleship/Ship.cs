@@ -8,16 +8,22 @@ namespace Battleship
 {
     public class Ship
     {
-        
-        public int length { get;  private set; }
+        public int length { get;  }
         private int hits;
-        public string name { get; private set; }
-
-        public Ship(string name, int length)
+        public string name { get; }
+        public char orientation { get; }
+        public int x { get; }
+        public int y { get; }
+        
+        public Ship(string name, int length, int x, int y, char orientation)
         {
             this.length = length;
             this.name = name;
-            this.hits = 0;
+            this.x = x;
+            this.y = y;
+            this.orientation = orientation;
+            hits = 0;
+            
         }
         public bool IsSunken()
         {

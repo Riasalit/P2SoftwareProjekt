@@ -10,8 +10,8 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
-            AI ole = new AI("ole");
-            ole.SetShips(new TestUI());
+            Game mainGame = new Game();
+            mainGame.Start();
         }
     }
 }

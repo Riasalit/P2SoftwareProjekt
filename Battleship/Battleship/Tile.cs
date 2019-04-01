@@ -23,7 +23,7 @@ namespace Battleship
         {
             this.ship = ship;
         }
-        public string GetHit()
+        public string ShotInformation()
         {
             isHit = true;
             //Runs if ship is hit and sunken
