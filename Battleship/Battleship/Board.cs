@@ -94,13 +94,13 @@ namespace Battleship
             }
             return false;
         }
-        public string ShootAt(int x, int y)
+        public string ShootAt(Point point)
         {
             //Shoots at x, y on the board if not already shot
-            if (gameBoard[y, x].tile == (int)Tile.TileState.unknown)
+            if (gameBoard[point.Y, point.X].tile == (int)Tile.TileState.unknown)
             {
-                YourShots.Add(gameBoard[y, x]);
-                return gameBoard[y, x].ShotInformation();
+                YourShots.Add(gameBoard[point.Y, point.X]);
+                return gameBoard[point.Y, point.X].ShotInformation();
             }
             else
             {

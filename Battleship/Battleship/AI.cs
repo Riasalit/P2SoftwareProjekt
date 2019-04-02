@@ -19,7 +19,7 @@ namespace Battleship
         }
         public override void SetShips()
         {
-            int x, y, orientation;
+            int orientation;
             string[] shipNames = new string[5] {"Destroyer", "Submarine",
                                                 "Cruiser", "Battleship", "Carrier"};
             int[] shipLengths = new int[5] { 2, 3, 3, 4, 5 };

@@ -54,7 +54,7 @@ namespace Battleship
         }
         public Ship GetShips(bool correctlyPlaced)
         {
-            Ship returnShip = new Ship("temp",0,0,0,'H');
+            Ship returnShip = new Ship("temp", 0, new Point(1, 2),'H');
             bool gotValidShipData = false;
             if (correctlyPlaced)
             {
@@ -74,7 +74,7 @@ namespace Battleship
                     int x = int.Parse(input[0]);
                     int y = int.Parse(input[1]);
                     char orientation = char.Parse(input[2]);
-                    returnShip = new Ship(shipNames[0], shipLengths[0], x, y, orientation);
+                    returnShip = new Ship(shipNames[0], shipLengths[0], new Point(x, y), orientation);
 
                     gotValidShipData = true;
                 }
