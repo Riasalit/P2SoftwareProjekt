@@ -10,8 +10,9 @@ namespace Battleship
     public class Board
     {
         private Tile[,] gameBoard;
-        private List<Ship> ships;
         public List<Tile> YourShots { get; private set; }
+        public List<Ship> ships { get;  }
+
         public int sunkenShips { get; private set; }
 
         public Board()

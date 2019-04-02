@@ -9,7 +9,7 @@ using System.Drawing;
  * ************************************/
 namespace Battleship
 {
-    class TestUI : IUserInterface
+    public class TestUI : IUserInterface
     {
         List<string> shipNames;
         List<int> shipLengths;

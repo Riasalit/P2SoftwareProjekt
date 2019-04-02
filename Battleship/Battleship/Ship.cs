@@ -25,7 +25,7 @@ namespace Battleship
         }
         public bool IsSunken()
         {
-            return hits == length;
+            return ++hits == length;
         }
     }
 }

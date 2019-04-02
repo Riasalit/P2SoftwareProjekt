@@ -10,7 +10,7 @@ namespace Battleship
     public abstract class Player
     {
         public List<Point> points;
-        public Board board;
+        public Board board { get; }
         private Player opponent;
         private string playerName { get; }
         private int hitCount;
