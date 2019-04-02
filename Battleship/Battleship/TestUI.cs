@@ -107,7 +107,7 @@ namespace Battleship
                 }
                 else
                 {
-                    Console.WriteLine("Try again pl´s. The input wasn't valid :C");
+                    Console.WriteLine("Try again pls. The input wasn't valid :C");
                 }
             }
             return returnPoint;
