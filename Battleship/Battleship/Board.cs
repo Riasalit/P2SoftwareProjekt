@@ -10,13 +10,14 @@ namespace Battleship
     public class Board
     {
         private Tile[,] gameBoard;
-        public List<Tile> YourShots { get; private set; }
+        public List<Tile> yourShots { get; private set; } 
         public List<Ship> ships { get;  }
 
         public int sunkenShips { get; private set; }
 
         public Board()
         {
+            yourShots = new List<Tile>();
             ships = new List<Ship>();
             //Creates game board
             gameBoard = new Tile[10, 10];
@@ -100,7 +101,7 @@ namespace Battleship
             //Shoots at x, y on the board if not already shot
             if (gameBoard[point.Y, point.X].tile == (int)Tile.TileState.unknown)
             {
-                YourShots.Add(gameBoard[point.Y, point.X]);
+                yourShots.Add(gameBoard[point.Y, point.X]);
                 return gameBoard[point.Y, point.X].ShotInformation();
             }
             else
