@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
 using System.Threading.Tasks;
+using System.Drawing;
 /**************************************
  * JEG ER EN TEST CLASS FOR TESTING :3*
  * ************************************/
@@ -75,7 +75,7 @@ namespace Battleship
                     int y = int.Parse(input[1]);
                     char orientation = char.Parse(input[2]);
                     returnShip = new Ship(shipNames[0], shipLengths[0], x, y, orientation);
-                    
+
                     gotValidShipData = true;
                 }
                 else

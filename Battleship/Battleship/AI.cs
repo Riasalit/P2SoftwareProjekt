@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Battleship
 {
@@ -10,7 +11,7 @@ namespace Battleship
     {
         public AI(string name) : base(name)
         {
-            
+
         }
         public override void YourTurn()
         {
@@ -28,10 +29,12 @@ namespace Battleship
                 bool correctlyPlaced = false;
                 while (!correctlyPlaced)
                 {
-                    x = new Random().Next(0, 10);
-                    y = new Random().Next(0, 10);
+                    Point point = new Point();
+                    point.X = new Random().Next(0, 10);
+                    point.Y = new Random().Next(0, 10);
+
                     orientation = new Random().Next(0, 2);
-                    correctlyPlaced = board.PlaceShips(new Ship(shipNames[i], shipLengths[i], x, y, 
+                    correctlyPlaced = board.PlaceShips(new Ship(shipNames[i], shipLengths[i], point,
                                                        orientation == 0 ? 'H' : 'V'));
                 }
             }

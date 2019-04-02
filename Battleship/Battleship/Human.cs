@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Battleship
 {
@@ -34,7 +34,7 @@ namespace Battleship
                     ship = UI.GetShips(lastShipCorrectlyPlaced);
                     correctlyPlaced = board.PlaceShips(ship);
                     lastShipCorrectlyPlaced = correctlyPlaced;
-                }          
+                }
             }
         }
     }

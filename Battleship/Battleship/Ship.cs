@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Battleship
 {
@@ -12,18 +13,16 @@ namespace Battleship
         private int hits;
         public string name { get; }
         public char orientation { get; }
-        public int x { get; }
-        public int y { get; }
-        
-        public Ship(string name, int length, int x, int y, char orientation)
+        public Point shipCoord = new Point();
+
+        public Ship(string name, int length, Point shipCoord,  char orientation)
         {
             this.length = length;
             this.name = name;
-            this.x = x;
-            this.y = y;
             this.orientation = orientation;
+            this.shipCoord = shipCoord;
             hits = 0;
-            
+
         }
         public bool IsSunken()
         {

@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Battleship
 {
     public class Tile
     {
-        public bool isHit { get; private set; }
+        public enum TileState : int {unknown = 0, hit = 1, missed = 2};
         private Ship ship;
+        public int tile;
 
         public Tile()
         {
-            isHit = false;
+            tile =  (int)TileState.unknown;
         }
         public bool CheckShip()
         {
@@ -25,19 +27,22 @@ namespace Battleship
         }
         public string ShotInformation()
         {
-            isHit = true;
+
             //Runs if ship is hit and sunken
             if (ship != null && ship.IsSunken())
             {
+                tile = (int)TileState.hit;
                 return "You sunk " + ship.name + "!";
             }
             //Runs if ship is hit but not sunken
             else if (ship != null)
             {
+                tile = (int)TileState.hit;
                 return "You hit a ship";
             }
             else
             {
+                tile = (int)TileState.missed;
                 return "You missed";
             }
         }

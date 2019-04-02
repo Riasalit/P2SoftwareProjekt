@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Battleship
 {
@@ -21,7 +21,7 @@ namespace Battleship
             board = new Board();
             points = new List<Point>();
         }
-        public void SetOpponent(Player opponent) 
+        public void SetOpponent(Player opponent)
         {
             this.opponent = opponent;
         }
