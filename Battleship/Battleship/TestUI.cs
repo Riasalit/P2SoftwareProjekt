@@ -8,7 +8,7 @@ using System.Threading.Tasks;
  * ************************************/
 namespace Battleship
 {
-    class TestUI : IUserInterface
+    public class TestUI : IUserInterface
     {
 
         int increment = 0;

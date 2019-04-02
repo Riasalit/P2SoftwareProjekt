@@ -9,7 +9,7 @@ namespace Battleship
     public class Board
     {
         private Tile[,] gameBoard;
-        private List<Ship> ships;
+        public List<Ship> ships { get;  }
         public int sunkenShips { get; private set; }
 
         public Board()
