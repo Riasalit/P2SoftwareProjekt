@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 using System.Threading.Tasks;
 /******************************************************************************
  * General interface for communicating with the user                          *
@@ -13,6 +14,8 @@ namespace Battleship
     public interface IUserInterface
     {
         Player[] InitializePlayers(IUserInterface UI);
-        Ship GetShips();
+        Ship GetShips(bool correctlyPlaced);
+        Point MakeTargetPoint(List<Point> points);
+        void ReturnInformation(string info);
     }
 }

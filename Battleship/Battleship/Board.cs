@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Battleship
@@ -92,12 +93,12 @@ namespace Battleship
             }
             return false;
         }
-        public string ShootAt(int x, int y)
+        public string ShootAt(Point point)
         {
             //Shoots at x, y on the board if not already shot
-            if (!gameBoard[y, x].isHit)
+            if (!gameBoard[point.Y, point.X].isHit)
             {
-                return gameBoard[y, x].ShotInformation();
+                return gameBoard[point.Y, point.X].ShotInformation();
             }
             else
             {
