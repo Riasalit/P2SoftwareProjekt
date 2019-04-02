@@ -71,11 +71,12 @@ namespace Battleship
                 Console.WriteLine($"Give coordinates and direction for your {shipNames[0]}");
                 Console.WriteLine($"The information should be in the following format: x, y, H/V");
                 string[] input = Console.ReadLine().Replace(" ", "").Split(',');
-                if (input.Length == 3)
+                if (input.Length == 3 && (input[2] == "H" || input[2] == "V"))
                 {
-                    int x = int.Parse(input[0]);
-                    int y = int.Parse(input[1]);
+                    int x = int.Parse(input[1]);
+                    int y = int.Parse(input[0]);
                     char orientation = char.Parse(input[2]);
+                    
                     returnShip = new Ship(shipNames[0], shipLengths[0], new Point(x, y), orientation);
 
                     gotValidShipData = true;
