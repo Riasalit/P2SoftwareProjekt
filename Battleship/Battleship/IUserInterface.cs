@@ -16,6 +16,6 @@ namespace Battleship
         Player[] InitializePlayers(IUserInterface UI);
         Ship GetShips(bool correctlyPlaced);
         Point MakeTargetPoint(List<Point> points);
-        void ReturnInformation(string info);
+        void ReturnInformation(Point point, string info);
     }
 }

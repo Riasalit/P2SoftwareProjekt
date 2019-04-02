@@ -13,7 +13,7 @@ namespace Battleship
         private int hits;
         public string name { get; }
         public char orientation { get; }
-        public Point shipCoord = new Point();
+        public Point shipCoord { get; }
 
         public Ship(string name, int length, Point shipCoord,  char orientation)
         {
@@ -22,7 +22,6 @@ namespace Battleship
             this.orientation = orientation;
             this.shipCoord = shipCoord;
             hits = 0;
-
         }
         public bool IsSunken()
         {

@@ -9,7 +9,7 @@ namespace Battleship
 {
     public class Tile
     {
-        public enum TileState : int {unknown = 0, hit = 1, missed = 2};
+        public enum TileState : int {unknown, hit, missed};
         private Ship ship;
         public int tile;
 
@@ -27,7 +27,6 @@ namespace Battleship
         }
         public string ShotInformation()
         {
-
             //Runs if ship is hit and sunken
             if (ship != null && ship.IsSunken())
             {

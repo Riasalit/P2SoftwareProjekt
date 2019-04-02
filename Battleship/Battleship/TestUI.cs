@@ -13,7 +13,7 @@ namespace Battleship
     {
         List<string> shipNames;
         List<int> shipLengths;
-        public Player[] InitializePlayers(IUserInterface UI)
+        public TestUI()
         {
             shipNames = new List<string>();
             shipLengths = new List<int>();
@@ -27,7 +27,9 @@ namespace Battleship
             shipLengths.Add(3);
             shipLengths.Add(3);
             shipLengths.Add(2);
-
+        }
+        public Player[] InitializePlayers(IUserInterface UI)
+        {
             Player[] players = new Player[2];
             for (int i = 0; i < players.Length; i++)
             {
@@ -93,7 +95,7 @@ namespace Battleship
             {
                 Console.WriteLine("Where do you want to shoot?");
                 Console.WriteLine("Give the coordinate as: x, y");
-                string[] input = Console.ReadLine().Trim().Split(',');
+                string[] input = Console.ReadLine().Replace(" ", "").Split(',');
                 if(input.Length == 2)
                 {
                     returnPoint.X = int.Parse(input[0]);
@@ -110,7 +112,7 @@ namespace Battleship
             }
             return returnPoint;
         }
-        public void ReturnInformation(string info)
+        public void ReturnInformation(Point point, string info)
         {
             Console.WriteLine(info);
         }

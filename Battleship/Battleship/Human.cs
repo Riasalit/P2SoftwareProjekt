@@ -18,7 +18,7 @@ namespace Battleship
         {
             Point target = UI.MakeTargetPoint(points);
             points.Add(target);
-            UI.ReturnInformation(ShootOpponent(target));
+            UI.ReturnInformation(target, ShootOpponent(target));
         }
         public override void SetShips()
         {
