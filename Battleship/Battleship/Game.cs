@@ -21,6 +21,7 @@ namespace Battleship
             turn = new Random().Next(0,2);
             running = true;
             UI = new TestUI();
+            
         }
         public void Start()
         {

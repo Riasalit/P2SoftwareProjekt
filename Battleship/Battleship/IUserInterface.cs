@@ -14,8 +14,8 @@ namespace Battleship
     public interface IUserInterface
     {
         Player[] InitializePlayers(IUserInterface UI);
-        Ship GetShips(bool correctlyPlaced);
-        Point MakeTargetPoint(List<Point> points);
+        Ship GetShips(bool correctlyPlaced, string name);
+        Point MakeTargetPoint(List<Point> points, string name);
         void ReturnInformation(Point point, string info);
     }
 }

@@ -46,14 +46,14 @@ namespace Battleship
                 {
                     for (int i = 0; i < ship.length; i++)
                     {
-                        gameBoard[ship.shipCoord.Y, ship.shipCoord.X + i].SetShip(ship);
+                        gameBoard[ship.shipCoord.X + i, ship.shipCoord.Y].SetShip(ship);
                     }
                 }
                 else if (ship.orientation == 'V')
                 {
                     for (int i = 0; i < ship.length; i++)
                     {
-                        gameBoard[ship.shipCoord.Y + i, ship.shipCoord.X].SetShip(ship);
+                        gameBoard[ship.shipCoord.X, ship.shipCoord.Y + i].SetShip(ship);
                     }
                 }
                 return true;
@@ -68,8 +68,8 @@ namespace Battleship
         private bool ShipOutOfBounds(Ship ship)
         {
             //Returns true if a ship is out of bounds
-            return ((ship.orientation == 'H' && ship.shipCoord.X + ship.length - 1 >= 10) ||
-                    (ship.orientation == 'V' && ship.shipCoord.Y + ship.length - 1 >= 10));
+            return ((ship.orientation == 'V' && ship.shipCoord.Y + ship.length - 1 >= 10) ||
+                    (ship.orientation == 'H' && ship.shipCoord.X + ship.length - 1 >= 10));
         }
         private bool ShipsOverlap(Ship ship)
         {
@@ -78,9 +78,9 @@ namespace Battleship
             {
                 for (int i = 0; i < ship.length; i++)
                 {
-                    if (gameBoard[ship.shipCoord.Y, ship.shipCoord.X + i].CheckShip())
+                    if (gameBoard[ship.shipCoord.X + i, ship.shipCoord.Y].CheckShip())
                     {
-                        return true;
+                        return true; 
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace Battleship
             {
                 for (int i = 0; i < ship.length; i++)
                 {
-                    if (gameBoard[ship.shipCoord.Y + 1, ship.shipCoord.X].CheckShip())
+                    if (gameBoard[ship.shipCoord.X, ship.shipCoord.Y + i].CheckShip())
                     {
                         return true;
                     }
@@ -99,10 +99,10 @@ namespace Battleship
         public string ShootAt(Point point)
         {
             //Shoots at x, y on the board if not already shot
-            if (gameBoard[point.Y, point.X].tile == (int)Tile.TileState.unknown)
+            if (gameBoard[point.X, point.Y].tile == (int)Tile.TileState.unknown)
             {
-                yourShots.Add(gameBoard[point.Y, point.X]);
-                return gameBoard[point.Y, point.X].ShotInformation();
+                yourShots.Add(gameBoard[point.X, point.Y]);
+                return gameBoard[point.X, point.Y].ShotInformation();
             }
             else
             {

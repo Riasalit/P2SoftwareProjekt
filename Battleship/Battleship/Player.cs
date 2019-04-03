@@ -12,7 +12,7 @@ namespace Battleship
         public List<Point> points;
         public Board board { get; }
         private Player opponent;
-        private string playerName { get; }
+        public string playerName { get; }
         private int hitCount;
 
         public Player(string name)

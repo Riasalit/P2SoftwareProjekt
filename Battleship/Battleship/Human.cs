@@ -16,7 +16,7 @@ namespace Battleship
         }
         public override void YourTurn()
         {
-            Point target = UI.MakeTargetPoint(points);
+            Point target = UI.MakeTargetPoint(points, playerName);
             points.Add(target);
             UI.ReturnInformation(target, ShootOpponent(target));
         }
@@ -31,7 +31,7 @@ namespace Battleship
                 correctlyPlaced = false;
                 while (!correctlyPlaced)
                 {
-                    ship = UI.GetShips(lastShipCorrectlyPlaced);
+                    ship = UI.GetShips(lastShipCorrectlyPlaced, playerName);
                     correctlyPlaced = board.PlaceShips(ship);
                     lastShipCorrectlyPlaced = correctlyPlaced;
                 }

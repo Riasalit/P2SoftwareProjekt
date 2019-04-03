@@ -20,13 +20,7 @@ namespace Battleship
             shipNames.Add("Carrier");
             shipNames.Add("Battleship");
             shipNames.Add("Cruiser");
-            shipNames.Add("Submarine");
-            shipNames.Add("Destroyer");
-            shipLengths.Add(5);
-            shipLengths.Add(4);
-            shipLengths.Add(3);
-            shipLengths.Add(3);
-            shipLengths.Add(2);
+            shipCount = 5;
         }
         public Player[] InitializePlayers(IUserInterface UI)
         {
@@ -54,55 +48,64 @@ namespace Battleship
             }
             return players;
         }
-        public Ship GetShips(bool correctlyPlaced)
+        public Ship GetShips(bool correctlyPlaced, string playerName)
         {
             Ship returnShip = new Ship("temp", 0, new Point(1, 2),'H');
             bool gotValidShipData = false;
-            if (correctlyPlaced)
+
+            if (shipCount == 5)
             {
-                shipNames.RemoveAt(0);
-                shipLengths.RemoveAt(0);
-            }else if (shipLengths.Count != 5)
+                shipCount = 0;
+                Console.Clear();
+                Console.WriteLine($"{playerName}: Place ships");
+            } // Lav en clear mere!
+
+            if (!correctlyPlaced && (shipCount != 0))
             {
-                Console.WriteLine($"Your {shipNames[0]} could not be placed there. try again");
+                shipCount--;
+                Console.WriteLine($"Your {shipNames[shipCount]} could not be placed there. try again");
             }
             while (!gotValidShipData)
             {
-                Console.WriteLine($"Give coordinates and direction for your {shipNames[0]}");
+                Console.WriteLine($"Give coordinates and direction for your {shipNames[shipCount]}");
                 Console.WriteLine($"The information should be in the following format: x, y, H/V");
                 string[] input = Console.ReadLine().Replace(" ", "").Split(',');
+                Console.WriteLine();
                 if (input.Length == 3 && (input[2] == "H" || input[2] == "V"))
                 {
-                    int x = int.Parse(input[1]);
-                    int y = int.Parse(input[0]);
+                    int x = int.Parse(input[0]);
+                    int y = int.Parse(input[1]); //tryparse
                     char orientation = char.Parse(input[2]);
                     
-                    returnShip = new Ship(shipNames[0], shipLengths[0], new Point(x, y), orientation);
+                    returnShip = new Ship(shipNames[shipCount], shipLengths[shipCount], new Point(x, y), orientation);
 
                     gotValidShipData = true;
+                    shipCount++;
                 }
                 else
                 {
-                    Console.WriteLine("Try again pls. The input wasn't valid :C");
+                    Console.WriteLine("Try again pls. The input wasn't valid ");
                 }
             }
             return returnShip;
         }
-        public Point MakeTargetPoint(List<Point> points)
+        public Point MakeTargetPoint(List<Point> points, string name)
         {
             Point returnPoint = new Point();
             bool gotValidTarget = false;
+            Console.WriteLine($"{name}'s turn");
             while (!gotValidTarget)
             {
-                Console.WriteLine("Where do you want to shoot?");
+                Console.WriteLine($"Where do you want to shoot?");
                 Console.WriteLine("Give the coordinate as: x, y");
                 string[] input = Console.ReadLine().Replace(" ", "").Split(',');
                 if(input.Length == 2)
                 {
                     returnPoint.X = int.Parse(input[0]);
-                    returnPoint.Y = int.Parse(input[1]);
+                    returnPoint.Y = int.Parse(input[1]); // tryparse
                     if (!points.Contains(returnPoint))
                     {
+                        //You typed something wrong
                         gotValidTarget = true;
                     }
                 }
