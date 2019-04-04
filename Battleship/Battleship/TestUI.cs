@@ -11,15 +11,12 @@ namespace Battleship
 {
     public class TestUI : IUserInterface
     {
-        List<string> shipNames;
-        List<int> shipLengths;
+        List<string> shipNames = new List<string>() { "Carrier", "Battleship",
+                                          "Cruiser", "Submarine", "Destroyer"};
+        List<int> shipLengths = new List<int>() { 5, 4, 3, 3, 2 };
+        private int shipCount;
         public TestUI()
         {
-            shipNames = new List<string>();
-            shipLengths = new List<int>();
-            shipNames.Add("Carrier");
-            shipNames.Add("Battleship");
-            shipNames.Add("Cruiser");
             shipCount = 5;
         }
         public Player[] InitializePlayers(IUserInterface UI)
@@ -50,16 +47,17 @@ namespace Battleship
         }
         public Ship GetShips(bool correctlyPlaced, string playerName)
         {
-            Ship returnShip = new Ship("temp", 0, new Point(1, 2),'H');
+            Ship returnShip = new Ship("temp", 0, new Point(1, 2), 'H');
             bool gotValidShipData = false;
+            int x = 0;
+            int y = 0;
+            char orientation = 's';
 
             if (shipCount == 5)
             {
                 shipCount = 0;
-                Console.Clear();
                 Console.WriteLine($"{playerName}: Place ships");
-            } // Lav en clear mere!
-
+            }
             if (!correctlyPlaced && (shipCount != 0))
             {
                 shipCount--;
@@ -71,20 +69,24 @@ namespace Battleship
                 Console.WriteLine($"The information should be in the following format: x, y, H/V");
                 string[] input = Console.ReadLine().Replace(" ", "").Split(',');
                 Console.WriteLine();
-                if (input.Length == 3 && (input[2] == "H" || input[2] == "V"))
+                //Validation
+                while (input.Length != 3 || !int.TryParse(input[0], out x) || !int.TryParse(input[1], out y) ||
+                           !(input[2] == "H" || input[2] == "V"))
                 {
-                    int x = int.Parse(input[0]);
-                    int y = int.Parse(input[1]); //tryparse
-                    char orientation = char.Parse(input[2]);
-                    
-                    returnShip = new Ship(shipNames[shipCount], shipLengths[shipCount], new Point(x, y), orientation);
-
-                    gotValidShipData = true;
-                    shipCount++;
+                    Console.WriteLine("Wrong Input");
+                    Console.WriteLine($"Give coordinates and direction for your {shipNames[shipCount]}");
+                    Console.WriteLine($"The information should be in the following format: x, y, 'H'/'V'");
+                    input = Console.ReadLine().Replace(" ", "").Split(',');
+                    Console.WriteLine();
                 }
-                else
+                orientation = char.Parse(input[2]);
+                returnShip = new Ship(shipNames[shipCount], shipLengths[shipCount], 
+                             new Point(x-1, y-1), orientation);
+                gotValidShipData = true;
+                shipCount++;
+                if (shipCount == 5)
                 {
-                    Console.WriteLine("Try again pls. The input wasn't valid ");
+                    Console.Clear();
                 }
             }
             return returnShip;
@@ -99,14 +101,20 @@ namespace Battleship
                 Console.WriteLine($"Where do you want to shoot?");
                 Console.WriteLine("Give the coordinate as: x, y");
                 string[] input = Console.ReadLine().Replace(" ", "").Split(',');
-                if(input.Length == 2)
+                Console.WriteLine();
+                if (input.Length == 2)
                 {
-                    returnPoint.X = int.Parse(input[0]);
-                    returnPoint.Y = int.Parse(input[1]); // tryparse
-                    if (!points.Contains(returnPoint))
+                    returnPoint.X = int.Parse(input[0]) - 1;
+                    returnPoint.Y = int.Parse(input[1]) - 1; 
+                    //Validation
+                    if (!points.Contains(returnPoint) && (returnPoint.X >= 0 && returnPoint.X < 10) 
+                                                      && (returnPoint.Y >= 0 && returnPoint.Y < 10))
                     {
-                        //You typed something wrong
                         gotValidTarget = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Coordinates. Please try again: ");
                     }
                 }
                 else
@@ -120,5 +128,24 @@ namespace Battleship
         {
             Console.WriteLine(info);
         }
+        public void GameComplete(Player[] players, int playerWon)
+        {
+            Console.WriteLine($"Congratulations {players[playerWon].playerName}, " +
+                              $"you won the game with {players[playerWon].turnCounter} turns!");
+            for (int i = 0; i < 2; i++)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"{players[i].playerName} sunk: ");
+                foreach (Ship ship in players[i+1%2].board.ships)
+                {
+                    if (ship.IsSunken())
+                    {
+                        Console.WriteLine($"{ship.name} on ({ship.shipCoord.X},{ship.shipCoord.Y}) " +
+                                          $"with orientation: {ship.orientation}");
+                    }
+
+                }
+            }
+        } 
     }
 }
