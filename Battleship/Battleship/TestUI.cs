@@ -101,7 +101,6 @@ namespace Battleship
                 Console.WriteLine($"Where do you want to shoot?");
                 Console.WriteLine("Give the coordinate as: x, y");
                 string[] input = Console.ReadLine().Replace(" ", "").Split(',');
-                Console.WriteLine();
                 if (input.Length == 2)
                 {
                     returnPoint.X = int.Parse(input[0]) - 1;
@@ -127,6 +126,7 @@ namespace Battleship
         public void ReturnInformation(Point point, string info)
         {
             Console.WriteLine(info);
+            Console.WriteLine();
         }
         public void GameComplete(Player[] players, int playerWon)
         {
@@ -143,7 +143,6 @@ namespace Battleship
                         Console.WriteLine($"{ship.name} on ({ship.shipCoord.X},{ship.shipCoord.Y}) " +
                                           $"with orientation: {ship.orientation}");
                     }
-
                 }
             }
         } 

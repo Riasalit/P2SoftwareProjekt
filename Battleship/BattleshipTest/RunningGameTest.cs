@@ -81,8 +81,9 @@ namespace BattleshipTest
             Player player = new AI("Erik");
             Ship testship = new Ship("Testship", 2, new Point(0,0), 'V');
 
-            
+
             string test;
+
 
             player.board.PlaceShips(testship);
             player.board.ShootAt(new Point(0, 0));
@@ -114,7 +115,5 @@ namespace BattleshipTest
 
             Assert.AreEqual("Already hit", test);
         }
-
-
     }
 }

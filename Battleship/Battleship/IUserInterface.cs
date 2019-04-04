@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using System.Drawing;
 /******************************************************************************
  * General interface for communicating with the user                          *
- * This interface needs for a user to create the players: InitializePlayers() *
- * A function to return a complete ship: GetShip()                            *
+ * InitializePlayers(): Allows a user to initialize the players               *
+ * GetShips(): Gets a ship from a human player                                *
+ * MakeTargetPoint(): Gets a specific coordinate from player to shoot at      *
+ * ReturnInformation(): Returns shooting information for a specific tile      *
  * ****************************************************************************/
 namespace Battleship
 {

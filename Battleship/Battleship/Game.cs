@@ -21,7 +21,6 @@ namespace Battleship
             turn = new Random().Next(0,2);
             running = true;
             UI = new TestUI();
-            
         }
         public void Start()
         {
@@ -33,7 +32,7 @@ namespace Battleship
             //Places Ships
             players[0].SetShips();
             players[1].SetShips();
-            //Swaps turns and shoot until all ships are gone
+            //Swaps turns and shoots until all ships are gone
             while (running)
             {
                 NextPlayer();
@@ -49,10 +48,5 @@ namespace Battleship
             }
             turn = (turn + 1) % 2;
         }
-
-
-
-
-
     }
 }

@@ -16,7 +16,9 @@ namespace Battleship
         }
         public override void YourTurn()
         {
+            //target represents the coordinates the player wants to shoot at
             Point target = UI.MakeTargetPoint(points, playerName);
+            //The point is added to a player's list of points they've shot at
             points.Add(target);
             UI.ReturnInformation(target, ShootOpponent(target));
         }
@@ -31,7 +33,9 @@ namespace Battleship
                 correctlyPlaced = false;
                 while (!correctlyPlaced)
                 {
+                    //Gets a ship from player
                     ship = UI.GetShips(lastShipCorrectlyPlaced, playerName);
+                    //Validates ship location and places if possible
                     correctlyPlaced = board.PlaceShips(ship);
                     lastShipCorrectlyPlaced = correctlyPlaced;
                 }

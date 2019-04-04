@@ -13,13 +13,14 @@ namespace Battleship
         public Board board { get; }
         private Player opponent;
         public string playerName { get; }
-        private int hitCount;
+        public int turnCounter { get; private set; }
 
         public Player(string name)
         {
             playerName = name;
             board = new Board();
             points = new List<Point>();
+            turnCounter = 0;
         }
         public void SetOpponent(Player opponent)
         {
@@ -27,6 +28,7 @@ namespace Battleship
         }
         public string ShootOpponent(Point point)
         {
+            turnCounter++;
             return opponent.board.ShootAt(point);
         }
         public abstract void YourTurn();

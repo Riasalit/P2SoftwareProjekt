@@ -11,8 +11,7 @@ namespace Battleship
     {
         private Tile[,] gameBoard;
         public List<Tile> yourShots { get; private set; } 
-        public List<Ship> ships { get;  }
-
+        public List<Ship> ships { get; }
         public int sunkenShips { get; private set; }
 
         public Board()
@@ -32,8 +31,8 @@ namespace Battleship
         }
         public bool PlaceShips(Ship ship)
         {
-            //out of bounds check/overlap check
-            //returns false if something fail
+            //Out of bounds check/overlap check
+            //Returns false if something fails
             if (CheckIfError(ship))
             {
                 return false;
@@ -62,8 +61,7 @@ namespace Battleship
         private bool CheckIfError(Ship ship)
         {
             //Returns true if a ship is being placed out of bounds or is being placed on an existing ship
-            return (ShipOutOfBounds(ship) ||
-                    ShipsOverlap(ship));
+            return (ShipOutOfBounds(ship) || ShipsOverlap(ship));
         }
         private bool ShipOutOfBounds(Ship ship)
         {
@@ -98,11 +96,17 @@ namespace Battleship
         }
         public string ShootAt(Point point)
         {
+            string returnString;
             //Shoots at x, y on the board if not already shot
             if (gameBoard[point.X, point.Y].tile == (int)Tile.TileState.unknown)
             {
                 yourShots.Add(gameBoard[point.X, point.Y]);
-                return gameBoard[point.X, point.Y].ShotInformation();
+                returnString = gameBoard[point.X, point.Y].ShotInformation();
+                if (gameBoard[point.X, point.Y].GetShipStatus())
+                {
+                    sunkenShips++;
+                }
+                return returnString;
             }
             else
             {
