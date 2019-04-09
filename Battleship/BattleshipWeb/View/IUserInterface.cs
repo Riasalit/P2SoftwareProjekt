@@ -11,7 +11,7 @@ using System.Drawing;
  * MakeTargetPoint(): Gets a specific coordinate from player to shoot at      *
  * ReturnInformation(): Returns shooting information for a specific tile      *
  * ****************************************************************************/
-namespace Battleship
+namespace BattleshipWeb
 {
     public interface IUserInterface
     {

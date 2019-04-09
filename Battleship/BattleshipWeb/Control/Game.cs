@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-
-namespace Battleship
+namespace BattleshipWeb
 {
     class Game
     {
@@ -45,6 +44,7 @@ namespace Battleship
             if (players[(turn + 1) % 2].board.sunkenShips == 5)
             {
                 running = false;
+                UI.GameComplete(players, turn);
             }
             turn = (turn + 1) % 2;
         }
