@@ -82,6 +82,7 @@ namespace BattleshipWeb
             //5 skib 120
             int minimumLength = 10 - length + 1;
             int numberOfStates = minimumLength * 2 * 10;
+            //ulong k = 0;
             node.SetNumberOfStates((ulong)numberOfStates);
             for (int orientation = 0; orientation < 2; orientation++)
             {
@@ -89,9 +90,12 @@ namespace BattleshipWeb
                 {
                     for (int j = 0; j < (orientation == 1 ? 10 : minimumLength); j++)
                     {
+                        //FEJL!!! jeg har tjekket - jakob. Istedet for (i+j) skal der være en int, eks. k der incrementes efter hvert label-set. 
+                        //Viser imorgen! :-)
                         node.SetStateLabel((ulong)(i+j), (orientation == 1 ? "H" : "V") 
                                                                      + $"_{i}{j}");
                         node.GetTable().SetDataItem((ulong)(i + j), 1 / numberOfStates); 
+                        //k++
                     }
                 }
             }
@@ -107,6 +111,7 @@ namespace BattleshipWeb
             List<Point> secondPoints = new List<Point>();
             string firstName, secondName;
             //Iterates through entire tables on constraint's parents
+            //istedet for firstShip.GetTable().GetData().Length kan vi skrive firstShip.GetNumberOfStates()
             for (int i = 0; i < firstShip.GetTable().GetData().Length; i++)
             {
                 firstName = firstShip.GetStateLabel((ulong)i);
