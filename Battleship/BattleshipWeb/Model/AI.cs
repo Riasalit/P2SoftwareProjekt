@@ -68,8 +68,8 @@ namespace BattleshipWeb
                     tile.SetStateLabel(1, "True");
                     for (int k = 0; k < shipList.Count; k++)
                     {
-                        Console.WriteLine($"{k} : {tile.GetTable().GetSize()}");
                         tile.AddParent(shipList[k]);
+                        Console.WriteLine($"tile {tile.GetName()} has {k + 1} parents with a total table size of: {tile.GetTable().GetSize()}");
                     }
                     tile = SetAllStatesForTiles(tile, shipList);
                 }
