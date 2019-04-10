@@ -23,54 +23,50 @@ namespace BattleshipWeb
         }
         public Domain InitBayesianNetwork()
         {
-            Domain battleShip = new Domain();
+            Domain battleship = new Domain();
             List<LabelledDCNode> shipList = new List<LabelledDCNode>();
             string[] shipNames = new string[5] {"Destroyer", "Submarine",
-                                                "Cruiser", "Battleship", "Carrier"};
+                                                "Cruiser", "battleship", "Carrier"};
             int[] shipLengths = new int[5] { 2, 3, 3, 4, 5 };
             //Initializes ships
             for (int i = 0; i < 5; i++)
             {
-                shipList.Add(new LabelledDCNode(battleShip));
+                shipList.Add(new LabelledDCNode(battleship));
                 shipList[i].SetName(shipNames[i]);
                 //Set states and tables for all ships
                 shipList[i] = SetAllStatesForShips(shipList[i], shipLengths[i]);
             }
 
-            //((LabelledDCNode)shipList[1]);
-            //Initializes constraints (4+3+2+1=10 constraints)
-            for (int i = 0; i < 5; i++)
+            //Initializes constraints (4+3+2+1=10 constraints) with the intent 
+            //to prevent ships from overlapping 
+            for (int i = 0; i < shipList.Count; i++)
             {
-                for (int j = i + 1; j < 5; j++)
+                for (int j = i + 1; j < shipList.Count; j++)
                 {
-                    BooleanDCNode constraint = new BooleanDCNode(battleShip);
-                    constraint.AddParent(shipList[i]);
-                    constraint.AddParent(shipList[j]);
-                    constraint.SetName($"Overlap{i}_{j}");
-                    constraint.SetNumberOfStates(2);
-                    constraint.SetStateLabel(0, "False");
-                    constraint.SetStateLabel(1, "True");
-                    constraint = SetAllStatesForConstraints(constraint, shipList[i], shipList[j]);
+                    BooleanDCNode overlap = new BooleanDCNode(battleship);
+                    overlap.AddParent(shipList[i]);
+                    overlap.AddParent(shipList[j]);
+                    overlap.SetName($"Overlap{i}_{j}");
+                    overlap.SetNumberOfStates(2);
+                    overlap.SetStateLabel(0, "False");
+                    overlap.SetStateLabel(1, "True");
+                    overlap = SetAllStatesForConstraints(overlap, shipList[i], shipList[j]);
                 }
             }
-            Domain d = new Domain();
-            BooleanDCNode BLAH = new BooleanDCNode(battleShip);
-            BLAH.SetName("hehehehe");
-            BLAH.SetNumberOfStates(2);
-            BLAH.GetTable().SetDataItem(1, 1);
+
             //Initializes tiles
             for (int i = 0; i < 10; i++)
             {
                 char letter = (char)(i + 65);
                 for (int j = 0; j < 10; j++)
                 {
-                    LabelledDCNode tile = new LabelledDCNode(battleShip);
+                    LabelledDCNode tile = new LabelledDCNode(battleship);
                     tile.SetName(letter + $"{(j + 1)}");
                     tile.SetLabel($"{i}{j }");
                     tile.SetNumberOfStates(2);
                     tile.SetStateLabel(0, "False");
                     tile.SetStateLabel(1, "True");
-                    for (int k = 0; k < 5; k++)
+                    for (int k = 0; k < shipList.Count; k++)
                     {
                         Console.WriteLine($"{k} : {tile.GetTable().GetSize()}");
                         tile.AddParent(shipList[k]);
@@ -79,39 +75,37 @@ namespace BattleshipWeb
                 }
             }
 
-            return battleShip;
+            return battleship;
 
         }
-        private LabelledDCNode SetAllStatesForShips(LabelledDCNode node, int length)
+        private LabelledDCNode SetAllStatesForShips(LabelledDCNode ship, int length)
         {
             //10 is the length of the board, 2 is the dimensions of the board
-            //2 skib 180
-            //3 skib 160
-            //4 skib 140
-            //5 skib 120
+            //Length 2 ship: 180 dataitems
+            //Length 3 ship: 160 dataitems
+            //Length 4 ship: 140 dataitems
+            //Length 5 ship: 120 dataitems
             int minimumLength = 10 - length + 1;
             int numberOfStates = minimumLength * 2 * 10;
-            ulong k = 0;
-            node.SetNumberOfStates((ulong)numberOfStates);
+            ulong count = 0;
+            ship.SetNumberOfStates((ulong)numberOfStates);
             for (int orientation = 0; orientation < 2; orientation++)
             {
                 for (int i = 0; i < (orientation == 0 ? 10 : minimumLength); i++)
                 {
                     for (int j = 0; j < (orientation == 1 ? 10 : minimumLength); j++)
                     {
-                        //FEJL!!! jeg har tjekket - jakob. Istedet for (i+j) skal der være en int, eks. k der incrementes efter hvert label-set. 
-                        //Viser imorgen! :-)
-                        node.SetStateLabel((ulong)(k), (orientation == 1 ? "H" : "V") 
+                        ship.SetStateLabel((ulong)(count), (orientation == 1 ? "H" : "V") 
                                                                      + $"_{i}{j}");
-                        node.GetTable().SetDataItem((ulong)(k), 1 / numberOfStates);
-                        k++;
+                        ship.GetTable().SetDataItem((ulong)(count), 1 / numberOfStates);
+                        count++;
                     }
                 }
             }
-            return node;
+            return ship;
 
         }
-        private BooleanDCNode SetAllStatesForConstraints(BooleanDCNode constraint, LabelledDCNode firstShip, LabelledDCNode secondShip)
+        private BooleanDCNode SetAllStatesForConstraints(BooleanDCNode overlap, LabelledDCNode firstShip, LabelledDCNode secondShip)
         {
             //Example: 10+1-180/20 = 2
             int firstLength = 10 + 1 - firstShip.GetTable().GetData().Length / 20;
@@ -121,8 +115,7 @@ namespace BattleshipWeb
             ulong count = ulong.MaxValue; 
             string firstName, secondName;
             //Iterates through entire tables on constraint's parents
-            //istedet for firstShip.GetTable().GetData().Length kan vi skrive firstShip.GetNumberOfStates()
-            for (int i = 0; i < firstShip.GetTable().GetData().Length; i++)
+            for (int i = 0; i < (int)firstShip.GetNumberOfStates(); i++)
             {
                 firstName = firstShip.GetStateLabel((ulong)i);
                 //Gives coordinates for first ship
@@ -133,30 +126,30 @@ namespace BattleshipWeb
                     secondName = secondShip.GetStateLabel((ulong)j);
                     //Gives coordinates for second ship
                     secondPoints = ReturnCoordinates(secondLength, secondName);
-                    //Checks if ships overlap
+                    //Checks if any ship coordinates overlap
                     if (CheckForOverlap(firstPoints, secondPoints))
                     {
                         count++;
-                        constraint.GetTable().SetDataItem(count, 0);
+                        overlap.GetTable().SetDataItem(count, 0);
                         count++;
-                        constraint.GetTable().SetDataItem(count, 1);
+                        overlap.GetTable().SetDataItem(count, 1);
                         
                     }
                     else
                     {
                         count++;
-                        constraint.GetTable().SetDataItem(count, 1);
+                        overlap.GetTable().SetDataItem(count, 1);
                         count++;
-                        constraint.GetTable().SetDataItem(count, 0);
+                        overlap.GetTable().SetDataItem(count, 0);
                     }
-                    //Console.WriteLine($"name:{constraint.GetName()}");
+                    //Console.WriteLine($"name:{overlap.GetName()}");
                     //Console.WriteLine($"state ship1: {firstShip.GetStateLabel((ulong)(i))}, lenght: {firstLength}");
                     //Console.WriteLine($"state ship2: {secondShip.GetStateLabel((ulong)j)}, lenght: {secondLength}");
-                    //Console.WriteLine($"false: {constraint.GetTable().GetDataItem((ulong)(k-1))}");
-                    //Console.WriteLine($"true: {constraint.GetTable().GetDataItem((ulong)(k))}");
+                    //Console.WriteLine($"false: {overlap.GetTable().GetDataItem((ulong)(count - 1))}");
+                    //Console.WriteLine($"true: {overlap.GetTable().GetDataItem((ulong)(count))}");
                 }
             }
-            return constraint;
+            return overlap;
         }
         private List<Point> ReturnCoordinates(int length, string name)
         {
@@ -220,19 +213,19 @@ namespace BattleshipWeb
                                 {
                                     count++;
                                     tile.GetTable().SetDataItem(count, 0);
-                                    Console.WriteLine($"{tile.GetName()}:{tile.GetTable().GetDataItem(count)}");
+                                    //Console.WriteLine($"{tile.GetName()}:{tile.GetTable().GetDataItem(count)}");
                                     count++;
                                     tile.GetTable().SetDataItem(count, 1);
-                                    Console.WriteLine($"{tile.GetName()}:{tile.GetTable().GetDataItem(count)}");
+                                    //Console.WriteLine($"{tile.GetName()}:{tile.GetTable().GetDataItem(count)}");
                                 }
                                 else
                                 {
                                     count++;
                                     tile.GetTable().SetDataItem(count, 1);
-                                    Console.WriteLine($"{tile.GetName()} : {tile.GetTable().GetDataItem(count)}");
+                                    //Console.WriteLine($"{tile.GetName()} : {tile.GetTable().GetDataItem(count)}");
                                     count++;
                                     tile.GetTable().SetDataItem(count, 0);
-                                    Console.WriteLine($"{tile.GetName()} : {tile.GetTable().GetDataItem(count)}");
+                                    //Console.WriteLine($"{tile.GetName()} : {tile.GetTable().GetDataItem(count)}");
                                 }
                             }
                         }

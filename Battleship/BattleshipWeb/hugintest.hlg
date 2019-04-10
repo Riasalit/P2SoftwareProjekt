@@ -1,0 +1,185 @@
+Wed Apr 10 16:54:27 2019
+
+
+Moral links:
+
+    Marrying Battleship and Carrier
+    Marrying Cruiser and Carrier
+    Marrying Cruiser and Battleship
+    Marrying Submarine and Carrier
+    Marrying Submarine and Battleship
+    Marrying Submarine and Cruiser
+    Marrying Destroyer and Carrier
+    Marrying Destroyer and Battleship
+    Marrying Destroyer and Cruiser
+    Marrying Destroyer and Submarine
+
+
+Triangulating prime component with 1 member:
+    hehehehe
+This component is a clique of cost 2
+
+Triangulating prime component with 3 members:
+    Overlap1_2, Cruiser, Submarine
+This component is a clique of cost 51200
+
+Triangulating prime component with 3 members:
+    Overlap1_3, Battleship, Submarine
+This component is a clique of cost 44800
+
+Triangulating prime component with 3 members:
+    Overlap2_3, Battleship, Cruiser
+This component is a clique of cost 44800
+
+Triangulating prime component with 3 members:
+    Overlap1_4, Carrier, Submarine
+This component is a clique of cost 38400
+
+Triangulating prime component with 3 members:
+    Overlap2_4, Carrier, Cruiser
+This component is a clique of cost 38400
+
+Triangulating prime component with 3 members:
+    Overlap3_4, Carrier, Battleship
+This component is a clique of cost 33600
+
+Triangulating prime component with 3 members:
+    Overlap0_1, Submarine, Destroyer
+This component is a clique of cost 57600
+
+Triangulating prime component with 3 members:
+    Overlap0_2, Cruiser, Destroyer
+This component is a clique of cost 57600
+
+Triangulating prime component with 3 members:
+    Overlap0_3, Battleship, Destroyer
+This component is a clique of cost 50400
+
+Triangulating prime component with 5 members:
+    Carrier, Battleship, Cruiser, Submarine, Destroyer
+This component is a clique of cost 77414400000
+
+Triangulating prime component with 3 members:
+    Overlap0_4, Carrier, Destroyer
+This component is a clique of cost 43200
+
+
+Total cost of triangulation for all prime components is 77414860002
+
+
+Elimination sequence:
+
+    Overlap0_1
+    Overlap0_2
+    Overlap1_2
+    Overlap0_3
+    Overlap2_3
+    Overlap1_3
+    Overlap0_4
+    Overlap2_4
+    Overlap1_4
+    Destroyer
+    Submarine
+    Cruiser
+    Overlap3_4
+    Battleship
+    Carrier
+    hehehehe
+
+
+Cliques:
+
+Clique 12, 3 members, table size = 33600:
+    Carrier, Battleship, Overlap3_4
+
+Clique 11, 5 members, table size = 77414400000:
+    Carrier, Battleship, Cruiser, Submarine, Destroyer
+
+Clique 10, 3 members, table size = 38400:
+    Carrier, Submarine, Overlap1_4
+
+Clique 9, 3 members, table size = 38400:
+    Carrier, Cruiser, Overlap2_4
+
+Clique 8, 3 members, table size = 43200:
+    Carrier, Destroyer, Overlap0_4
+
+Clique 7, 3 members, table size = 44800:
+    Battleship, Submarine, Overlap1_3
+
+Clique 6, 3 members, table size = 44800:
+    Battleship, Cruiser, Overlap2_3
+
+Clique 5, 3 members, table size = 50400:
+    Battleship, Destroyer, Overlap0_3
+
+Clique 4, 3 members, table size = 51200:
+    Cruiser, Submarine, Overlap1_2
+
+Clique 3, 3 members, table size = 57600:
+    Cruiser, Destroyer, Overlap0_2
+
+Clique 2, 3 members, table size = 57600:
+    Submarine, Destroyer, Overlap0_1
+
+Clique 1, 1 member, table size = 2:
+    hehehehe
+
+Total clique table size: 77414860002
+
+
+The junction forest:
+
+Creating junction tree with clique 12 as root ...
+
+Cliques 11 and 12 linked, separator has 2 members and table size = 16800:
+    Carrier, Battleship
+
+Cliques 10 and 11 linked, separator has 2 members and table size = 19200:
+    Carrier, Submarine
+
+Cliques 9 and 11 linked, separator has 2 members and table size = 19200:
+    Carrier, Cruiser
+
+Cliques 8 and 11 linked, separator has 2 members and table size = 21600:
+    Carrier, Destroyer
+
+Cliques 7 and 11 linked, separator has 2 members and table size = 22400:
+    Battleship, Submarine
+
+Cliques 6 and 11 linked, separator has 2 members and table size = 22400:
+    Battleship, Cruiser
+
+Cliques 5 and 11 linked, separator has 2 members and table size = 25200:
+    Battleship, Destroyer
+
+Cliques 4 and 11 linked, separator has 2 members and table size = 25600:
+    Cruiser, Submarine
+
+Cliques 3 and 11 linked, separator has 2 members and table size = 28800:
+    Cruiser, Destroyer
+
+Cliques 2 and 11 linked, separator has 2 members and table size = 28800:
+    Submarine, Destroyer
+
+Creating junction tree with clique 1 as root ...
+
+
+Assignment of potentials to cliques:
+
+    Node hehehehe assigned to clique 1
+    Node Overlap3_4 assigned to clique 12
+    Node Overlap2_4 assigned to clique 9
+    Node Overlap2_3 assigned to clique 6
+    Node Overlap1_4 assigned to clique 10
+    Node Overlap1_3 assigned to clique 7
+    Node Overlap1_2 assigned to clique 4
+    Node Overlap0_4 assigned to clique 8
+    Node Overlap0_3 assigned to clique 5
+    Node Overlap0_2 assigned to clique 3
+    Node Overlap0_1 assigned to clique 2
+    Node Carrier assigned to clique 12
+    Node Battleship assigned to clique 12
+    Node Cruiser assigned to clique 9
+    Node Submarine assigned to clique 10
+    Node Destroyer assigned to clique 8

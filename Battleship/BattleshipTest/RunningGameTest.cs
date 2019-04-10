@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-using Battleship;
+using BattleshipWeb;
+using HAPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BattleshipTest
@@ -24,7 +25,7 @@ namespace BattleshipTest
         //{
         //    IUserInterface ui = new TestUI();
         //    Player player = new Human("Liv", ui);
-            
+
         //    player.SetShips();
 
         //    Assert.IsTrue(player.board.ships.Count > 0);
@@ -43,8 +44,8 @@ namespace BattleshipTest
         public void CannotPlaceShipThatOverlapWithOtherShip()
         {
             Player player = new AI("Erik");
-            Ship testship = new Ship("Testship", 3, new Point(0,0), 'V');
-            Ship overlapship = new Ship("Overlapship", 3, new Point(0,0), 'H');
+            Ship testship = new Ship("Testship", 3, new Point(0, 0), 'V');
+            Ship overlapship = new Ship("Overlapship", 3, new Point(0, 0), 'H');
             bool test;
 
             player.board.PlaceShips(testship);
@@ -56,7 +57,7 @@ namespace BattleshipTest
         public void CannotPlaceShipThatIsOutOfBoardBounds()
         {
             Player player = new AI("Erik");
-            Ship testship = new Ship("Testship", 3, new Point(8,0), 'H');
+            Ship testship = new Ship("Testship", 3, new Point(8, 0), 'H');
             bool test;
 
             test = player.board.PlaceShips(testship);
@@ -67,11 +68,11 @@ namespace BattleshipTest
         public void ReturnsHitIfHitShip()
         {
             Player player = new AI("Erik");
-            Ship testship = new Ship("Testship", 3, new Point(0,0), 'V');
+            Ship testship = new Ship("Testship", 3, new Point(0, 0), 'V');
             string test;
 
             player.board.PlaceShips(testship);
-            test = player.board.ShootAt(new Point(0,0));
+            test = player.board.ShootAt(new Point(0, 0));
 
             Assert.AreEqual("You hit a ship", test);
         }
@@ -79,7 +80,7 @@ namespace BattleshipTest
         public void ReturnsSunkenIfShipIsSunken()
         {
             Player player = new AI("Erik");
-            Ship testship = new Ship("Testship", 2, new Point(0,0), 'V');
+            Ship testship = new Ship("Testship", 2, new Point(0, 0), 'V');
 
 
             string test;
