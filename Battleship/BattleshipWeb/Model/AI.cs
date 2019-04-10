@@ -21,7 +21,7 @@ namespace BattleshipWeb
         {
             InitBayesianNetwork();
         }
-        private Domain InitBayesianNetwork()
+        public Domain InitBayesianNetwork()
         {
             Domain battleShip = new Domain();
             List<LabelledDCNode> shipList = new List<LabelledDCNode>();
@@ -53,7 +53,11 @@ namespace BattleshipWeb
                     constraint = SetAllStatesForConstraints(constraint, shipList[i], shipList[j]);
                 }
             }
-
+            Domain d = new Domain();
+            BooleanDCNode BLAH = new BooleanDCNode(battleShip);
+            BLAH.SetName("hehehehe");
+            BLAH.SetNumberOfStates(2);
+            BLAH.GetTable().SetDataItem(1, 1);
             //Initializes tiles
             for (int i = 0; i < 10; i++)
             {
@@ -62,14 +66,19 @@ namespace BattleshipWeb
                 {
                     LabelledDCNode tile = new LabelledDCNode(battleShip);
                     tile.SetName(letter + $"{(j + 1)}");
-                    tile.SetLabel($"{i+1}{j + 1}");
+                    tile.SetLabel($"{i}{j }");
+                    tile.SetNumberOfStates(2);
+                    tile.SetStateLabel(0, "False");
+                    tile.SetStateLabel(1, "True");
                     for (int k = 0; k < 5; k++)
                     {
+                        Console.WriteLine($"{k} : {tile.GetTable().GetSize()}");
                         tile.AddParent(shipList[k]);
                     }
-                    SetAllStatesForTiles(tile, shipList);
+                    tile = SetAllStatesForTiles(tile, shipList);
                 }
             }
+
             return battleShip;
 
         }
@@ -82,7 +91,7 @@ namespace BattleshipWeb
             //5 skib 120
             int minimumLength = 10 - length + 1;
             int numberOfStates = minimumLength * 2 * 10;
-            //ulong k = 0;
+            ulong k = 0;
             node.SetNumberOfStates((ulong)numberOfStates);
             for (int orientation = 0; orientation < 2; orientation++)
             {
@@ -92,10 +101,10 @@ namespace BattleshipWeb
                     {
                         //FEJL!!! jeg har tjekket - jakob. Istedet for (i+j) skal der være en int, eks. k der incrementes efter hvert label-set. 
                         //Viser imorgen! :-)
-                        node.SetStateLabel((ulong)(i+j), (orientation == 1 ? "H" : "V") 
+                        node.SetStateLabel((ulong)(k), (orientation == 1 ? "H" : "V") 
                                                                      + $"_{i}{j}");
-                        node.GetTable().SetDataItem((ulong)(i + j), 1 / numberOfStates); 
-                        //k++
+                        node.GetTable().SetDataItem((ulong)(k), 1 / numberOfStates);
+                        k++;
                     }
                 }
             }
@@ -109,6 +118,7 @@ namespace BattleshipWeb
             int secondLength = 10 + 1 - secondShip.GetTable().GetData().Length / 20;
             List<Point> firstPoints = new List<Point>();
             List<Point> secondPoints = new List<Point>();
+            ulong count = ulong.MaxValue; 
             string firstName, secondName;
             //Iterates through entire tables on constraint's parents
             //istedet for firstShip.GetTable().GetData().Length kan vi skrive firstShip.GetNumberOfStates()
@@ -117,23 +127,33 @@ namespace BattleshipWeb
                 firstName = firstShip.GetStateLabel((ulong)i);
                 //Gives coordinates for first ship
                 firstPoints = ReturnCoordinates(firstLength, firstName);
-                for (int j = 0; j < secondShip.GetTable().GetData().Length; j++)
+                for (int j = 0; j < (int)secondShip.GetNumberOfStates(); j++)
                 {
+                    //secondShip.GetTable().GetData().Length
                     secondName = secondShip.GetStateLabel((ulong)j);
                     //Gives coordinates for second ship
                     secondPoints = ReturnCoordinates(secondLength, secondName);
                     //Checks if ships overlap
                     if (CheckForOverlap(firstPoints, secondPoints))
                     {
-                        constraint.GetTable().SetDataItem((ulong)(j + i) * 2, 0);
-                        constraint.GetTable().SetDataItem((ulong)(j + i) * 2 + 1, 1);
+                        count++;
+                        constraint.GetTable().SetDataItem(count, 0);
+                        count++;
+                        constraint.GetTable().SetDataItem(count, 1);
+                        
                     }
                     else
                     {
-                        constraint.GetTable().SetDataItem((ulong)(j + i) * 2, 1);
-                        constraint.GetTable().SetDataItem((ulong)(j + i) * 2 + 1, 0);
+                        count++;
+                        constraint.GetTable().SetDataItem(count, 1);
+                        count++;
+                        constraint.GetTable().SetDataItem(count, 0);
                     }
-
+                    //Console.WriteLine($"name:{constraint.GetName()}");
+                    //Console.WriteLine($"state ship1: {firstShip.GetStateLabel((ulong)(i))}, lenght: {firstLength}");
+                    //Console.WriteLine($"state ship2: {secondShip.GetStateLabel((ulong)j)}, lenght: {secondLength}");
+                    //Console.WriteLine($"false: {constraint.GetTable().GetDataItem((ulong)(k-1))}");
+                    //Console.WriteLine($"true: {constraint.GetTable().GetDataItem((ulong)(k))}");
                 }
             }
             return constraint;
@@ -174,8 +194,64 @@ namespace BattleshipWeb
         }
         private LabelledDCNode SetAllStatesForTiles(LabelledDCNode tile, List<LabelledDCNode> shipList)
         {
-
+            List<List<Point>> pointList = new List<List<Point>>();
+            int[] lengthArray = new int[5];
+            for (int i = 0; i < 5; i++)
+            {
+                lengthArray[i] = 10 + 1 - shipList[i].GetTable().GetData().Length / 20;
+            }
+            ulong count = ulong.MaxValue;
+            for (int i = 0; i < (int)shipList[0].GetNumberOfStates(); i++)
+            {
+                pointList.Add(ReturnCoordinates(lengthArray[0], shipList[0].GetStateLabel((ulong)i)));
+                for (int j = 0; j < (int)shipList[1].GetNumberOfStates(); j++)
+                {
+                    pointList.Add(ReturnCoordinates(lengthArray[1], shipList[1].GetStateLabel((ulong)j)));
+                    for (int k = 0; k < (int)shipList[2].GetNumberOfStates(); k++)
+                    {
+                        pointList.Add(ReturnCoordinates(lengthArray[2], shipList[2].GetStateLabel((ulong)k)));
+                        for (int l = 0; l < (int)shipList[3].GetNumberOfStates(); l++)
+                        {
+                            pointList.Add(ReturnCoordinates(lengthArray[3], shipList[3].GetStateLabel((ulong)k)));
+                            for (int m = 0; m < (int)shipList[4].GetNumberOfStates(); m++)
+                            {
+                                pointList.Add(ReturnCoordinates(lengthArray[4], shipList[4].GetStateLabel((ulong)m)));
+                                if (IsAnyShipOnTile(tile.GetLabel(), pointList))
+                                {
+                                    count++;
+                                    tile.GetTable().SetDataItem(count, 0);
+                                    Console.WriteLine($"{tile.GetName()}:{tile.GetTable().GetDataItem(count)}");
+                                    count++;
+                                    tile.GetTable().SetDataItem(count, 1);
+                                    Console.WriteLine($"{tile.GetName()}:{tile.GetTable().GetDataItem(count)}");
+                                }
+                                else
+                                {
+                                    count++;
+                                    tile.GetTable().SetDataItem(count, 1);
+                                    Console.WriteLine($"{tile.GetName()} : {tile.GetTable().GetDataItem(count)}");
+                                    count++;
+                                    tile.GetTable().SetDataItem(count, 0);
+                                    Console.WriteLine($"{tile.GetName()} : {tile.GetTable().GetDataItem(count)}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return tile;
+        }
+        private bool IsAnyShipOnTile(string name, List<List<Point>> shipList)
+        {
+            Point getCord = new Point(name[0], name[1]);
+            foreach (List<Point> list in shipList)
+            {
+                if (list.Contains(getCord))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         public override void SetShips()
         {

@@ -15,6 +15,8 @@ namespace BattleshipWeb
         public static void Main(string[] args)
         {
             Game game = new Game();
+            AI man = new AI("lars");
+            man.InitBayesianNetwork();
             game.Start();
             //CreateWebHostBuilder(args).Build().Run();
         }
