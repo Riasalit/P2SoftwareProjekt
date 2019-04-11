@@ -219,10 +219,10 @@ namespace BattleshipWeb
             List<Point> firstPoints = new List<Point>();
             List<Point> secondPoints = new List<Point>();
             List<Point> concatList = new List<Point>();
-            char xCoord = name[0];
+            int xCoord = (name[0] - 'A');
             int yCoord = name[1];
             string firstName, secondName;
-            Point tilePlace = new Point(xCoord-'A', yCoord);
+            Point tilePlace = new Point(xCoord, yCoord);
             int firstLength = 10 + 1 - firstShip.GetTable().GetData().Length / 20;
             int secondLength = 10 + 1 - secondShip.GetTable().GetData().Length / 20;
             ulong count = ulong.MaxValue;
@@ -243,7 +243,7 @@ namespace BattleshipWeb
                     {
                         count++;
                         tile.GetTable().SetDataItem(count, 0);
-                        Console.WriteLine(tile.GetTable().GetDataItem(count));
+                        Console.WriteLine("he" + tile.GetTable().GetDataItem(count));
                         count++;
                         tile.GetTable().SetDataItem(count, 1);
                     }
