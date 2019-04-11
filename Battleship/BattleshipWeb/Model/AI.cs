@@ -13,18 +13,51 @@ namespace BattleshipWeb
 {
     public class AI : Player
     {
+        List<LabelledDCNode> shipList = new List<LabelledDCNode>();
+        List<List<LabelledDCNode>> tileList = new List<List<LabelledDCNode>>();
         Domain battleship;
         public AI(string name) : base(name)
         {
             battleship = new Domain();
+            InitBayesianNetwork();
         }
         public override void YourTurn()
         {
-            InitBayesianNetwork();
+            double probability;
+            Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
+            for (int i = 0; i < 100; i++)
+            {
+                probability = 0;
+                foreach (LabelledDCNode tile in tileList[i] )
+                {
+                    //Adds all the true value to a probability dictionary 
+                    //to a probability mapping from a point (tile)
+                    probability += tile.GetBelief(1);
+                }
+                Point tilePoint = new Point(i / 10, i % 10);
+                probabilities.Add(tilePoint, probability);
+            }
+            ShootOpponent(FindShootingPoint(probabilities));
+            //"You sunk {ship}!" "You hit a ship" "You missed"
+            //Insert evidence
+            foreach (LabelledDCNode tile in tileList[99])
+            {
+                tile.SelectState(1);
+            }
+        }
+        private Point FindShootingPoint(Dictionary<Point, double> probabilities)
+        {
+            double maxValue = 0;
+            maxValue = probabilities.Values.Max();
+
+            Point[] points = probabilities.Where(p => p.Value == maxValue)
+                                          .Select(p => p.Key).ToArray();
+            return points[new Random().Next(0, points.Length)];
+            
         }
         public Domain InitBayesianNetwork()
         {
-            List<LabelledDCNode> shipList = new List<LabelledDCNode>();
+
             string[] shipNames = new string[5] {"Destroyer", "Submarine",
                                                 "Cruiser", "battleship", "Carrier"};
             int[] shipLengths = new int[5] { 2, 3, 3, 4, 5 };
@@ -49,28 +82,14 @@ namespace BattleshipWeb
                 char letter = (char)(i + 65);
                 for (int j = 0; j < 10; j++)
                 {
-                    MakeStatesForDivorcing(shipList, true, $"{letter}{j}S");
+                    tileList.Add(MakeStatesForDivorcing(shipList, true, $"{letter}{j}S"));
                 }
             }
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    char letter = (char)(i + 65);
-            //    for (int j = 0; j < 10; j++)
-            //    {
-            //        LabelledDCNode tile = new LabelledDCNode(battleship);
-            //        tile.SetName(letter + $"{(j + 1)}");
-            //        tile.SetLabel($"{i}{j }");
-            //        tile.SetNumberOfStates(2);
-            //        tile.SetStateLabel(0, "False");
-            //        tile.SetStateLabel(1, "True");
-            //        for (int k = 0; k < shipList.Count; k++)
-            //        {
-            //            tile.AddParent(shipList[k]);
-            //            Console.WriteLine($"tile {tile.GetName()} has {k + 1} parents with a total table size of: {tile.GetTable().GetSize()}");
-            //        }
-            //        tile = SetAllStatesForTiles(tile, shipList);
-            //    }
-            //}
+            battleship.Compile();
+
+            Console.WriteLine("is domain alive?: " + battleship.IsAlive());
+
+            //GetNodeByName("A0S0_1").
 
             battleship.SaveAsKB("hugintest.hkb");
             return battleship;
@@ -83,8 +102,8 @@ namespace BattleshipWeb
             //Length 3 ship: 160 dataitems
             //Length 4 ship: 140 dataitems
             //Length 5 ship: 120 dataitems
-            int minimumLength = 10 - length + 1;
-            int numberOfStates = minimumLength * 2 * 10;
+            double minimumLength = 10 - length + 1;
+            double numberOfStates = minimumLength * 2 * 10;
             ulong count = 0;
             ship.SetNumberOfStates((ulong)numberOfStates);
             for (int orientation = 0; orientation < 2; orientation++)
@@ -93,9 +112,9 @@ namespace BattleshipWeb
                 {
                     for (int j = 0; j < (orientation == 1 ? 10 : minimumLength); j++)
                     {
-                        ship.SetStateLabel((ulong)(count), (orientation == 1 ? "H" : "V") 
+                        ship.SetStateLabel((count), (orientation == 1 ? "H" : "V") 
                                                                      + $"_{i}{j}");
-                        ship.GetTable().SetDataItem((ulong)(count), (double)(1 / numberOfStates));
+                        ship.GetTable().SetDataItem((count), (1 / numberOfStates));
                         count++;
                     }
                 }
@@ -140,11 +159,6 @@ namespace BattleshipWeb
                         count++;
                         overlap.GetTable().SetDataItem(count, 0);
                     }
-                    //Console.WriteLine($"name:{overlap.GetName()}");
-                    //Console.WriteLine($"state ship1: {firstShip.GetStateLabel((ulong)(i))}, lenght: {firstLength}");
-                    //Console.WriteLine($"state ship2: {secondShip.GetStateLabel((ulong)j)}, lenght: {secondLength}");
-                    //Console.WriteLine($"false: {overlap.GetTable().GetDataItem((ulong)(count - 1))}");
-                    //Console.WriteLine($"true: {overlap.GetTable().GetDataItem((ulong)(count))}");
                 }
             }
             return overlap;
@@ -153,8 +167,8 @@ namespace BattleshipWeb
         {
             List<Point> pointList = new List<Point>();
             char orientation = name[0];
-            int xCoord = name[2];
-            int yCoord = name[3];
+            int xCoord = name[2] - '0';
+            int yCoord = name[3] - '0';
             for (int i = 0; i < length; i++)
             {
                 if (orientation == 'H')
@@ -183,8 +197,9 @@ namespace BattleshipWeb
             }
             return false;
         }
-        private void MakeStatesForDivorcing(List<LabelledDCNode> shipList, bool isTile, string name)
+        private List<LabelledDCNode> MakeStatesForDivorcing(List<LabelledDCNode> shipList, bool isTile, string name)
         {
+            List<LabelledDCNode> tempTileList = new List<LabelledDCNode>();
             Node node;
             for (int i = 0; i < shipList.Count; i++)
             {
@@ -209,18 +224,21 @@ namespace BattleshipWeb
                         node.AddParent(shipList[i]);
                         node.AddParent(shipList[j]);
                         node = SetAllStatesForConstraints(((BooleanDCNode)node), shipList[i], shipList[j]);
+                        ((BooleanDCNode)node).SelectState(0);
                     }
                     node.SetName($"{name}{i}_{j}");
+                    tempTileList.Add((LabelledDCNode)node);
                 }
             }
+            return tempTileList;
         }
         private LabelledDCNode SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode firstShip, LabelledDCNode secondShip, string name)
         {
             List<Point> firstPoints = new List<Point>();
             List<Point> secondPoints = new List<Point>();
             List<Point> concatList = new List<Point>();
-            int xCoord = (name[0] - 'A');
-            int yCoord = name[1];
+            int xCoord = name[0] - 'A';
+            int yCoord = name[1] - '0';
             string firstName, secondName;
             Point tilePlace = new Point(xCoord, yCoord);
             int firstLength = 10 + 1 - firstShip.GetTable().GetData().Length / 20;
@@ -243,7 +261,6 @@ namespace BattleshipWeb
                     {
                         count++;
                         tile.GetTable().SetDataItem(count, 0);
-                        Console.WriteLine("he" + tile.GetTable().GetDataItem(count));
                         count++;
                         tile.GetTable().SetDataItem(count, 1);
                     }
@@ -251,10 +268,8 @@ namespace BattleshipWeb
                     {
                         count++;
                         tile.GetTable().SetDataItem(count, 1);
-                        Console.WriteLine(tile.GetTable().GetDataItem(count));
                         count++;
                         tile.GetTable().SetDataItem(count, 0);
-                        Console.WriteLine(tile.GetTable().GetDataItem(count));
                     }
                 }
             }
