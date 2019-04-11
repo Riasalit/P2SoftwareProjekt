@@ -13,9 +13,10 @@ namespace BattleshipWeb
 {
     public class AI : Player
     {
+        Domain battleship;
         public AI(string name) : base(name)
         {
-
+            battleship = new Domain();
         }
         public override void YourTurn()
         {
@@ -23,7 +24,6 @@ namespace BattleshipWeb
         }
         public Domain InitBayesianNetwork()
         {
-            Domain battleship = new Domain();
             List<LabelledDCNode> shipList = new List<LabelledDCNode>();
             string[] shipNames = new string[5] {"Destroyer", "Submarine",
                                                 "Cruiser", "battleship", "Carrier"};
@@ -39,42 +39,40 @@ namespace BattleshipWeb
 
             //Initializes constraints (4+3+2+1=10 constraints) with the intent 
             //to prevent ships from overlapping 
-            for (int i = 0; i < shipList.Count; i++)
-            {
-                for (int j = i + 1; j < shipList.Count; j++)
-                {
-                    BooleanDCNode overlap = new BooleanDCNode(battleship);
-                    overlap.AddParent(shipList[i]);
-                    overlap.AddParent(shipList[j]);
-                    overlap.SetName($"Overlap{i}_{j}");
-                    overlap.SetNumberOfStates(2);
-                    overlap.SetStateLabel(0, "False");
-                    overlap.SetStateLabel(1, "True");
-                    overlap = SetAllStatesForConstraints(overlap, shipList[i], shipList[j]);
-                }
-            }
 
+            MakeStatesForDivorcing(shipList, false, "Overlap");
+
+       
             //Initializes tiles
             for (int i = 0; i < 10; i++)
             {
                 char letter = (char)(i + 65);
                 for (int j = 0; j < 10; j++)
                 {
-                    LabelledDCNode tile = new LabelledDCNode(battleship);
-                    tile.SetName(letter + $"{(j + 1)}");
-                    tile.SetLabel($"{i}{j }");
-                    tile.SetNumberOfStates(2);
-                    tile.SetStateLabel(0, "False");
-                    tile.SetStateLabel(1, "True");
-                    for (int k = 0; k < shipList.Count; k++)
-                    {
-                        tile.AddParent(shipList[k]);
-                        Console.WriteLine($"tile {tile.GetName()} has {k + 1} parents with a total table size of: {tile.GetTable().GetSize()}");
-                    }
-                    tile = SetAllStatesForTiles(tile, shipList);
+                    MakeStatesForDivorcing(shipList, true, $"{letter}{j}S");
                 }
             }
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    char letter = (char)(i + 65);
+            //    for (int j = 0; j < 10; j++)
+            //    {
+            //        LabelledDCNode tile = new LabelledDCNode(battleship);
+            //        tile.SetName(letter + $"{(j + 1)}");
+            //        tile.SetLabel($"{i}{j }");
+            //        tile.SetNumberOfStates(2);
+            //        tile.SetStateLabel(0, "False");
+            //        tile.SetStateLabel(1, "True");
+            //        for (int k = 0; k < shipList.Count; k++)
+            //        {
+            //            tile.AddParent(shipList[k]);
+            //            Console.WriteLine($"tile {tile.GetName()} has {k + 1} parents with a total table size of: {tile.GetTable().GetSize()}");
+            //        }
+            //        tile = SetAllStatesForTiles(tile, shipList);
+            //    }
+            //}
 
+            battleship.SaveAsKB("hugintest.hkb");
             return battleship;
 
         }
@@ -97,7 +95,7 @@ namespace BattleshipWeb
                     {
                         ship.SetStateLabel((ulong)(count), (orientation == 1 ? "H" : "V") 
                                                                      + $"_{i}{j}");
-                        ship.GetTable().SetDataItem((ulong)(count), 1 / numberOfStates);
+                        ship.GetTable().SetDataItem((ulong)(count), (double)(1 / numberOfStates));
                         count++;
                     }
                 }
@@ -155,17 +153,17 @@ namespace BattleshipWeb
         {
             List<Point> pointList = new List<Point>();
             char orientation = name[0];
-            int xCord = name[2];
-            int yCord = name[3];
+            int xCoord = name[2];
+            int yCoord = name[3];
             for (int i = 0; i < length; i++)
             {
                 if (orientation == 'H')
                 {
-                    pointList.Add(new Point(xCord+i, yCord));
+                    pointList.Add(new Point(xCoord+i, yCoord));
                 }
                 else if (orientation == 'V')
                 {
-                    pointList.Add(new Point(xCord, yCord+i));
+                    pointList.Add(new Point(xCoord, yCoord+i));
                 }
                 else
                 {
@@ -185,7 +183,84 @@ namespace BattleshipWeb
             }
             return false;
         }
-        private LabelledDCNode SetAllStatesForTiles(LabelledDCNode tile, List<LabelledDCNode> shipList)
+        private void MakeStatesForDivorcing(List<LabelledDCNode> shipList, bool isTile, string name)
+        {
+            Node node;
+            for (int i = 0; i < shipList.Count; i++)
+            {
+                for (int j = i + 1; j < shipList.Count; j++)
+                {
+                    if (isTile)
+                    {
+                        node = new LabelledDCNode(battleship);
+                        ((LabelledDCNode)node).SetNumberOfStates(2);
+                        ((LabelledDCNode)node).SetStateLabel(0, "False");
+                        ((LabelledDCNode)node).SetStateLabel(1, "True");
+                        node.AddParent(shipList[i]);
+                        node.AddParent(shipList[j]);
+                        node = SetAllStatesForTiles(((LabelledDCNode)node), shipList[i], shipList[j], name);
+                    }
+                    else
+                    {
+                        node = new BooleanDCNode(battleship);
+                        ((BooleanDCNode)node).SetNumberOfStates(2);
+                        ((BooleanDCNode)node).SetStateLabel(0, "False");
+                        ((BooleanDCNode)node).SetStateLabel(1, "True");
+                        node.AddParent(shipList[i]);
+                        node.AddParent(shipList[j]);
+                        node = SetAllStatesForConstraints(((BooleanDCNode)node), shipList[i], shipList[j]);
+                    }
+                    node.SetName($"{name}{i}_{j}");
+                }
+            }
+        }
+        private LabelledDCNode SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode firstShip, LabelledDCNode secondShip, string name)
+        {
+            List<Point> firstPoints = new List<Point>();
+            List<Point> secondPoints = new List<Point>();
+            List<Point> concatList = new List<Point>();
+            char xCoord = name[0];
+            int yCoord = name[1];
+            string firstName, secondName;
+            Point tilePlace = new Point(xCoord-'A', yCoord);
+            int firstLength = 10 + 1 - firstShip.GetTable().GetData().Length / 20;
+            int secondLength = 10 + 1 - secondShip.GetTable().GetData().Length / 20;
+            ulong count = ulong.MaxValue;
+            for (int i = 0; i < (int)firstShip.GetNumberOfStates(); i++)
+            {
+                firstName = firstShip.GetStateLabel((ulong)i);
+                //Gives coordinates for first ship
+                firstPoints = ReturnCoordinates(firstLength, firstName);
+                for (int j = 0; j < (int)secondShip.GetNumberOfStates(); j++)
+                {
+                    //secondShip.GetTable().GetData().Length
+                    secondName = secondShip.GetStateLabel((ulong)j);
+                    //Gives coordinates for second ship
+                    secondPoints = ReturnCoordinates(secondLength, secondName);
+                    concatList = secondPoints.Concat(firstPoints).ToList();
+                    secondPoints.Concat(firstPoints);
+                    if (secondPoints.Contains(tilePlace) || firstPoints.Contains(tilePlace)) 
+                    {
+                        count++;
+                        tile.GetTable().SetDataItem(count, 0);
+                        Console.WriteLine(tile.GetTable().GetDataItem(count));
+                        count++;
+                        tile.GetTable().SetDataItem(count, 1);
+                    }
+                    else
+                    {
+                        count++;
+                        tile.GetTable().SetDataItem(count, 1);
+                        Console.WriteLine(tile.GetTable().GetDataItem(count));
+                        count++;
+                        tile.GetTable().SetDataItem(count, 0);
+                        Console.WriteLine(tile.GetTable().GetDataItem(count));
+                    }
+                }
+            }
+            return tile;
+        }
+        private LabelledDCNode SetAllStatesForTile(LabelledDCNode tile, List<LabelledDCNode> shipList)
         {
             List<List<Point>> pointList = new List<List<Point>>();
             int[] lengthArray = new int[5];
