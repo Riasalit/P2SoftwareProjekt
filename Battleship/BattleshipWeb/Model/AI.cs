@@ -227,7 +227,10 @@ namespace BattleshipWeb
                         ((BooleanDCNode)node).SelectState(0);
                     }
                     node.SetName($"{name}{i}_{j}");
-                    tempTileList.Add((LabelledDCNode)node);
+                    if (node is LabelledDCNode)
+                    {
+                        tempTileList.Add(node as LabelledDCNode);
+                    }
                 }
             }
             return tempTileList;
