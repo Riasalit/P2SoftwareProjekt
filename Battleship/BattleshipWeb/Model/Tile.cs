@@ -50,7 +50,7 @@ namespace BattleshipWeb
             if (GetShipStatus())
             {
                 tile = (int)TileState.hit;
-                return "You sunk " + ship.name + "!";
+                return "You sunk " + ship.name;
             }
             //Runs if ship is hit, but not sunken
             else if (ship != null)

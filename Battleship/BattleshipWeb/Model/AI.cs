@@ -15,6 +15,7 @@ namespace BattleshipWeb
     {
         List<LabelledDCNode> shipList = new List<LabelledDCNode>();
         List<List<LabelledDCNode>> tileList = new List<List<LabelledDCNode>>();
+        private List<Point> previousHits = new List<Point>();
         Domain battleship;
         public AI(string name) : base(name)
         {
@@ -23,8 +24,15 @@ namespace BattleshipWeb
         }
         public override void YourTurn()
         {
+            Point shootingPoint;
             double probability;
+            string shootingResult;
+            int index;
+            long shipStateIndex;
             Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
+
+            battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
+                                 Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
             for (int i = 0; i < 100; i++)
             {
                 probability = 0;
@@ -37,14 +45,119 @@ namespace BattleshipWeb
                 Point tilePoint = new Point(i / 10, i % 10);
                 probabilities.Add(tilePoint, probability);
             }
-            ShootOpponent(FindShootingPoint(probabilities));
-            //"You sunk {ship}!" "You hit a ship" "You missed"
-            //Insert evidence
-            foreach (LabelledDCNode tile in tileList[99])
+            shootingPoint = FindShootingPoint(probabilities);
+            shootingResult = ShootOpponent(shootingPoint);
+
+            //"You sunk {ship}" "You hit a ship" "You missed"
+            index = shootingPoint.X * 10 + shootingPoint.Y;
+            if (shootingResult == "You hit a ship")
             {
-                tile.SelectState(1);
+                foreach (LabelledDCNode tile in tileList[index])
+                {
+                    tile.SelectState(1);
+                }
+                previousHits.Add(shootingPoint);
+            }
+            else if (shootingResult == "You missed")
+            {
+                foreach (LabelledDCNode tile in tileList[index])
+                {
+                    tile.SelectState(0);
+                }
+            }
+            else
+            {
+                foreach (LabelledDCNode tile in tileList[index])
+                {
+                    tile.SelectState(1);
+                }
+                String shipName = shootingResult.Split(' ')[2];
+                switch (shipName)
+                {
+                    case "Destroyer":
+                        shipStateIndex = 
+                             shipList[0].GetStateIndex(FindShipPos(2, shootingPoint));
+                        shipList[0].SelectState((ulong)shipStateIndex);
+                        break;
+                    case "Submarine":
+                        shipStateIndex =
+                             shipList[1].GetStateIndex(FindShipPos(3, shootingPoint));
+                        shipList[1].SelectState((ulong)shipStateIndex);
+                        break;
+                    case "Cruiser":
+                        shipStateIndex =
+                             shipList[2].GetStateIndex(FindShipPos(3, shootingPoint));
+                        shipList[2].SelectState((ulong)shipStateIndex);
+                        break;
+                    case "Battleship":
+                        shipStateIndex =
+                             shipList[3].GetStateIndex(FindShipPos(4, shootingPoint));
+                        shipList[3].SelectState((ulong)shipStateIndex);
+                        break;
+                    case "Carrier":
+                        shipStateIndex =
+                             shipList[4].GetStateIndex(FindShipPos(5, shootingPoint));
+                        shipList[4].SelectState((ulong)shipStateIndex);
+                        break;
+                }
             }
         }
+
+        private string FindShipPos(int length, Point coord)
+        {
+            if (FindShipPosHelpMethod(length, 1, 0, coord))
+            {
+                RemoveCoordFromHitList(1, 0, coord, length);
+                return $"H{coord.X}_{coord.Y}";
+            }
+            else if (FindShipPosHelpMethod(length, 0, 1, coord))
+            {
+                RemoveCoordFromHitList(0, 1, coord, length);
+                return $"V{coord.X}_{coord.Y}";
+            }
+            else if (FindShipPosHelpMethod(length, -1, 0, coord))
+            {
+                RemoveCoordFromHitList(-1, 0, coord, length);
+                return $"H{coord.X-length+1}_{coord.Y}";
+            }
+            else if (FindShipPosHelpMethod(length, 0, -1, coord))
+            {
+                RemoveCoordFromHitList(0, -1, coord, length);
+                return $"V{coord.X}_{coord.Y-length+1}";
+            }
+            else
+            {
+                throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
+            }
+        }
+
+        private bool FindShipPosHelpMethod
+            (int length, int xDir, int yDir, Point coord)
+        {
+            Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
+            if (length == 0)
+            {
+                return true;
+            }
+            else if (!previousHits.Contains(coord))
+            {
+                return false;
+            }
+            else
+            {
+                return FindShipPosHelpMethod(length - 1, xDir, yDir, newCoord);
+            }
+        }
+
+        private void RemoveCoordFromHitList
+            (int xDir, int yDir, Point coord, int length)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                previousHits.Remove(new Point(coord.X + xDir * i, coord.Y + yDir * i));
+            }
+        }
+
         private Point FindShootingPoint(Dictionary<Point, double> probabilities)
         {
             double maxValue = 0;
