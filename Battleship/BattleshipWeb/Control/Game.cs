@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+
 namespace BattleshipWeb
 {
     class Game
@@ -41,7 +42,7 @@ namespace BattleshipWeb
         {
             //Runs the game and swaps turns between players
             players[turn].YourTurn();
-            if (players[(turn + 1) % 2].board.sunkenShips == 5)
+            if (players[(turn + 1) % 2].board.sunkenShips == Settings.shipCount)
             {
                 running = false;
                 UI.GameComplete(players, turn);

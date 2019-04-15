@@ -11,13 +11,16 @@ namespace BattleshipWeb
 {
     public class TestUI : IUserInterface
     {
-        List<string> shipNames = new List<string>() { "Carrier", "Battleship",
-                                          "Cruiser", "Submarine", "Destroyer"};
-        List<int> shipLengths = new List<int>() { 5, 4, 3, 3, 2 };
+        List<string> shipNames;
+        List<int> shipLengths;
         private int shipCount;
         public TestUI()
         {
-            shipCount = 5;
+            shipNames = new List<string>();
+            shipLengths = new List<int>();
+            foreach (string name in Settings.shipNames) shipNames.Add(name);
+            foreach (int integer in Settings.shipLengths) shipLengths.Add(integer);
+            shipCount = Settings.shipCount;
         }
         public Player[] InitializePlayers(IUserInterface UI)
         {
@@ -53,7 +56,7 @@ namespace BattleshipWeb
             int y = 0;
             char orientation = 's';
 
-            if (shipCount == 5)
+            if (shipCount == Settings.shipCount)
             {
                 shipCount = 0;
                 Console.WriteLine($"{playerName}: Place ships");
@@ -84,7 +87,7 @@ namespace BattleshipWeb
                              new Point(x-1, y-1), orientation);
                 gotValidShipData = true;
                 shipCount++;
-                if (shipCount == 5)
+                if (shipCount == Settings.shipCount)
                 {
                     Console.Clear();
                 }
@@ -106,8 +109,8 @@ namespace BattleshipWeb
                     returnPoint.X = int.Parse(input[0]) - 1;
                     returnPoint.Y = int.Parse(input[1]) - 1; 
                     //Validation
-                    if (!points.Contains(returnPoint) && (returnPoint.X >= 0 && returnPoint.X < 10) 
-                                                      && (returnPoint.Y >= 0 && returnPoint.Y < 10))
+                    if (!points.Contains(returnPoint) && (returnPoint.X >= 0 && returnPoint.X < Settings.boardWidth) 
+                                                      && (returnPoint.Y >= 0 && returnPoint.Y < Settings.boardWidth))
                     {
                         gotValidTarget = true;
                     }

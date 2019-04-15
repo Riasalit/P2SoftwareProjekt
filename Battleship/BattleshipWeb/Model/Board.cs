@@ -19,10 +19,10 @@ namespace BattleshipWeb
             yourShots = new List<Tile>();
             ships = new List<Ship>();
             //Creates game board
-            gameBoard = new Tile[10, 10];
-            for (int i = 0; i < 10; i++)
+            gameBoard = new Tile[Settings.boardWidth, Settings.boardWidth];
+            for (int i = 0; i < Settings.boardWidth; i++)
             {
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < Settings.boardWidth; j++)
                 {
                     gameBoard[i, j] = new Tile();
                 }
@@ -66,8 +66,8 @@ namespace BattleshipWeb
         private bool ShipOutOfBounds(Ship ship)
         {
             //Returns true if a ship is out of bounds
-            return ((ship.orientation == 'V' && ship.shipCoord.Y + ship.length - 1 >= 10) ||
-                    (ship.orientation == 'H' && ship.shipCoord.X + ship.length - 1 >= 10));
+            return ((ship.orientation == 'V' && ship.shipCoord.Y + ship.length - 1 >= Settings.boardWidth) ||
+                    (ship.orientation == 'H' && ship.shipCoord.X + ship.length - 1 >= Settings.boardWidth));
         }
         private bool ShipsOverlap(Ship ship)
         {
