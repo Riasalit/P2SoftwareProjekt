@@ -147,7 +147,9 @@ namespace BattleshipWeb
                                           $"with orientation: {ship.orientation}");
                     }
                 }
+
             }
+            Console.ReadKey();
         } 
     }
 }

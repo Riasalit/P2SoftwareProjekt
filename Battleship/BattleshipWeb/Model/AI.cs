@@ -16,6 +16,8 @@ namespace BattleshipWeb
         private List<LabelledDCNode> shipList = new List<LabelledDCNode>();
         private List<List<LabelledDCNode>> tileList = new List<List<LabelledDCNode>>();
         private List<Point> previousHits = new List<Point>();
+        //             index in plural
+        private List<int> indices = new List<int>();
         private Domain battleship;
         public AI(string name) : base(name)
         {
@@ -27,7 +29,6 @@ namespace BattleshipWeb
             Point shootingPoint;
             string shootingResult;
             Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
-            battleship.SaveAsNet("TestStuffs");
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
                                  Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
             //Gets all the probabilities for a ship to be on the tiles
@@ -81,6 +82,7 @@ namespace BattleshipWeb
             }
             else
             {
+                previousHits.Add(shootingPoint);
                 foreach (LabelledDCNode tile in tileList[index])
                 {
                     tile.SelectState(1);
@@ -90,58 +92,62 @@ namespace BattleshipWeb
                 {
                     if (Settings.shipNames[i] == shipName)
                     {
-                        shipStateIndex = shipList[i].GetStateIndex(FindShipPos(Settings.shipLengths[i], shootingPoint));
-                        shipList[i].SelectState((ulong)shipStateIndex);
+                        indices.Add(i);
+                        indices.Sort();
+                        int count = 0;
+                        foreach(int shipIndex in indices)
+                        {
+                            count += Settings.shipLengths[shipIndex];
+                        }
+                        if(count == previousHits.Count)
+                        {
+                            foreach(int shipIndex in indices)
+                            {
+                                shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[i]));
+                                shipList[shipIndex].SelectState((ulong)shipStateIndex);
+                            }
+                            indices.Clear();
+                        }
                     }
                 }
             }
         }
-        private string FindShipPos(int length, Point coord)
+        private string FindShipPos(int length)
         {
-            if (FindShipPosHelpMethod(length, 1, 0, coord))
+            string returnString;
+            for (int i = 0; i < previousHits.Count; i++)
             {
-                RemoveCoordFromHitList(1, 0, coord, length);
-                return $"H_{coord.X}{coord.Y}";
+                if (FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
+                {
+                    returnString = $"V_{previousHits[i].X}{previousHits[i].Y}";
+                    RemoveCoordFromHitList(0, 1, previousHits[i], length);
+                    return returnString;
+                }
+                if (FindShipPosHelpMethod(length, 1, 0, previousHits[i]))
+                {
+                    returnString = $"H_{previousHits[i].X}{previousHits[i].Y}";
+                    RemoveCoordFromHitList(1, 0, previousHits[i], length);
+                    return returnString;
+                }
             }
-            else if (FindShipPosHelpMethod(length, 0, 1, coord))
-            {
-                RemoveCoordFromHitList(0, 1, coord, length);
-                return $"V_{coord.X}{coord.Y}";
-            }
-            else if (FindShipPosHelpMethod(length, -1, 0, coord))
-            {
-                RemoveCoordFromHitList(-1, 0, coord, length);
-                return $"H_{coord.X - length + 1}{coord.Y}";
-            }
-            else if (FindShipPosHelpMethod(length, 0, -1, coord))
-            {
-                RemoveCoordFromHitList(0, -1, coord, length);
-                return $"V_{coord.X}{coord.Y - length + 1}";
-            }
-            else
-            {
-                throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
-            }
+            throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
         }
 
-        private bool FindShipPosHelpMethod
-            //length skal muligvis være 1 mindre?? 
-            //ved en destroyer kommer den ind som 2, 1 mindre bliver tjekket,
-            //hvilket vil være et 3.punkt selvom der kun er 2
-            (int length, int xDir, int yDir, Point coord) 
+        private bool FindShipPosHelpMethod(int length, int xDir, int yDir, Point coord) 
         {
+            int testLength = length - 1;
             Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
-            if (length == 1)
+            if (testLength == 0)
             {
                 return true;
             }
-            else if (!previousHits.Contains(newCoord)) //skal være Constains(newCoord)
+            else if (!previousHits.Contains(newCoord))
             {
                 return false;
             }
             else
             {
-                return FindShipPosHelpMethod(length - 1, xDir, yDir, newCoord);
+                return FindShipPosHelpMethod(testLength, xDir, yDir, newCoord);
             }
         }
 
@@ -222,7 +228,7 @@ namespace BattleshipWeb
             }
             return ship;
         }
-        private void SetStatesForOverlaps(BooleanDCNode overlap, LabelledDCNode firstShip, LabelledDCNode secondShip)
+        private void SetStatesForOverlaps(BooleanDCNode overlap, LabelledDCNode secondShip, LabelledDCNode firstShip)
         {
             //Example: 10+1-180/20 = 2
             int firstLength = Settings.boardWidth + 1 - firstShip.GetTable().GetData().Length
@@ -334,8 +340,8 @@ namespace BattleshipWeb
                 }
             }
         }
-        private void SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode firstShip,
-                                          LabelledDCNode secondShip, string name)
+        private void SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode secondShip, 
+                                          LabelledDCNode  firstShip, string name)
         {
             List<Point> firstPoints = new List<Point>();
             List<Point> secondPoints = new List<Point>();
