@@ -36,8 +36,10 @@ namespace BattleshipWeb
             points.Add(shootingPoint);
             //Shoots at the board
             shootingResult = ShootOpponent(shootingPoint);
+            Console.WriteLine($"{this.playerName} shoots at: {shootingPoint}");
+            Console.WriteLine($"{shootingResult}");
             //Inserts evidence to the bayesian network
-            battleship.SaveAsKB("TestStuffs.hkb");
+            battleship.SaveAsKB("TestStuffswithevidence.hkb");
             SetEvidence(shootingResult, shootingPoint);
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
                                  Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
@@ -96,7 +98,7 @@ namespace BattleshipWeb
                         {
                             foreach(int shipIndex in indices)
                             {
-                                shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[i]));
+                                shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[shipIndex]));
                                 shipList[shipIndex].SelectState((ulong)shipStateIndex);
                             }
                             indices.Clear();
