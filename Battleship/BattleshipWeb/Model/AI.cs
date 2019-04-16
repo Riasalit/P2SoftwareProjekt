@@ -29,8 +29,6 @@ namespace BattleshipWeb
             Point shootingPoint;
             string shootingResult;
             Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
-            battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
-                                 Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
             //Gets all the probabilities for a ship to be on the tiles
             CalculateProbabilities(probabilities);
             //Finds point with highest probability to contain a ship
@@ -41,7 +39,8 @@ namespace BattleshipWeb
             //Inserts evidence to the bayesian network
             battleship.SaveAsKB("TestStuffs.hkb");
             SetEvidence(shootingResult, shootingPoint);
-            
+            battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
+                                 Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
         }
         private void CalculateProbabilities(Dictionary<Point, double> probabilities)
         {
@@ -54,7 +53,7 @@ namespace BattleshipWeb
                 {
                     //Adds all the true value to a probability dictionary 
                     //to a probability mapping from a point (tile)
-                    probability += tile.GetBelief(1);
+                    probability += tile.GetBelief(1); //THIS LINE MIGHT NEED TO BE CHANGED TO BE LIKE OTHER TILELIST STUFF
                 }
                 Point tilePoint = new Point(i / Settings.boardWidth, i % Settings.boardWidth);
                 probabilities.Add(tilePoint, probability);
@@ -67,25 +66,19 @@ namespace BattleshipWeb
             int index = shootingPoint.X * Settings.boardWidth + shootingPoint.Y;
             if (shootingResult == "You hit a ship")
             {
-                foreach (LabelledDCNode tile in tileList[index])
-                {
-                    tile.SelectState(1);
-                }
+                tileList[index][tileList[index].Count - 1].SelectState(1); // we only need to set evidence in the last node in a chain
                 previousHits.Add(shootingPoint);
             }
             else if (shootingResult == "You missed")
             {
-                foreach (LabelledDCNode tile in tileList[index])
-                {
-                    tile.SelectState(0);
-                }
+                tileList[index][tileList[index].Count - 1].SelectState(0);
             }
             else
             {
                 previousHits.Add(shootingPoint);
                 foreach (LabelledDCNode tile in tileList[index])
                 {
-                    tile.SelectState(1);
+                    tileList[index][tileList[index].Count - 1].SelectState(1);
                 }
                 string shipName = shootingResult.Split(' ')[2];
                 for (int i = 0; i < Settings.shipCount; i++)
@@ -196,6 +189,7 @@ namespace BattleshipWeb
                     tileList.Add(MakeStatesForTiles(shipList, $"{letter}{j}S"));
                 }
             }
+            battleship.SaveAsKB("hugintest.hkb");
             battleship.Compile();
             Console.WriteLine("is domain alive?: " + battleship.IsAlive());
 
@@ -302,22 +296,29 @@ namespace BattleshipWeb
         private List<LabelledDCNode> MakeStatesForTiles(List<LabelledDCNode> shipList, string name)
         {
             List<LabelledDCNode> tempTileList = new List<LabelledDCNode>();
+            int templistIndex = 0;
             LabelledDCNode tile;
-            //køre ikke ved 1 skib
-            for (int i = 0; i < shipList.Count; i++)
+            int constraintNumber = 0;
+            tile = new LabelledDCNode(battleship);
+            tile.SetNumberOfStates(2);
+            tile.SetStateLabel(0, "False");
+            tile.SetStateLabel(1, "True");
+            tile.AddParent(shipList[0]);
+            tile.AddParent(shipList[1]);
+            SetAllStatesForTiles(tile, shipList[0], shipList[1], name);
+            tile.SetName($"{name}{constraintNumber++}");
+            tempTileList.Add(tile);
+            for (int i = 2; i < shipList.Count; i++)
             {
-                for (int j = i + 1; j < shipList.Count; j++)
-                {
-                    tile = new LabelledDCNode(battleship);
-                    tile.SetNumberOfStates(2);
-                    tile.SetStateLabel(0, "False");
-                    tile.SetStateLabel(1, "True");
-                    tile.AddParent(shipList[i]);
-                    tile.AddParent(shipList[j]);
-                    SetAllStatesForTiles(tile, shipList[i], shipList[j], name);
-                    tile.SetName($"{name}{i}_{j}");
-                    tempTileList.Add(tile);
-                }
+                tile = new LabelledDCNode(battleship);
+                tile.SetNumberOfStates(2);
+                tile.SetStateLabel(0, "False");
+                tile.SetStateLabel(1, "True");
+                tile.AddParent(shipList[i]);
+                tile.AddParent(tempTileList[templistIndex]);
+                SetStatesForTilesWithOnlyOneShip(tile, shipList[i], tempTileList[templistIndex++], name);
+                tile.SetName($"{name}{constraintNumber++}");
+                tempTileList.Add(tile);
             }
             return tempTileList;
         }
@@ -337,6 +338,39 @@ namespace BattleshipWeb
                     SetStatesForOverlaps(overlap, shipList[i], shipList[j]);
                     overlap.SelectState(0);
                     overlap.SetName($"Overlap{i}_{j}");
+                }
+            }
+        }
+        //Basically copy paste function from "MakeStatesForTiles()" 
+        //it compares to previous nodes instead of a second ship
+        private void SetStatesForTilesWithOnlyOneShip(LabelledDCNode tile, LabelledDCNode ship, LabelledDCNode node, string name)
+        {
+            int shipLength = Settings.boardWidth + 1 - ship.GetTable().GetData().Length
+                                                              / (2 * Settings.boardWidth);
+            int xCoord = name[0] - 'A';
+            int yCoord = name[1] - '0';
+            Point tilePlace = new Point(xCoord, yCoord);
+            List<Point> shipPoints = new List<Point>();
+            bool labelIsTrue;
+            string shipName;
+            ulong count = 0;
+            for (ulong  i = 0; i < 2; i++)
+            {
+                labelIsTrue = node.GetStateLabel(i) == "True";
+                for(ulong j = 0; j < ship.GetNumberOfStates(); j++)
+                {
+                    shipName = ship.GetStateLabel(j);
+                    shipPoints = ReturnCoordinates(shipLength, shipName);
+                    if (labelIsTrue || shipPoints.Contains(tilePlace))
+                    {
+                        tile.GetTable().SetDataItem(count++, 0);
+                        tile.GetTable().SetDataItem(count++, 1);
+                    }
+                    else
+                    {
+                        tile.GetTable().SetDataItem(count++, 1);
+                        tile.GetTable().SetDataItem(count++, 0);
+                    }
                 }
             }
         }
