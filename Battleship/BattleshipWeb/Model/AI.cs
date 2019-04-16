@@ -27,6 +27,7 @@ namespace BattleshipWeb
             Point shootingPoint;
             string shootingResult;
             Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
+            battleship.SaveAsNet("TestStuffs");
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
                                  Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
             //Gets all the probabilities for a ship to be on the tiles
@@ -37,7 +38,9 @@ namespace BattleshipWeb
             //Shoots at the board
             shootingResult = ShootOpponent(shootingPoint);
             //Inserts evidence to the bayesian network
+            battleship.SaveAsKB("TestStuffs.hkb");
             SetEvidence(shootingResult, shootingPoint);
+            
         }
         private void CalculateProbabilities(Dictionary<Point, double> probabilities)
         {
@@ -98,22 +101,22 @@ namespace BattleshipWeb
             if (FindShipPosHelpMethod(length, 1, 0, coord))
             {
                 RemoveCoordFromHitList(1, 0, coord, length);
-                return $"H{coord.X}_{coord.Y}";
+                return $"H_{coord.X}{coord.Y}";
             }
             else if (FindShipPosHelpMethod(length, 0, 1, coord))
             {
                 RemoveCoordFromHitList(0, 1, coord, length);
-                return $"V{coord.X}_{coord.Y}";
+                return $"V_{coord.X}{coord.Y}";
             }
             else if (FindShipPosHelpMethod(length, -1, 0, coord))
             {
                 RemoveCoordFromHitList(-1, 0, coord, length);
-                return $"H{coord.X - length + 1}_{coord.Y}";
+                return $"H_{coord.X - length + 1}{coord.Y}";
             }
             else if (FindShipPosHelpMethod(length, 0, -1, coord))
             {
                 RemoveCoordFromHitList(0, -1, coord, length);
-                return $"V{coord.X}_{coord.Y - length + 1}";
+                return $"V_{coord.X}{coord.Y - length + 1}";
             }
             else
             {
@@ -122,14 +125,17 @@ namespace BattleshipWeb
         }
 
         private bool FindShipPosHelpMethod
-            (int length, int xDir, int yDir, Point coord)
+            //length skal muligvis være 1 mindre?? 
+            //ved en destroyer kommer den ind som 2, 1 mindre bliver tjekket,
+            //hvilket vil være et 3.punkt selvom der kun er 2
+            (int length, int xDir, int yDir, Point coord) 
         {
             Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
-            if (length == 0)
+            if (length == 1)
             {
                 return true;
             }
-            else if (!previousHits.Contains(coord))
+            else if (!previousHits.Contains(newCoord)) //skal være Constains(newCoord)
             {
                 return false;
             }
@@ -291,6 +297,7 @@ namespace BattleshipWeb
         {
             List<LabelledDCNode> tempTileList = new List<LabelledDCNode>();
             LabelledDCNode tile;
+            //køre ikke ved 1 skib
             for (int i = 0; i < shipList.Count; i++)
             {
                 for (int j = i + 1; j < shipList.Count; j++)
@@ -352,7 +359,6 @@ namespace BattleshipWeb
                     secondName = secondShip.GetStateLabel((ulong)j);
                     //Gives coordinates for second ship
                     secondPoints = ReturnCoordinates(secondLength, secondName);
-                    secondPoints.Concat(firstPoints);
                     if (secondPoints.Contains(tilePlace) || firstPoints.Contains(tilePlace))
                     {
                         tile.GetTable().SetDataItem(count++, 0);

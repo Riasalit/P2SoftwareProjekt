@@ -139,7 +139,7 @@ namespace BattleshipWeb
             {
                 Console.WriteLine();
                 Console.WriteLine($"{players[i].playerName} sunk: ");
-                foreach (Ship ship in players[i+1%2].board.ships)
+                foreach (Ship ship in players[(i+1)%2].board.ships)
                 {
                     if (ship.IsSunken())
                     {
