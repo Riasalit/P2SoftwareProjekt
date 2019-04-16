@@ -443,5 +443,9 @@ namespace BattleshipWeb
                 }
             }
         }
+        public void DeleteDomain()
+        {
+            battleship.Delete();
+        }
     }
 }

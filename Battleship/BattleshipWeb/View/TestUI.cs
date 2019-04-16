@@ -131,7 +131,7 @@ namespace BattleshipWeb
             Console.WriteLine(info);
             Console.WriteLine();
         }
-        public void GameComplete(Player[] players, int playerWon)
+        public bool GameComplete(Player[] players, int playerWon)
         {
             Console.WriteLine($"Congratulations {players[playerWon].playerName}, " +
                               $"you won the game with {players[playerWon].turnCounter} turns!");
@@ -149,7 +149,20 @@ namespace BattleshipWeb
                 }
 
             }
-            Console.ReadKey();
+            Console.WriteLine("Do you want to play again?");
+            Console.WriteLine("Restart: 1, End: 0");
+            string choice = Console.ReadLine();
+            if (choice == "1")
+            {
+                Console.WriteLine("Restarting...");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Bye!");
+                return false;
+            }
+
         } 
     }
 }

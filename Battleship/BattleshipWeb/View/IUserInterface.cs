@@ -19,6 +19,7 @@ namespace BattleshipWeb
         Ship GetShips(bool correctlyPlaced, string name);
         Point MakeTargetPoint(List<Point> points, string name);
         void ReturnInformation(Point point, string info);
-        void GameComplete(Player[] players, int playerWon);
+        bool GameComplete(Player[] players, int playerWon);
+
     }
 }

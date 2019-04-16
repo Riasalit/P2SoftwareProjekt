@@ -11,7 +11,7 @@ namespace BattleshipWeb
     {
         private Tile[,] gameBoard;
         public List<Tile> yourShots { get; private set; } 
-        public List<Ship> ships { get; }
+        public List<Ship> ships { get;}
         public int sunkenShips { get; private set; }
 
         public Board()
