@@ -88,7 +88,6 @@ namespace BattleshipWeb
                     if (Settings.shipNames[i] == shipName)
                     {
                         indices.Add(i);
-                        indices.Sort();
                         int count = 0;
                         foreach(int shipIndex in indices)
                         {

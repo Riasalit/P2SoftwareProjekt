@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace BattleshipWeb
 {
-    class Game
+    public class Game
     {
         Player[] players;
         int turn;

@@ -1,5 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +7,18 @@ using System.Drawing;
 using HAPI;
 using System.Diagnostics;
 using System.IO;
+using BattleshipWeb;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace BattleshipTest
+
+namespace BattleshipTest.ModelTest
 {
     [TestClass]
-    public class RunningGameTest
+    public class GameRunning
     {
+        //Can network Compile?
         [TestMethod]
-        public void TestMethod1()
+        public void CanGameRun()
         {
         }
     }

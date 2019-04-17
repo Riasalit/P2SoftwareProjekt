@@ -7,15 +7,17 @@ using System.Drawing;
 using HAPI;
 using System.Diagnostics;
 using System.IO;
+using BattleshipWeb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace BattleshipTest
+namespace BattleshipTest.BayesianNetworkTest
 {
     [TestClass]
     public class BayesianNetworkTest
     {
+        //Can network Compile?
         [TestMethod]
-        public void CanAISetShipStates()
+        public void CanAIMakeBayesianNetWork()
         {
         }
     }
