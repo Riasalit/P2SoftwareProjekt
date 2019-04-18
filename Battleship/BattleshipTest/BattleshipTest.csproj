@@ -16,10 +16,4 @@
     <ProjectReference Include="..\BattleshipWeb\BattleshipWeb.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="HAPI">
-      <HintPath>..\..\..\..\..\..\..\Programs\C-programmer\P2\Battleship\HAPI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

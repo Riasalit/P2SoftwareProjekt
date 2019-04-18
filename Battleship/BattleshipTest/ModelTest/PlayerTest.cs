@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Diagnostics;
 using System.IO;
-using HAPI;
 using BattleshipWeb;
 namespace BattleshipTest.ModelTest
 {
@@ -29,6 +28,9 @@ namespace BattleshipTest.ModelTest
         public void AreHumansConstructedCorrectly()
         {
             Player testPlayer = new Human("TestPlayer", new TestUI());
+            AI s = new AI("2");
+            s.SetShips();
+            s.SetOpponent(testPlayer);
 
             bool board_expected = true;
             bool board_result = testPlayer.board != null ? true : false;

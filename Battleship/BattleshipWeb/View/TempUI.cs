@@ -9,12 +9,12 @@ using System.Drawing;
  * ************************************/
 namespace BattleshipWeb
 {
-    public class TestUI : IUserInterface
+    public class TempUI : IUserInterface
     {
         List<string> shipNames;
         List<int> shipLengths;
         private int shipCount;
-        public TestUI()
+        public TempUI()
         {
             shipNames = new List<string>();
             shipLengths = new List<int>();

@@ -20,7 +20,7 @@ namespace BattleshipWeb
             //Random player starts
             turn = new Random().Next(0,2);
             running = true;
-            UI = new TestUI();
+            UI = new TempUI();
         }
         public void Start()
         {
