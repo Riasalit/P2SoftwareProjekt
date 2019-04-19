@@ -92,13 +92,13 @@ namespace BattleshipWeb
                         indices.Add(i);
                         indices.Sort();
                         int count = 0;
-                        foreach(int shipIndex in indices)
+                        foreach (int shipIndex in indices)
                         {
                             count += Settings.shipLengths[shipIndex];
                         }
-                        if(count == previousHits.Count)
+                        if (count == previousHits.Count)
                         {
-                            foreach(int shipIndex in indices)
+                            foreach (int shipIndex in indices)
                             {
                                 shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[shipIndex]));
                                 shipList[shipIndex].SelectState((ulong)shipStateIndex);
@@ -111,30 +111,86 @@ namespace BattleshipWeb
         }
         private string FindShipPos(int length)
         {
-            string returnString;
+            List<List<Point>> allPossiblePositions = new List<List<Point>>();
+            bool horizontal;
             for (int i = 0; i < previousHits.Count; i++)
             {
-                if (FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
+                if(FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
                 {
-                    returnString = $"V_{previousHits[i].X}{previousHits[i].Y}";
-                    RemoveCoordFromHitList(0, 1, previousHits[i], length);
-                    return returnString;
+                    allPossiblePositions.Add(CreateShipPositionsList(length, 'V', previousHits[i]));
                 }
-                if (FindShipPosHelpMethod(length, 1, 0, previousHits[i]))
+                else if(FindShipPosHelpMethod(length, 1, 0, previousHits[i]))
                 {
-                    returnString = $"H_{previousHits[i].X}{previousHits[i].Y}";
-                    RemoveCoordFromHitList(1, 0, previousHits[i], length);
-                    return returnString;
+                    allPossiblePositions.Add(CreateShipPositionsList(length, 'H', previousHits[i]));
+                }
+            }
+            foreach(List<Point> list in allPossiblePositions)
+            {
+                horizontal = list[0].Y - list[1].Y == 0;
+                if (horizontal && !FindShipPosHelpMethod(2, 1, 0, list[length-1]) && CheckCondition(0, 1, list[length - 1]))
+                {
+                    RemoveCoordFromHitList(1, 0, list[0], length);
+                    return $"H_{list[0].X}{list[0].Y}";
+                }
+                else if (horizontal && !FindShipPosHelpMethod(2, -1, 0, list[0]) && CheckCondition(0, 1, list[0]))
+                {
+                    RemoveCoordFromHitList(1, 0, list[0], length);
+                    return $"H_{list[0].X}{list[0].Y}";
+                }else if(horizontal && CheckCondition(0, 1, list[length-1]) && CheckCondition(0, 1, list[0]))
+                {
+                    RemoveCoordFromHitList(1, 0, list[0], length);
+                    return $"H_{list[0].X}{list[0].Y}";
+                }
+                if (!horizontal && !FindShipPosHelpMethod(2, 0, 1, list[length - 1]) && CheckCondition(1, 0, list[length - 1]))
+                {
+                    RemoveCoordFromHitList(0, 1, list[0], length);
+                    return $"V_{list[0].X}{list[0].Y}";
+                }
+                else if (!horizontal && !FindShipPosHelpMethod(2, 0, -1, list[0]) && CheckCondition(1, 0, list[0]))
+                {
+                    RemoveCoordFromHitList(0, 1, list[0], length);
+                    return $"H_{list[0].X}{list[0].Y}";
+                }
+                else if (!horizontal && CheckCondition(1, 0, list[length - 1]) && CheckCondition(1, 0, list[0]))
+                {
+                    RemoveCoordFromHitList(0, 1, list[0], length);
+                    return $"H_{list[0].X}{list[0].Y}";
                 }
             }
             throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
         }
-
-        private bool FindShipPosHelpMethod(int length, int xDir, int yDir, Point coord) 
+        private bool CheckCondition(int x, int y, Point start)
+        {
+            return !FindShipPosHelpMethod(2, x, y, start) && !FindShipPosHelpMethod(2, -x, -y, start);
+        }
+        private List<Point> CreateShipPositionsList(int length, char direction, Point start)
+        {
+            List<Point> returnList = new List<Point>();
+            if(direction == 'H')
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    returnList.Add(new Point(start.X + i, start.Y));
+                }
+            }
+            else if (direction == 'V')
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    returnList.Add(new Point(start.X, start.Y + i));
+                }
+            }
+            else
+            {
+                throw new ArgumentException("invalid direction");
+            }
+            return returnList;
+        }
+        private bool FindShipPosHelpMethod(int length, int xDir, int yDir, Point coord)
         {
             int testLength = length - 1;
             Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
-            if (testLength == 0 && !FindShipPosHelpMethod(testLength, xDir, yDir, newCoord))
+            if (testLength == 0)
             {
                 return true;
             }
@@ -355,10 +411,10 @@ namespace BattleshipWeb
             bool labelIsTrue;
             string shipName;
             ulong count = 0;
-            for (ulong  i = 0; i < 2; i++)
+            for (ulong i = 0; i < 2; i++)
             {
                 labelIsTrue = node.GetStateLabel(i) == "True";
-                for(ulong j = 0; j < ship.GetNumberOfStates(); j++)
+                for (ulong j = 0; j < ship.GetNumberOfStates(); j++)
                 {
                     shipName = ship.GetStateLabel(j);
                     shipPoints = ReturnCoordinates(shipLength, shipName);
@@ -375,8 +431,8 @@ namespace BattleshipWeb
                 }
             }
         }
-        private void SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode secondShip, 
-                                          LabelledDCNode  firstShip, string name)
+        private void SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode secondShip,
+                                          LabelledDCNode firstShip, string name)
         {
             List<Point> firstPoints = new List<Point>();
             List<Point> secondPoints = new List<Point>();
