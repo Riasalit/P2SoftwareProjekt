@@ -36,8 +36,8 @@ namespace BattleshipWeb
             points.Add(shootingPoint);
             //Shoots at the board
             shootingResult = ShootOpponent(shootingPoint);
-            Console.WriteLine($"{this.playerName} shoots at: {shootingPoint}");
-            Console.WriteLine($"{shootingResult}");
+            Debug.WriteLine($"{playerName} shoots at: {shootingPoint}");
+            Debug.WriteLine($"{shootingResult}");
             //Inserts evidence to the bayesian network
             battleship.SaveAsKB("TestStuffswithevidence.hkb");
             SetEvidence(shootingResult, shootingPoint);
