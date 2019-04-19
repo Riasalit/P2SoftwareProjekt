@@ -11,16 +11,15 @@ using BattleshipWeb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
-namespace BattleshipTest.ModelTest
+namespace BattleshipTest.ControlTest
 {
     [TestClass]
     public class GameRunning
     {
-        //Can network Compile?
+        //Can Game run
         [TestMethod]
         public void CanGameRun()
         {
-
         }
     }
 }

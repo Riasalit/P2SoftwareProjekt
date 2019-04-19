@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.Drawing;
 using BattleshipWeb;
 
-namespace BattleshipTest.ModelTest
+namespace BattleshipTest
 {
     public class TestUI : IUserInterface
     {
+        static int shipNumber = 0;
         List<string> shipNames;
         List<int> shipLengths;
         private int shipCount;
@@ -20,6 +21,7 @@ namespace BattleshipTest.ModelTest
             foreach (string name in Settings.shipNames) shipNames.Add(name);
             foreach (int integer in Settings.shipLengths) shipLengths.Add(integer);
             shipCount = Settings.shipCount;
+            shipNumber = 0;
         }
         public Player[] InitializePlayers(IUserInterface UI)
         {
@@ -40,7 +42,7 @@ namespace BattleshipTest.ModelTest
             }
             int random = new Random().Next(1, Settings.boardWidth / 2);
             int randomShipPoint = new Random().Next(0, Settings.boardWidth-1);
-            Ship returnShip = new Ship("temp", random, new Point(0 , randomShipPoint), 'H');
+            Ship returnShip = new Ship($"temp{shipNumber++}", random, new Point(0 , randomShipPoint), 'H');
             shipCount++;
             return returnShip;
         }

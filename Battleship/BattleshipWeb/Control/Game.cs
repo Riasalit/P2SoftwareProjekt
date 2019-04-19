@@ -11,16 +11,16 @@ namespace BattleshipWeb
     {
         Player[] players;
         int turn;
-        bool running;
+        public bool running;
         IUserInterface UI;
 
-        public Game()
+        public Game(IUserInterface UI)
         {
             players = new Player[2];
             //Random player starts
             turn = new Random().Next(0,2);
             running = true;
-            UI = new TempUI();
+            this.UI = UI;
         }
         public void Start()
         {

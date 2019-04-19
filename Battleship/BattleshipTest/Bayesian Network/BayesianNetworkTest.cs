@@ -20,15 +20,12 @@ namespace BattleshipTest.BayesianNetworkTest
         {
             Player testAI = new AI("TestAI");
             Player testHuman = new AI("TestHuman");
-            for (int j = 0; j < Settings.shipCount; j++)
-            {
-
-            }
             for (int i = 0; i < Settings.shipCount; i++)
             {
-                testHuman.board.PlaceShips(new Ship($"TestShip{i}", Settings.shipLengths[i], new Point(i, 0), 'V'));
+                testHuman.board.PlaceShips(new Ship(Settings.shipNames[i], Settings.shipLengths[i], new Point(i, 0), 'V'));
             }
             testAI.SetOpponent(testHuman);
+
             try
             {
                 while (testHuman.board.sunkenShips != Settings.shipCount)
@@ -44,6 +41,7 @@ namespace BattleshipTest.BayesianNetworkTest
             {
                 Debug.WriteLine(e.Message);
             }
+
             Assert.AreEqual(Settings.shipCount, testHuman.board.sunkenShips);
         }
 
