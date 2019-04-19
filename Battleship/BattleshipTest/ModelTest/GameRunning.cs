@@ -20,6 +20,7 @@ namespace BattleshipTest.ModelTest
         [TestMethod]
         public void CanGameRun()
         {
+
         }
     }
 }

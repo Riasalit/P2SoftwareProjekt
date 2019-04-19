@@ -16,56 +16,30 @@ namespace BattleshipTest.ModelTest
     public class PlayerTest
     {
         [TestMethod]
-        public void AreHumansMadeCorrectly()
+        public void ArePlayersMadeCorrectly()
         {
             TestUI testUI = new TestUI();
             Player[] players = new Player[2];
             players = testUI.InitializePlayers(testUI);
             
             Assert.AreEqual(true, players[0] is Human);
+            Assert.AreEqual(true, players[1] is AI);
         }
         [TestMethod]
-        public void AreHumansConstructedCorrectly()
+        public void CanHumanPlaceShipsCorrectly()
         {
-            Player testPlayer = new Human("TestPlayer", new TestUI());
-            AI s = new AI("2");
-            s.SetShips();
-            s.SetOpponent(testPlayer);
+            Player testHuman = new Human("TestHuman", new TestUI());
+            testHuman.SetShips();
 
-            bool board_expected = true;
-            bool board_result = testPlayer.board != null ? true : false;
-
-            bool points_expected = true;
-            bool points_result = testPlayer.board != null ? true : false;
-
-            bool playerName_expected = true;
-            bool playerName_result = testPlayer.playerName != null ? true : false;
-
-            Assert.AreEqual(board_expected, board_result);
-            Assert.AreEqual(points_expected, points_result);
-            Assert.AreEqual(playerName_expected, playerName_result);
+            Assert.AreEqual(Settings.shipCount, testHuman.board.ships.Count);
         }
         [TestMethod]
-        public void CanHumanPlaceShipCorrectly()
+        public void CanAIPlaceShipsCorrectly()
         {
-            Player testPlayer = new Human("TestPlayer", new TestUI());
-            testPlayer.SetShips();
+            Player testAI = new Human("TestAI", new TestUI());
+            testAI.SetShips();
 
-            bool expected = true;
-            bool result = testPlayer.board.ships != null ? true : false;
-
-            Assert.AreEqual(expected, result);
-        }
-        [TestMethod]
-        public void DoesHumanPlaceCorrectAmountOfShips()
-        {
-            Player testPlayer = new Human("TestPlayer", new TestUI());
-            testPlayer.SetShips();
-
-            bool expected = true;
-            bool result = testPlayer.board.ships.Count == Settings.shipCount ? true : false;
-
-            Assert.AreEqual(expected, result);
+            Assert.AreEqual(Settings.shipCount, testAI.board.ships.Count);
         }
         [TestMethod]
         public void CanHumanSinkAllOpponentsShips()
@@ -82,6 +56,18 @@ namespace BattleshipTest.ModelTest
                 testPlayer1.YourTurn();
             }
             Assert.AreEqual(Settings.shipCount, testPlayer2.board.sunkenShips);
+        }
+        [TestMethod]
+        public void CanHumansShootOpponent()
+        {
+            TestUI testUI = new TestUI();
+            Player testHuman1 = new Human("TestHuman1", testUI);
+            testHuman1.SetShips();
+            Player testHuman2 = new Human("TestHuman2", testUI);
+            testHuman2.SetShips();
+            testHuman1.SetOpponent(testHuman2);
+            testHuman1.YourTurn();
+            Assert.AreEqual(1, testHuman2.board.yourShots.Count);
         }
     }
 }

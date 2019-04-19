@@ -15,10 +15,37 @@ namespace BattleshipTest.BayesianNetworkTest
     [TestClass]
     public class BayesianNetworkTest
     {
-        //Can network Compile?
         [TestMethod]
-        public void CanAIMakeBayesianNetWork()
+        public void DoesAIWorkIfShipsArePlacedBesidesEachOther()
         {
+            Player testAI = new AI("TestAI");
+            Player testHuman = new AI("TestHuman");
+            for (int j = 0; j < Settings.shipCount; j++)
+            {
+
+            }
+            for (int i = 0; i < Settings.shipCount; i++)
+            {
+                testHuman.board.PlaceShips(new Ship($"TestShip{i}", Settings.shipLengths[i], new Point(i, 0), 'V'));
+            }
+            testAI.SetOpponent(testHuman);
+            try
+            {
+                while (testHuman.board.sunkenShips != Settings.shipCount)
+                {
+                    testAI.YourTurn();
+                }
+            }
+            catch (ArgumentException e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            catch (ExceptionInconsistencyOrUnderflow e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            Assert.AreEqual(Settings.shipCount, testHuman.board.sunkenShips);
         }
+
     }
 }

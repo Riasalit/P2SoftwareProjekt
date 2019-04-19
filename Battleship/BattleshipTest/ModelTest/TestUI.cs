@@ -24,8 +24,8 @@ namespace BattleshipTest.ModelTest
         public Player[] InitializePlayers(IUserInterface UI)
         {
             Player[] players = new Player[2];
-            players[0] = new Human("TestHuman_one", UI);
-            players[1] = new Human("TestHuman_two", UI);
+            players[0] = new Human("TestHuman", UI);
+            players[1] = new AI("TestAI");
             return players;
         }
         public Ship GetShips(bool correctlyPlaced, string name)
