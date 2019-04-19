@@ -125,7 +125,7 @@ namespace BattleshipWeb
                 }
             }
             foreach(List<Point> list in allPossiblePositions)
-            {
+            { // These if statements needs to be fixed
                 horizontal = list[0].Y - list[1].Y == 0;
                 if (horizontal && !FindShipPosHelpMethod(2, 1, 0, list[length-1]) && CheckCondition(0, 1, list[length - 1]))
                 {

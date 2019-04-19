@@ -16,4 +16,10 @@
     <ProjectReference Include="..\BattleshipWeb\BattleshipWeb.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="HAPI">
+      <HintPath>..\BattleshipWeb\HAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
