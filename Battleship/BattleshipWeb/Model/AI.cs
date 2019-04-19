@@ -78,7 +78,7 @@ namespace BattleshipWeb
             else
             {
                 previousHits.Add(shootingPoint);
-                previousHits.OrderBy(p => p.X).ThenBy(p => p.Y);
+                previousHits.OrderBy(p => p.X).ThenBy(p => p.Y).Reverse();
                 foreach (LabelledDCNode tile in tileList[index])
                 {
                     tileList[index][tileList[index].Count - 1].SelectState(1);
@@ -89,7 +89,8 @@ namespace BattleshipWeb
                     if (Settings.shipNames[i] == shipName)
                     {
                         // Indices keeps track of which index any ships sunk where in the list of ship names
-                        indices.Add(i); 
+                        indices.Add(i);
+                        indices.Sort();
                         int count = 0;
                         foreach(int shipIndex in indices)
                         {
@@ -133,7 +134,7 @@ namespace BattleshipWeb
         {
             int testLength = length - 1;
             Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
-            if (testLength == 0)
+            if (testLength == 0 && !FindShipPosHelpMethod(testLength, xDir, yDir, newCoord))
             {
                 return true;
             }
@@ -192,12 +193,9 @@ namespace BattleshipWeb
                     tileList.Add(MakeStatesForTiles(shipList, $"{letter}{j}S"));
                 }
             }
-            battleship.SaveAsKB("hugintest.hkb");
             battleship.Compile();
             Console.WriteLine("is domain alive?: " + battleship.IsAlive());
-
-            //GetNodeByName("A0S0_1").
-            battleship.SaveAsKB("hugintest.hkb");
+            Console.WriteLine();
             return battleship;
         }
         private LabelledDCNode SetAllStatesForShips(LabelledDCNode ship, int length)

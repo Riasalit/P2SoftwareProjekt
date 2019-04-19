@@ -98,6 +98,7 @@ namespace BattleshipWeb
         {
             Point returnPoint = new Point();
             bool gotValidTarget = false;
+            Console.WriteLine();
             Console.WriteLine($"{name}'s turn");
             while (!gotValidTarget)
             {
@@ -150,7 +151,7 @@ namespace BattleshipWeb
             }
             Console.WriteLine();
             Console.WriteLine("Do you want to play again?");
-            Console.WriteLine("Restart: 1, End: 0");
+            Console.WriteLine("Restart: 1 \nEnd: 0");
             string choice = Console.ReadLine();
             if (choice == "1")
             {
