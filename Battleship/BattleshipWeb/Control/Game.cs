@@ -33,54 +33,39 @@ namespace BattleshipWeb
             players[0].SetShips();
             players[1].SetShips();
             //Swaps turns and shoots until all ships are gone
-            bool restartChoice = true;
             while (running)
             {
-                restartChoice = NextPlayer();
+                turn = (turn + 1) % 2;
+                NextPlayer();
             }
-            ContinueGameOrExit(restartChoice);
+            ContinueGameOrExit(UI.GameComplete(players, turn));
             Console.ReadKey();
         }
-        private bool NextPlayer()
+        private void NextPlayer()
         {
-            bool restartChoice = true;
             //Runs the game and swaps turns between players
             players[turn].YourTurn();
             if (players[(turn + 1) % 2].board.sunkenShips == Settings.shipCount)
             {
                 running = false;
-                restartChoice = UI.GameComplete(players, turn);
             }
-            turn = (turn + 1) % 2;
-            return restartChoice;
         }
         private void ContinueGameOrExit(bool restartChoice)
         {
-            //restart domain for each player
+
+            //Resets the domain for all AI players
+            foreach (Player player in players)
+            {
+                if (player is AI)
+                {
+                    (player as AI).DeleteDomain();
+                }
+            }
             if (restartChoice == true)
             {
-                foreach(Player player in players)
-                {
-                    if (player is AI)
-                    {
-                        (player as AI).DeleteDomain();
-                    }
-                }
                 running = true;
                 Start();
             }
-            else
-            {
-                foreach (Player player in players)
-                {
-                    if (player is AI)
-                    {
-                        (player as AI).DeleteDomain();
-                    }
-                }
-            }
-
-
         }
     }
 }

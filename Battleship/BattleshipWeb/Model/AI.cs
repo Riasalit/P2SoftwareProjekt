@@ -78,6 +78,7 @@ namespace BattleshipWeb
             else
             {
                 previousHits.Add(shootingPoint);
+                previousHits.OrderBy(p => p.X).ThenBy(p => p.Y);
                 foreach (LabelledDCNode tile in tileList[index])
                 {
                     tileList[index][tileList[index].Count - 1].SelectState(1);
@@ -87,7 +88,8 @@ namespace BattleshipWeb
                 {
                     if (Settings.shipNames[i] == shipName)
                     {
-                        indices.Add(i);
+                        // Indices keeps track of which index any ships sunk where in the list of ship names
+                        indices.Add(i); 
                         int count = 0;
                         foreach(int shipIndex in indices)
                         {

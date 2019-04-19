@@ -147,7 +147,6 @@ namespace BattleshipWeb
                                           $"with orientation: {ship.orientation}");
                     }
                 }
-
             }
             Console.WriteLine("Do you want to play again?");
             Console.WriteLine("Restart: 1, End: 0");
@@ -162,7 +161,6 @@ namespace BattleshipWeb
                 Console.WriteLine("Bye!");
                 return false;
             }
-
         } 
     }
 }
