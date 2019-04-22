@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-
+using HAPI;
+using System.Diagnostics;
+using System.IO;
 namespace BattleshipWeb
 {
     public class Human : Player
@@ -20,6 +22,8 @@ namespace BattleshipWeb
             Point target = UI.MakeTargetPoint(points, playerName);
             //The point is added to a player's list of points they've shot at
             points.Add(target);
+            Debug.WriteLine(playerName + " shoots at " + target);
+            Debug.WriteLine(ShootOpponent(target));
             UI.ReturnInformation(target, ShootOpponent(target));
         }
         public override void SetShips()
