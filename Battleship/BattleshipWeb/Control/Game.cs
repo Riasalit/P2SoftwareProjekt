@@ -20,7 +20,7 @@ namespace BattleshipWeb
             //Random player starts
             turn = new Random().Next(0,2);
             running = true;
-            UI = new TempUI();
+            UI = new TempUI(); // maybe overfør UI som en parameter til game?
         }
         public void Start()
         {
