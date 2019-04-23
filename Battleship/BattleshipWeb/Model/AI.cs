@@ -51,12 +51,7 @@ namespace BattleshipWeb
             for (int i = 0; i < Settings.boardSize; i++)
             {
                 probability = 0;
-                foreach (LabelledDCNode tile in tileList[i])
-                {
-                    //Adds all the true value to a probability dictionary 
-                    //to a probability mapping from a point (tile)
-                    probability += tile.GetBelief(1); //THIS LINE MIGHT NEED TO BE CHANGED TO BE LIKE OTHER TILELIST STUFF
-                }
+                probability = tileList[i][tileList[i].Count - 1].GetBelief(1);
                 Point tilePoint = new Point(i / Settings.boardWidth, i % Settings.boardWidth);
                 probabilities.Add(tilePoint, probability);
             }
@@ -100,7 +95,7 @@ namespace BattleshipWeb
                         {
                             foreach (int shipIndex in indices)
                             {
-                                shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[shipIndex]));
+                                shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[shipIndex], shipList[shipIndex]));
                                 shipList[shipIndex].SelectState((ulong)shipStateIndex);
                             }
                             indices.Clear();
@@ -109,10 +104,15 @@ namespace BattleshipWeb
                 }
             }
         }
-        private string FindShipPos(int length)
+        private string FindShipPos(int length, LabelledDCNode ship)
         {
             List<List<Point>> allPossiblePositions = new List<List<Point>>();
+            List<double> beliefs = new List<double>();
+            List<string> labels = new List<string>();
             bool horizontal;
+            double bestBelief = 0;
+            string label = "";
+            ulong beliefIndex;
             for (int i = 0; i < previousHits.Count; i++)
             {
                 if(FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
@@ -125,37 +125,29 @@ namespace BattleshipWeb
                 }
             }
             foreach(List<Point> list in allPossiblePositions)
-            { // These if statements needs to be fixed
-                horizontal = list[0].Y - list[1].Y == 0;
-                if (horizontal && !FindShipPosHelpMethod(2, 1, 0, list[length-1]) && CheckCondition(0, 1, list[length - 1]))
+            {
+                if(list[0].Y - list[1].Y == 0)
                 {
-                    RemoveCoordFromHitList(1, 0, list[0], length);
-                    return $"H_{list[0].X}{list[0].Y}";
+                    label = $"H_{list[0].X}{list[0].Y}";
                 }
-                else if (horizontal && !FindShipPosHelpMethod(2, -1, 0, list[0]) && CheckCondition(0, 1, list[0]))
+                else
                 {
-                    RemoveCoordFromHitList(1, 0, list[0], length);
-                    return $"H_{list[0].X}{list[0].Y}";
-                }else if(horizontal && CheckCondition(0, 1, list[length-1]) && CheckCondition(0, 1, list[0]))
-                {
-                    RemoveCoordFromHitList(1, 0, list[0], length);
-                    return $"H_{list[0].X}{list[0].Y}";
+                    label = $"V_{list[0].X}{list[0].Y}";
                 }
-                if (!horizontal && !FindShipPosHelpMethod(2, 0, 1, list[length - 1]) && CheckCondition(1, 0, list[length - 1]))
+                beliefIndex = (ulong) ship.GetStateIndex(label);
+                beliefs.Add(ship.GetBelief(beliefIndex));
+                labels.Add(label);
+            }
+            for(int i = 0; i < beliefs.Count; i++)
+            {
+                if(beliefs[i] > bestBelief)
                 {
-                    RemoveCoordFromHitList(0, 1, list[0], length);
-                    return $"V_{list[0].X}{list[0].Y}";
+                    label = labels[i];
                 }
-                else if (!horizontal && !FindShipPosHelpMethod(2, 0, -1, list[0]) && CheckCondition(1, 0, list[0]))
-                {
-                    RemoveCoordFromHitList(0, 1, list[0], length);
-                    return $"H_{list[0].X}{list[0].Y}";
-                }
-                else if (!horizontal && CheckCondition(1, 0, list[length - 1]) && CheckCondition(1, 0, list[0]))
-                {
-                    RemoveCoordFromHitList(0, 1, list[0], length);
-                    return $"H_{list[0].X}{list[0].Y}";
-                }
+            }
+            if (label != "")
+            {
+                return label;
             }
             throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
         }
@@ -252,6 +244,7 @@ namespace BattleshipWeb
             battleship.Compile();
             Console.WriteLine("is domain alive?: " + battleship.IsAlive());
             Console.WriteLine();
+            battleship.Compress();
             return battleship;
         }
         private LabelledDCNode SetAllStatesForShips(LabelledDCNode ship, int length)
