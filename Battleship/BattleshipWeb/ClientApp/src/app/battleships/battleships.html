@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Battleship</title>
+  <!--<link rel="stylesheet" href="../../styles.css"/>-->
+  <style>
+    .button {
+      border: none;
+      padding: 0px 0px;
+      display: inline-block;
+      margin: 0px 0px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <table style="height:510px; width:510px; table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+
+    <tr *ngFor="let tile of tiles">
+      <td style="padding:1px; border: 1px thin transparent;" width="50" *ngFor="let tile of tiles">
+        <button style="height:50px;width:50px"></button>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+
