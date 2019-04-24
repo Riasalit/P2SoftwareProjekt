@@ -109,7 +109,6 @@ namespace BattleshipWeb
             List<List<Point>> allPossiblePositions = new List<List<Point>>();
             List<double> beliefs = new List<double>();
             List<string> labels = new List<string>();
-            bool horizontal;
             double bestBelief = 0;
             string label = "";
             ulong beliefIndex;
