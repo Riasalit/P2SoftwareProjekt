@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-
+﻿
 namespace BattleshipWeb
 {
     public class Tile
@@ -13,7 +7,7 @@ namespace BattleshipWeb
         //unknown: tile not shot at
         //hit: tile shot at and ship is hit
         //missed: tile shot at, but no ship on it
-        public enum TileState : int {unknown, hit, missed};
+        public enum TileState { unknown, hit, missed };
         private Ship ship;
         public int tile;
 
@@ -35,10 +29,8 @@ namespace BattleshipWeb
             {
                 return ship.IsSunken();
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
         public string ShotInformation()
         {

@@ -1,104 +1,131 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using HAPI;
 using System.Diagnostics;
-using System.IO;
-
 
 namespace BattleshipWeb
 {
     public class AI : Player
     {
+        private Domain battleship;
         private List<LabelledDCNode> shipList = new List<LabelledDCNode>();
         private List<List<LabelledDCNode>> tileList = new List<List<LabelledDCNode>>();
         private List<Point> previousHits = new List<Point>();
-        //             index in plural
-        private List<int> indices = new List<int>();
-        private Domain battleship;
+        private List<int> Indexes = new List<int>();
+
         public AI(string name) : base(name)
         {
             battleship = new Domain();
             InitBayesianNetwork();
         }
+        // Executes all necessary methods on the player's turn
         public override void YourTurn()
         {
             Point shootingPoint;
             string shootingResult;
             Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
-            //Gets all the probabilities for a ship to be on the tiles
+
             CalculateProbabilities(probabilities);
-            //Finds point with highest probability to contain a ship
+            // Finds point with highest probability to contain a ship
             shootingPoint = FindShootingPoint(probabilities);
-            points.Add(shootingPoint);
-            //Shoots at the board
+            pointsShot.Add(shootingPoint);
+            // Shoots at the board
             shootingResult = ShootOpponent(shootingPoint);
-            Debug.WriteLine($"{playerName} shoots at: {shootingPoint}");
-            Debug.WriteLine($"{shootingResult}");
-            //Inserts evidence to the bayesian network
+            /***************
+            * Slet!!!!!!   *
+            ****************/           
             battleship.SaveAsKB("TestStuffswithevidence.hkb");
+            // Inserts evidence to the bayesian network
             SetEvidence(shootingResult, shootingPoint);
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
                                  Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
         }
+        // Calculates the probablility for each tile and adds the result to the dictionary
         private void CalculateProbabilities(Dictionary<Point, double> probabilities)
         {
             double probability;
+
             probabilities.Clear();
             for (int i = 0; i < Settings.boardSize; i++)
             {
-                probability = 0;
                 probability = tileList[i][tileList[i].Count - 1].GetBelief(1);
                 Point tilePoint = new Point(i / Settings.boardWidth, i % Settings.boardWidth);
                 probabilities.Add(tilePoint, probability);
             }
         }
+        // Finds the points with the greatest probablities and returns one of these randomly
+        private Point FindShootingPoint(Dictionary<Point, double> probabilities)
+        {
+            Dictionary<Point, double> temp = probabilities;
+            double maxValue = 0;
+            // Removes points already shot from the dictionary
+            foreach (Point point in pointsShot)
+            {
+                temp.Remove(point);
+            }
+            maxValue = temp.Values.Max();
+            Point[] shootingPoints = temp.Where(p => p.Value == maxValue).Select(p => p.Key).ToArray();
+
+            return shootingPoints[new Random().Next(0, shootingPoints.Length)];
+        }
         private void SetEvidence(string shootingResult, Point shootingPoint)
         {
-            //"You sunk {ship}" "You hit a ship" "You missed"
             long shipStateIndex;
             int index = shootingPoint.X * Settings.boardWidth + shootingPoint.Y;
+            int divorcedTiles = tileList[index].Count - 1;
+
             if (shootingResult == "You hit a ship")
             {
-                tileList[index][tileList[index].Count - 1].SelectState(1); // we only need to set evidence in the last node in a chain
+                // Only sets evidence for the last tile node 
+                tileList[index][divorcedTiles].SelectState(1);
                 previousHits.Add(shootingPoint);
             }
             else if (shootingResult == "You missed")
             {
-                tileList[index][tileList[index].Count - 1].SelectState(0);
+                tileList[index][divorcedTiles].SelectState(0);
             }
             else
             {
+                string shipName = shootingResult.Split(' ')[2];
+                int totalShipLengths = 0;
+
                 previousHits.Add(shootingPoint);
                 previousHits.OrderBy(p => p.X).ThenBy(p => p.Y).Reverse();
-                foreach (LabelledDCNode tile in tileList[index])
-                {
-                    tileList[index][tileList[index].Count - 1].SelectState(1);
-                }
-                string shipName = shootingResult.Split(' ')[2];
+                tileList[index][divorcedTiles].SelectState(1);
                 for (int i = 0; i < Settings.shipCount; i++)
                 {
                     if (Settings.shipNames[i] == shipName)
                     {
-                        // Indices keeps track of which index any ships sunk where in the list of ship names
-                        indices.Add(i);
-                        indices.Sort();
-                        int count = 0;
-                        foreach (int shipIndex in indices)
+                        totalShipLengths = 0;
+                        // Indexes keeps track of where in the list of ship names the sunken ship is
+                        Indexes.Add(i);
+                        // Sorts so evidence is set for the largest ships first
+                        Indexes.Sort();
+
+                        foreach (int shipIndex in Indexes)
                         {
-                            count += Settings.shipLengths[shipIndex];
+                            totalShipLengths += Settings.shipLengths[shipIndex];
                         }
-                        if (count == previousHits.Count)
+                        /*****************************************************
+                        * REEEET!!!!!!                                       *
+                        * Sunken ships bliver ikke fjernet fra previouseHits *                       
+                        ******************************************************/
+
+                        // Inserts evidence only if there is one possible position
+                        if (totalShipLengths == previousHits.Count)
                         {
-                            foreach (int shipIndex in indices)
+                            // Ændre navn pls
+                            string noget;
+
+                            foreach (int shipIndex in Indexes)
                             {
-                                shipStateIndex = shipList[shipIndex].GetStateIndex(FindShipPos(Settings.shipLengths[shipIndex], shipList[shipIndex]));
+                                noget = FindShipPos(Settings.shipLengths[shipIndex], shipList[shipIndex]);
+                                shipStateIndex = shipList[shipIndex].GetStateIndex(noget);
                                 shipList[shipIndex].SelectState((ulong)shipStateIndex);
                             }
-                            indices.Clear();
+                            Indexes.Clear();
                         }
                     }
                 }
@@ -109,24 +136,24 @@ namespace BattleshipWeb
             List<List<Point>> allPossiblePositions = new List<List<Point>>();
             List<double> beliefs = new List<double>();
             List<string> labels = new List<string>();
-            bool horizontal;
             double bestBelief = 0;
             string label = "";
             ulong beliefIndex;
+
             for (int i = 0; i < previousHits.Count; i++)
             {
-                if(FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
+                if (FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
                 {
                     allPossiblePositions.Add(CreateShipPositionsList(length, 'V', previousHits[i]));
                 }
-                else if(FindShipPosHelpMethod(length, 1, 0, previousHits[i]))
+                else if (FindShipPosHelpMethod(length, 1, 0, previousHits[i]))
                 {
                     allPossiblePositions.Add(CreateShipPositionsList(length, 'H', previousHits[i]));
                 }
             }
-            foreach(List<Point> list in allPossiblePositions)
+            foreach (List<Point> list in allPossiblePositions)
             {
-                if(list[0].Y - list[1].Y == 0)
+                if (list[0].Y - list[1].Y == 0)
                 {
                     label = $"H_{list[0].X}{list[0].Y}";
                 }
@@ -134,13 +161,13 @@ namespace BattleshipWeb
                 {
                     label = $"V_{list[0].X}{list[0].Y}";
                 }
-                beliefIndex = (ulong) ship.GetStateIndex(label);
+                beliefIndex = (ulong)ship.GetStateIndex(label);
                 beliefs.Add(ship.GetBelief(beliefIndex));
                 labels.Add(label);
             }
-            for(int i = 0; i < beliefs.Count; i++)
+            for (int i = 0; i < beliefs.Count; i++)
             {
-                if(beliefs[i] > bestBelief)
+                if (beliefs[i] > bestBelief)
                 {
                     label = labels[i];
                 }
@@ -150,10 +177,6 @@ namespace BattleshipWeb
                 return label;
             }
             throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
-        }
-        private bool CheckCondition(int x, int y, Point start)
-        {
-            return !FindShipPosHelpMethod(2, x, y, start) && !FindShipPosHelpMethod(2, -x, -y, start);
         }
         private List<Point> CreateShipPositionsList(int length, char direction, Point start)
         {
@@ -182,40 +205,17 @@ namespace BattleshipWeb
         {
             int testLength = length - 1;
             Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
+
             if (testLength == 0)
             {
                 return true;
             }
-            else if (!previousHits.Contains(newCoord))
+            if (!previousHits.Contains(newCoord))
             {
                 return false;
             }
-            else
-            {
-                return FindShipPosHelpMethod(testLength, xDir, yDir, newCoord);
-            }
-        }
 
-        private void RemoveCoordFromHitList
-            (int xDir, int yDir, Point coord, int length)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                previousHits.Remove(new Point(coord.X + xDir * i, coord.Y + yDir * i));
-            }
-        }
-
-        private Point FindShootingPoint(Dictionary<Point, double> probabilities)
-        {
-            Dictionary<Point, double> privateProbabilities = probabilities;
-            double maxValue = 0;
-            foreach (Point point in points)
-            {
-                privateProbabilities.Remove(point);
-            }
-            maxValue = privateProbabilities.Values.Max();
-            Point[] shootingPoints = privateProbabilities.Where(p => p.Value == maxValue).Select(p => p.Key).ToArray();
-            return shootingPoints[new Random().Next(0, shootingPoints.Length)];
+            return FindShipPosHelpMethod(testLength, xDir, yDir, newCoord);
         }
         public Domain InitBayesianNetwork()
         {
