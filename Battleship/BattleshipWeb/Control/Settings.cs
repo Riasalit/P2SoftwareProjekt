@@ -8,6 +8,7 @@ namespace BattleshipWeb
     public static class Settings
     {
         public const int boardWidth = 7;
+        public const int dimension = 2;
         public const int boardSize = boardWidth * boardWidth;
         //largest ships first for ai purposes
         public static readonly string[] shipNames = 

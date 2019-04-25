@@ -3,10 +3,10 @@ namespace BattleshipWeb
 {
     public class Tile
     {
-        //TileState explains the state of the tile
-        //unknown: tile not shot at
-        //hit: tile shot at and ship is hit
-        //missed: tile shot at, but no ship on it
+        // TileState explains the state of the tile
+        // unknown: tile not shot at
+        // hit: tile shot at and ship is hit
+        // missed: tile shot at, but no ship on it
         public enum TileState { unknown, hit, missed };
         private Ship ship;
         public int tile;
@@ -38,13 +38,13 @@ namespace BattleshipWeb
             {
                 ship.IncreaseHits();
             }
-            //Runs if ship is hit and sunken
+            // Runs if ship is hit and sunken
             if (GetShipStatus())
             {
                 tile = (int)TileState.hit;
                 return "You sunk " + ship.name;
             }
-            //Runs if ship is hit, but not sunken
+            // Runs if ship is hit, but not sunken
             else if (ship != null)
             {
                 tile = (int)TileState.hit;

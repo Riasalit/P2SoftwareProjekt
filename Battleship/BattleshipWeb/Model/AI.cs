@@ -116,13 +116,13 @@ namespace BattleshipWeb
                         // Inserts evidence only if there is one possible position
                         if (totalShipLengths == previousHits.Count)
                         {
-                            // Ændre navn pls
-                            string noget;
+                            string shipPos;
 
                             foreach (int shipIndex in Indexes)
                             {
-                                noget = FindShipPos(Settings.shipLengths[shipIndex], shipList[shipIndex]);
-                                shipStateIndex = shipList[shipIndex].GetStateIndex(noget);
+                                shipPos = FindShipPos(Settings.shipLengths[shipIndex], shipList[shipIndex]);
+                                shipStateIndex = shipList[shipIndex].GetStateIndex(shipPos);
+                                // Inserts evidence
                                 shipList[shipIndex].SelectState((ulong)shipStateIndex);
                             }
                             Indexes.Clear();
@@ -133,55 +133,85 @@ namespace BattleshipWeb
         }
         private string FindShipPos(int length, LabelledDCNode ship)
         {
-            List<List<Point>> allPossiblePositions = new List<List<Point>>();
-            List<double> beliefs = new List<double>();
-            List<string> labels = new List<string>();
-            double bestBelief = 0;
-            string label = "";
-            ulong beliefIndex;
+            List<List<Point>> allPossiblePos = new List<List<Point>>();
 
+            // Runs through a list of hit tiles, which aren't labeled sunken yet
             for (int i = 0; i < previousHits.Count; i++)
             {
-                if (FindShipPosHelpMethod(length, 0, 1, previousHits[i]))
+                if (FindShipOrientation(length, 0, 1, previousHits[i]))
                 {
-                    allPossiblePositions.Add(CreateShipPositionsList(length, 'V', previousHits[i]));
+                    allPossiblePos.Add(CreateShipPosList(length, 'V', previousHits[i]));
                 }
-                else if (FindShipPosHelpMethod(length, 1, 0, previousHits[i]))
+                else if (FindShipOrientation(length, 1, 0, previousHits[i]))
                 {
-                    allPossiblePositions.Add(CreateShipPositionsList(length, 'H', previousHits[i]));
+                    allPossiblePos.Add(CreateShipPosList(length, 'H', previousHits[i]));
                 }
             }
-            foreach (List<Point> list in allPossiblePositions)
+
+            return SelectBestBelief(ship, allPossiblePos);
+        }
+        // Finds the ship position with the greatest probability
+        private string SelectBestBelief(LabelledDCNode ship, List<List<Point>> allPossiblePos)
+        {
+            List<double> beliefs = new List<double>();
+            List<string> startCoords = new List<string>();
+            double bestBelief = 0;
+            string startCoord = "";
+            ulong beliefIndex;
+            // Runs through all possible ship positions 
+            foreach (List<Point> list in allPossiblePos)
             {
+                // Enters if the two first Y-coordinates have the same value
                 if (list[0].Y - list[1].Y == 0)
                 {
-                    label = $"H_{list[0].X}{list[0].Y}";
+                    startCoord = $"H_{list[0].X}{list[0].Y}";
                 }
                 else
                 {
-                    label = $"V_{list[0].X}{list[0].Y}";
+                    startCoord = $"V_{list[0].X}{list[0].Y}";
                 }
-                beliefIndex = (ulong)ship.GetStateIndex(label);
+                beliefIndex = (ulong)ship.GetStateIndex(startCoord);
                 beliefs.Add(ship.GetBelief(beliefIndex));
-                labels.Add(label);
+                startCoords.Add(startCoord);
             }
             for (int i = 0; i < beliefs.Count; i++)
             {
+                // Enters if the probability is greater than those already found
                 if (beliefs[i] > bestBelief)
                 {
-                    label = labels[i];
+                    bestBelief = beliefs[i];
+                    startCoord = startCoords[i];
                 }
             }
-            if (label != "")
+            if (startCoord != "")
             {
-                return label;
+                return startCoord;
             }
-            throw new ArgumentException("Something went wrong while trying to find sunken ship start coordinate.");
+            throw new ArgumentException("Something went wrong while trying to find sunken ship's start coordinate.");
         }
-        private List<Point> CreateShipPositionsList(int length, char direction, Point start)
+        private bool FindShipOrientation(int length, int xDir, int yDir, Point coord)
+        {
+            int testLength = length - 1;
+            Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
+            // Enters if the ship is found
+            if (testLength == 0)
+            {
+                return true;
+            }
+            // Enters if there is no ship on the coordinate
+            if (!previousHits.Contains(newCoord))
+            {
+                return false;
+            }
+            // Calls the method recursively if all the coordinates are not found yet
+            return FindShipOrientation(testLength, xDir, yDir, newCoord);
+        }
+        // Creates a list with all the coordinates for the ship's positions
+        private List<Point> CreateShipPosList(int length, char direction, Point start)
         {
             List<Point> returnList = new List<Point>();
-            if(direction == 'H')
+
+            if (direction == 'H')
             {
                 for (int i = 0; i < length; i++)
                 {
@@ -197,42 +227,25 @@ namespace BattleshipWeb
             }
             else
             {
-                throw new ArgumentException("invalid direction");
+                throw new ArgumentException("Invalid direction");
             }
+
             return returnList;
-        }
-        private bool FindShipPosHelpMethod(int length, int xDir, int yDir, Point coord)
-        {
-            int testLength = length - 1;
-            Point newCoord = new Point(coord.X + xDir, coord.Y + yDir);
-
-            if (testLength == 0)
-            {
-                return true;
-            }
-            if (!previousHits.Contains(newCoord))
-            {
-                return false;
-            }
-
-            return FindShipPosHelpMethod(testLength, xDir, yDir, newCoord);
         }
         public Domain InitBayesianNetwork()
         {
-            //Initializes ships
+            // Initializes ships
             for (int i = 0; i < Settings.shipCount; i++)
             {
                 shipList.Add(new LabelledDCNode(battleship));
                 shipList[i].SetName(Settings.shipNames[i]);
-                //Set states and tables for all ships
-                shipList[i] = SetAllStatesForShips(shipList[i], Settings.shipLengths[i]);
+                // Set states and tables for all ships
+                SetAllStatesForShips(shipList[i], Settings.shipLengths[i]);
             }
-
-            //Initializes constraints (4+3+2+1=10 constraints) with the intent 
-            //to prevent ships from overlapping 
+            // Initializes overlap constraints
             MakeStatesForOverlap(shipList);
 
-            //Initializes tiles
+            // Initializes tiles 
             for (int i = 0; i < Settings.boardWidth; i++)
             {
                 char letter = (char)(i + 'A');
@@ -242,27 +255,24 @@ namespace BattleshipWeb
                 }
             }
             battleship.Compile();
-            Console.WriteLine("is domain alive?: " + battleship.IsAlive());
-            Console.WriteLine();
             battleship.Compress();
+
             return battleship;
         }
-        private LabelledDCNode SetAllStatesForShips(LabelledDCNode ship, int length)
+        private void SetAllStatesForShips(LabelledDCNode ship, int length)
         {
-            //10 is the length of the board, 2 is the dimensions of the board
-            //Length 2 ship: 180 dataitems
-            //Length 3 ship: 160 dataitems
-            //Length 4 ship: 140 dataitems
-            //Length 5 ship: 120 dataitems
-            double minimumLength = Settings.boardWidth - length + 1;
-            double numberOfStates = minimumLength * 2 * Settings.boardWidth;
+            double possiblePosForRow = Settings.boardWidth - length + 1;
+            // Finds all possible positions on the board for the ship 
+            double numberOfStates = Settings.boardWidth * possiblePosForRow * Settings.dimension;
             ulong count = 0;
+
             ship.SetNumberOfStates((ulong)numberOfStates);
-            for (int orientation = 0; orientation < 2; orientation++)
+            // 
+            for (int orientation = 0; orientation < Settings.dimension; orientation++)
             {
-                for (int i = 0; i < (orientation == 0 ? Settings.boardWidth : minimumLength); i++)
+                for (int i = 0; i < (orientation == 0 ? Settings.boardWidth : possiblePosForRow); i++)
                 {
-                    for (int j = 0; j < (orientation == 1 ? Settings.boardWidth : minimumLength); j++)
+                    for (int j = 0; j < (orientation == 1 ? Settings.boardWidth : possiblePosForRow); j++)
                     {
                         ship.SetStateLabel(count, (orientation == 1 ? "H" : "V") + $"_{i}{j}");
                         ship.GetTable().SetDataItem(count, 1 / numberOfStates);
@@ -270,7 +280,6 @@ namespace BattleshipWeb
                     }
                 }
             }
-            return ship;
         }
         private void SetStatesForOverlaps(BooleanDCNode overlap, LabelledDCNode secondShip, LabelledDCNode firstShip)
         {
