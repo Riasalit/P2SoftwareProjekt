@@ -8,29 +8,42 @@ import { renderTemplate } from '@angular/core/src/render3/instructions';
 })
 
 export class BattleshipsComponent {
-  public tiles: nodeData[][];
+  public tiles: NodeData[][];
   public gameStarted: boolean;
+  public boardSize: number;
   private url: string;
   private htClient: HttpClient;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
-    this.htClient.get<boolean>(this.url + 'api/BattleshipWeb/TestStartGame').subscribe(result => {
-      this.gameStarted = result;
-    })
-    this.tiles = [];
     this.url = baseUrl;
     this.htClient = http;
-    this.StartGame();
+    this.gameStarted = false;
+    http.get<number>(baseUrl + 'api/BattleshipWeb/StartData').subscribe(result => {
+      console.log(result);
+      this.boardSize = result;
+    }, error => console.error(error));
+
+    console.log(this.gameStarted);
   }
   public StartGame() {
-    this.htClient.get<boolean>(this.url + 'api/BattleshipWeb/TestStartGame').subscribe(result => {
-      this.gameStarted = result;
-    })
+    this.tiles = [];
+    for (var i = 0; i < this.boardSize; i++) {
+      this.tiles[i] = []
+      for (var j = 0; j < this.boardSize; j++) {
+        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + j, tileHit: 0};
+        console.log(this.tiles[i][j].tileName);
+      }
+    }
+    this.gameStarted = !this.gameStarted;
+    console.log(this.gameStarted);
   }
 }
 
-interface nodeData {
+interface NodeData {
   tileName: string;
   tileHit: number;
 }
 
+interface StartupData {
+  boardSize: number;
+}

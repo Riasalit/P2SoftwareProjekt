@@ -15,9 +15,8 @@
   </style>
 </head>
 <body>
-  <button (action)="StartGame" *ngIf="!gameStarted"> start </button>
+  <button (click)="StartGame()" *ngIf="!gameStarted"> Start </button>
   <table style="height:510px; width:510px; table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table' *ngIf="gameStarted">
-
     <tr *ngFor="let tile of tiles">
       <td style="padding:1px; border: 1px thin transparent;" width="50" *ngFor="let tile of tiles">
         <button style="height:50px;width:50px">{{tile}}</button>
