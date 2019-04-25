@@ -30,7 +30,7 @@ export class BattleshipsComponent {
     for (var i = 0; i < this.boardSize; i++) {
       this.tiles[i] = []
       for (var j = 0; j < this.boardSize; j++) {
-        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + j, tileHit: 0};
+        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + (j+1), tileHit: 0};
         console.log(this.tiles[i][j].tileName);
       }
     }
