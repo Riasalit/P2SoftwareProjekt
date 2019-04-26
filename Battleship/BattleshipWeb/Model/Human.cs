@@ -22,8 +22,6 @@ namespace BattleshipWeb
             Point target = UI.MakeTargetPoint(points, playerName);
             //The point is added to a player's list of points they've shot at
             points.Add(target);
-            Debug.WriteLine(playerName + " shoots at " + target);
-            Debug.WriteLine(ShootOpponent(target));
             UI.ReturnInformation(target, ShootOpponent(target));
         }
         public override void SetShips()

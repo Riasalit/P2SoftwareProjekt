@@ -4,10 +4,15 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BattleshipWeb.View
+namespace BattleshipWeb
 {
     public class WebUI : IUserInterface
     {
+        private string username;
+        public WebUI(string username)
+        {
+            this.username = username;
+        }
         public bool GameComplete(Player[] players, int playerWon)
         {
             throw new NotImplementedException();
@@ -20,7 +25,10 @@ namespace BattleshipWeb.View
 
         public Player[] InitializePlayers(IUserInterface UI)
         {
-            throw new NotImplementedException();
+            Player[] players = new Player[2];
+            players[0] = new AI("Strongest AI ever");
+            players[1] = new Human(username, UI);
+            return players;
         }
 
         public Point MakeTargetPoint(List<Point> points, string name)

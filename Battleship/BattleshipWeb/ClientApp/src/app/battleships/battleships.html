@@ -23,14 +23,26 @@
   </style>
 </head>
 <body>
-  <button (click)="StartGame()" *ngIf="!gameStarted"> Start </button>
-  <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table' *ngIf="gameStarted">
-    <tr *ngFor="let row of tiles">
-      <td width="61px" *ngFor="let tile of row">
-        <button id="tileButton" style="height:60px;width:60px">{{tile.tileName}}</button>
-      </td>
-    </tr>
-  </table>
+  <div *ngIf="gameState == 0">
+    <h1>Enter your name and press Start</h1>
+    <textarea id="nameField" autofocus></textarea>
+    <button (click)="StartGame()"> Start </button>
+  </div>
+
+
+
+  <div *ngIf="gameState == 1">
+    <h2>Hello {{username}}</h2>
+    <h3>Place your ships</h3>
+    <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+      <tr *ngFor="let row of tiles">
+        <td width="61px" *ngFor="let tile of row">
+          <button id="tileButton" style="height:60px;width:60px">{{tile.tileName}}</button>
+        </td>
+      </tr>
+    </table>
+    <button *ngFor="let info of shipInfos">{{info.name}}</button>
+  </div>
 </body>
 </html>
 
