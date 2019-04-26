@@ -11,7 +11,7 @@ namespace BattleshipWeb
     {
         private Domain battleship;
         private List<LabelledDCNode> shipList = new List<LabelledDCNode>();
-        private List<List<LabelledDCNode>> tileList = new List<List<LabelledDCNode>>();
+        private List<List<BooleanDCNode>> tilesList = new List<List<BooleanDCNode>>();
         private List<Point> previousHits = new List<Point>();
         private List<int> Indexes = new List<int>();
 
@@ -20,7 +20,273 @@ namespace BattleshipWeb
             battleship = new Domain();
             InitBayesianNetwork();
         }
+        public Domain InitBayesianNetwork()
+        {
+            InitShips();
+            // Initializes overlap constraints
+            MakeStatesForOverlap(shipList);
+            InitTiles();
+            battleship.Compile();
+            battleship.Compress();
+
+            return battleship;
+        }
+        // Initializes ships
+        public void InitShips()
+        {
+            for (int i = 0; i < Settings.shipCount; i++)
+            {
+                shipList.Add(new LabelledDCNode(battleship));
+                shipList[i].SetName(Settings.shipNames[i]);
+                // Set states and tables for all ships
+                SetAllStatesForShips(shipList[i], Settings.shipLengths[i]);
+            }
+        }
+        private void SetAllStatesForShips(LabelledDCNode ship, int length)
+        {
+            double possiblePosForRow = Settings.boardWidth - length + 1;
+            // Finds all possible positions on the board for the ship 
+            double numberOfStates = Settings.boardWidth * possiblePosForRow * Settings.dimension;
+            ulong count = 0;
+
+            ship.SetNumberOfStates((ulong)numberOfStates);
+            // Sets state labels and creates table for all states of the ship
+            // Runs through the two orientations; horizontal and vertical
+            for (int orientation = 0; orientation < Settings.dimension; orientation++)
+            {
+                for (int i = 0; i < (orientation == 0 ? Settings.boardWidth : possiblePosForRow); i++)
+                {
+                    for (int j = 0; j < (orientation == 1 ? Settings.boardWidth : possiblePosForRow); j++)
+                    {
+                        ship.SetStateLabel(count, (orientation == 1 ? "H" : "V") + $"_{i}{j}");
+                        ship.GetTable().SetDataItem(count, 1 / numberOfStates);
+                        count++;
+                    }
+                }
+            }
+        }
+        private void MakeStatesForOverlap(List<LabelledDCNode> shipList)
+        {
+            BooleanDCNode overlap;
+            for (int i = 0; i < shipList.Count; i++)
+            {
+                for (int j = i + 1; j < shipList.Count; j++)
+                {
+                    overlap = new BooleanDCNode(battleship);
+                    MakeStatesHelper(overlap, i, $"Overlap{i}_{j}");
+                    overlap.AddParent(shipList[j]);
+                    SetStatesForOverlaps(overlap, shipList[i], shipList[j]);
+                    overlap.SelectState(0);
+                }
+            }
+        }
+        private void MakeStatesHelper(BooleanDCNode node, int i, string name)
+        {
+            node.SetNumberOfStates(2);
+            node.SetStateLabel(0, "False");
+            node.SetStateLabel(1, "True");
+            node.AddParent(shipList[i]);
+            node.SetName(name);
+        }
+        private void SetStatesForOverlaps(BooleanDCNode overlap, LabelledDCNode secondShip, LabelledDCNode firstShip)
+        {
+            int firstShipLength = Settings.boardWidth + 1 - firstShip.GetTable().GetData().Length /
+                             (Settings.dimension * Settings.boardWidth);
+            int secondShipLength = Settings.boardWidth + 1 - secondShip.GetTable().GetData().Length /
+                              (Settings.dimension * Settings.boardWidth);
+            List<Point> firstPoints = new List<Point>();
+            List<Point> secondPoints = new List<Point>();
+            ulong count = 0;
+            string firstName, secondName;
+
+            // Iterates through entire tables on constraint's parents
+            for (int i = 0; i < (int)firstShip.GetNumberOfStates(); i++)
+            {
+                firstName = firstShip.GetStateLabel((ulong)i);
+                // Gets coordinates for first ship
+                firstPoints = ReturnCoordinates(firstShipLength, firstName);
+                for (int j = 0; j < (int)secondShip.GetNumberOfStates(); j++)
+                {
+                    secondName = secondShip.GetStateLabel((ulong)j);
+                    // Gets coordinates for second ship
+                    secondPoints = ReturnCoordinates(secondShipLength, secondName);
+                    // Checks if any ship coordinates overlap
+                    if (CheckForOverlap(firstPoints, secondPoints))
+                    {
+                        overlap.GetTable().SetDataItem(count++, 0);
+                        overlap.GetTable().SetDataItem(count++, 1);
+                    }
+                    else
+                    {
+                        overlap.GetTable().SetDataItem(count++, 1);
+                        overlap.GetTable().SetDataItem(count++, 0);
+                    }
+                }
+            }
+        }
+        // Converts start-coordinate to a list of the ships coordinates
+        private List<Point> ReturnCoordinates(int length, string name)
+        {
+            List<Point> pointList = new List<Point>();
+            char orientation = name[0];
+            int xCoord = name[2] - '0';
+            int yCoord = name[3] - '0';
+
+            for (int i = 0; i < length; i++)
+            {
+                if (orientation == 'H')
+                {
+                    pointList.Add(new Point(xCoord + i, yCoord));
+                }
+                else if (orientation == 'V')
+                {
+                    pointList.Add(new Point(xCoord, yCoord + i));
+                }
+                else
+                {
+                    Debug.WriteLine($"Something seriously wrong with the orientation - said: {orientation}");
+                }
+            }
+            return pointList;
+        }
+        private bool CheckForOverlap(List<Point> firstPoints, List<Point> secondPoints)
+        {
+            foreach (Point point in firstPoints)
+            {
+                if (secondPoints.Contains(point))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        // Initializes tiles 
+        public void InitTiles()
+        {
+            for (int i = 0; i < Settings.boardWidth; i++)
+            {
+                char letter = (char)(i + 'A');
+                for (int j = 0; j < Settings.boardWidth; j++)
+                {
+                    MakeTileStates($"{letter}{j}S");
+                }
+            }
+        }
+        private void MakeTileStates(string name)
+        {
+            List<BooleanDCNode> tileList = new List<BooleanDCNode>();
+            BooleanDCNode tile = new BooleanDCNode(battleship);
+            int templistIndex = 0;
+            int constraintNumber = 1;
+            // Sets states for the two first tiles
+            tile.AddParent(shipList[1]);
+            MakeStatesHelper(tile, 0, $"{name}{constraintNumber}");
+            SetTileStateWithTwoShips(tile, shipList[0], shipList[1], name);
+            tileList.Add(tile);
+            // Sets states for the rest of the tiles
+            for (int i = 2; i < shipList.Count; i++)
+            {
+                tile = new BooleanDCNode(battleship);
+                tile.AddParent(tileList[templistIndex]);
+                MakeStatesHelper(tile, 0, $"{name}{constraintNumber++}");
+                SetTileStateWithOneShip(tile, shipList[i], tileList[templistIndex++], name);
+                tileList.Add(tile);
+            }
+            tilesList.Add(tileList);
+        }
+        // Compares to two ships
+        private void SetTileStateWithTwoShips(BooleanDCNode tile, LabelledDCNode secondShip, LabelledDCNode firstShip, string name)
+        {
+            int firstShipLength = Settings.boardWidth + 1 - firstShip.GetTable().GetData().Length /
+                                 (Settings.dimension * Settings.boardWidth);
+            int secondShipLength = Settings.boardWidth + 1 - secondShip.GetTable().GetData().Length /
+                                  (Settings.dimension * Settings.boardWidth);
+            int xCoord = name[0] - 'A';
+            int yCoord = name[1] - '0';
+            List<Point> firstPoints = new List<Point>();
+            List<Point> secondPoints = new List<Point>();
+            Point tilePlace = new Point(xCoord, yCoord);
+            ulong count = 0;
+            string firstName, secondName;
+
+            for (int i = 0; i < (int)firstShip.GetNumberOfStates(); i++)
+            {
+                firstName = firstShip.GetStateLabel((ulong)i);
+                // Gets coordinates for first ship
+                firstPoints = ReturnCoordinates(firstShipLength, firstName);
+                for (int j = 0; j < (int)secondShip.GetNumberOfStates(); j++)
+                {
+                    secondName = secondShip.GetStateLabel((ulong)j);
+                    // Gets coordinates for second ship
+                    secondPoints = ReturnCoordinates(secondShipLength, secondName);
+                    if (secondPoints.Contains(tilePlace) || firstPoints.Contains(tilePlace))
+                    {
+                        tile.GetTable().SetDataItem(count++, 0);
+                        tile.GetTable().SetDataItem(count++, 1);
+                    }
+                    else
+                    {
+                        tile.GetTable().SetDataItem(count++, 1);
+                        tile.GetTable().SetDataItem(count++, 0);
+                    }
+                }
+            }
+        }
+        // Compares to previous tile instead of a second ship
+        private void SetTileStateWithOneShip(BooleanDCNode tile, LabelledDCNode ship, BooleanDCNode node, string name)
+        {
+            int shipLength = Settings.boardWidth + 1 - ship.GetTable().GetData().Length /
+                            (Settings.dimension * Settings.boardWidth);
+            int xCoord = name[0] - 'A';
+            int yCoord = name[1] - '0';
+            Point tilePlace = new Point(xCoord, yCoord);
+            List<Point> shipPoints;
+            bool labelIsTrue;
+            string shipName;
+            ulong count = 0;
+
+            for (ulong i = 0; i < 2; i++)
+            {
+                labelIsTrue = node.GetStateLabel(i) == "True";
+                for (ulong j = 0; j < ship.GetNumberOfStates(); j++)
+                {
+                    shipName = ship.GetStateLabel(j);
+                    shipPoints = ReturnCoordinates(shipLength, shipName);
+                    if (labelIsTrue || shipPoints.Contains(tilePlace))
+                    {
+                        tile.GetTable().SetDataItem(count++, 0);
+                        tile.GetTable().SetDataItem(count++, 1);
+                    }
+                    else
+                    {
+                        tile.GetTable().SetDataItem(count++, 1);
+                        tile.GetTable().SetDataItem(count++, 0);
+                    }
+                }
+            }
+        }
         // Executes all necessary methods on the player's turn
+        public override void SetShips()
+        {
+            int orientation;
+            char orientationLetter;
+            for (int i = 0; i < Settings.shipCount; i++)
+            {
+                bool correctlyPlaced = false;
+                while (!correctlyPlaced)
+                {
+                    Point point = new Point
+                    {
+                        X = new Random().Next(0, Settings.boardWidth),
+                        Y = new Random().Next(0, Settings.boardWidth)
+                    };
+                    orientation = new Random().Next(0, 2);
+                    orientationLetter = orientation == 0 ? 'H' : 'V';
+                    correctlyPlaced = board.PlaceShips(new Ship(Settings.shipNames[i], Settings.shipLengths[i], point,
+                                                       orientationLetter));
+                }
+            }
+        }
         public override void YourTurn()
         {
             Point shootingPoint;
@@ -50,7 +316,7 @@ namespace BattleshipWeb
             probabilities.Clear();
             for (int i = 0; i < Settings.boardSize; i++)
             {
-                probability = tileList[i][tileList[i].Count - 1].GetBelief(1);
+                probability = tilesList[i][tilesList[i].Count - 1].GetBelief(1);
                 Point tilePoint = new Point(i / Settings.boardWidth, i % Settings.boardWidth);
                 probabilities.Add(tilePoint, probability);
             }
@@ -74,17 +340,17 @@ namespace BattleshipWeb
         {
             long shipStateIndex;
             int index = shootingPoint.X * Settings.boardWidth + shootingPoint.Y;
-            int divorcedTiles = tileList[index].Count - 1;
+            int divorcedTiles = tilesList[index].Count - 1;
 
             if (shootingResult == "You hit a ship")
             {
                 // Only sets evidence for the last tile node 
-                tileList[index][divorcedTiles].SelectState(1);
+                tilesList[index][divorcedTiles].SelectState(1);
                 previousHits.Add(shootingPoint);
             }
             else if (shootingResult == "You missed")
             {
-                tileList[index][divorcedTiles].SelectState(0);
+                tilesList[index][divorcedTiles].SelectState(0);
             }
             else
             {
@@ -93,7 +359,7 @@ namespace BattleshipWeb
 
                 previousHits.Add(shootingPoint);
                 previousHits.OrderBy(p => p.X).ThenBy(p => p.Y).Reverse();
-                tileList[index][divorcedTiles].SelectState(1);
+                tilesList[index][divorcedTiles].SelectState(1);
                 for (int i = 0; i < Settings.shipCount; i++)
                 {
                     if (Settings.shipNames[i] == shipName)
@@ -150,45 +416,6 @@ namespace BattleshipWeb
 
             return SelectBestBelief(ship, allPossiblePos);
         }
-        // Finds the ship position with the greatest probability
-        private string SelectBestBelief(LabelledDCNode ship, List<List<Point>> allPossiblePos)
-        {
-            List<double> beliefs = new List<double>();
-            List<string> startCoords = new List<string>();
-            double bestBelief = 0;
-            string startCoord = "";
-            ulong beliefIndex;
-            // Runs through all possible ship positions 
-            foreach (List<Point> list in allPossiblePos)
-            {
-                // Enters if the two first Y-coordinates have the same value
-                if (list[0].Y - list[1].Y == 0)
-                {
-                    startCoord = $"H_{list[0].X}{list[0].Y}";
-                }
-                else
-                {
-                    startCoord = $"V_{list[0].X}{list[0].Y}";
-                }
-                beliefIndex = (ulong)ship.GetStateIndex(startCoord);
-                beliefs.Add(ship.GetBelief(beliefIndex));
-                startCoords.Add(startCoord);
-            }
-            for (int i = 0; i < beliefs.Count; i++)
-            {
-                // Enters if the probability is greater than those already found
-                if (beliefs[i] > bestBelief)
-                {
-                    bestBelief = beliefs[i];
-                    startCoord = startCoords[i];
-                }
-            }
-            if (startCoord != "")
-            {
-                return startCoord;
-            }
-            throw new ArgumentException("Something went wrong while trying to find sunken ship's start coordinate.");
-        }
         private bool FindShipOrientation(int length, int xDir, int yDir, Point coord)
         {
             int testLength = length - 1;
@@ -232,273 +459,44 @@ namespace BattleshipWeb
 
             return returnList;
         }
-        public Domain InitBayesianNetwork()
+        // Finds the ship position with the greatest probability
+        private string SelectBestBelief(LabelledDCNode ship, List<List<Point>> allPossiblePos)
         {
-            // Initializes ships
-            for (int i = 0; i < Settings.shipCount; i++)
+            List<double> beliefs = new List<double>();
+            List<string> startCoords = new List<string>();
+            double bestBelief = 0;
+            string startCoord = "";
+            ulong beliefIndex;
+            // Runs through all possible ship positions 
+            foreach (List<Point> list in allPossiblePos)
             {
-                shipList.Add(new LabelledDCNode(battleship));
-                shipList[i].SetName(Settings.shipNames[i]);
-                // Set states and tables for all ships
-                SetAllStatesForShips(shipList[i], Settings.shipLengths[i]);
-            }
-            // Initializes overlap constraints
-            MakeStatesForOverlap(shipList);
-
-            // Initializes tiles 
-            for (int i = 0; i < Settings.boardWidth; i++)
-            {
-                char letter = (char)(i + 'A');
-                for (int j = 0; j < Settings.boardWidth; j++)
+                // Enters if the two first Y-coordinates have the same value
+                if (list[0].Y - list[1].Y == 0)
                 {
-                    tileList.Add(MakeStatesForTiles(shipList, $"{letter}{j}S"));
-                }
-            }
-            battleship.Compile();
-            battleship.Compress();
-
-            return battleship;
-        }
-        private void SetAllStatesForShips(LabelledDCNode ship, int length)
-        {
-            double possiblePosForRow = Settings.boardWidth - length + 1;
-            // Finds all possible positions on the board for the ship 
-            double numberOfStates = Settings.boardWidth * possiblePosForRow * Settings.dimension;
-            ulong count = 0;
-
-            ship.SetNumberOfStates((ulong)numberOfStates);
-            // 
-            for (int orientation = 0; orientation < Settings.dimension; orientation++)
-            {
-                for (int i = 0; i < (orientation == 0 ? Settings.boardWidth : possiblePosForRow); i++)
-                {
-                    for (int j = 0; j < (orientation == 1 ? Settings.boardWidth : possiblePosForRow); j++)
-                    {
-                        ship.SetStateLabel(count, (orientation == 1 ? "H" : "V") + $"_{i}{j}");
-                        ship.GetTable().SetDataItem(count, 1 / numberOfStates);
-                        count++;
-                    }
-                }
-            }
-        }
-        private void SetStatesForOverlaps(BooleanDCNode overlap, LabelledDCNode secondShip, LabelledDCNode firstShip)
-        {
-            //Example: 10+1-180/20 = 2
-            int firstLength = Settings.boardWidth + 1 - firstShip.GetTable().GetData().Length
-                                                   / (2 * Settings.boardWidth);
-            int secondLength = Settings.boardWidth + 1 - secondShip.GetTable().GetData().Length
-                                                   / (2 * Settings.boardWidth);
-            List<Point> firstPoints = new List<Point>();
-            List<Point> secondPoints = new List<Point>();
-            ulong count = 0;
-            string firstName, secondName;
-            //Iterates through entire tables on constraint's parents
-            for (int i = 0; i < (int)firstShip.GetNumberOfStates(); i++)
-            {
-                firstName = firstShip.GetStateLabel((ulong)i);
-                //Gives coordinates for first ship
-                firstPoints = ReturnCoordinates(firstLength, firstName);
-                for (int j = 0; j < (int)secondShip.GetNumberOfStates(); j++)
-                {
-                    //secondShip.GetTable().GetData().Length
-                    secondName = secondShip.GetStateLabel((ulong)j);
-                    //Gives coordinates for second ship
-                    secondPoints = ReturnCoordinates(secondLength, secondName);
-                    //Checks if any ship coordinates overlap
-                    if (CheckForOverlap(firstPoints, secondPoints))
-                    {
-                        overlap.GetTable().SetDataItem(count++, 0);
-                        overlap.GetTable().SetDataItem(count++, 1);
-                    }
-                    else
-                    {
-                        overlap.GetTable().SetDataItem(count++, 1);
-                        overlap.GetTable().SetDataItem(count++, 0);
-                    }
-                }
-            }
-        }
-        private List<Point> ReturnCoordinates(int length, string name)
-        {
-            List<Point> pointList = new List<Point>();
-            char orientation = name[0];
-            int xCoord = name[2] - '0';
-            int yCoord = name[3] - '0';
-            for (int i = 0; i < length; i++)
-            {
-                if (orientation == 'H')
-                {
-                    pointList.Add(new Point(xCoord + i, yCoord));
-                }
-                else if (orientation == 'V')
-                {
-                    pointList.Add(new Point(xCoord, yCoord + i));
+                    startCoord = $"H_{list[0].X}{list[0].Y}";
                 }
                 else
                 {
-                    Debug.WriteLine($"Something seriously wrong with the orientation - said: {orientation}");
+                    startCoord = $"V_{list[0].X}{list[0].Y}";
                 }
+                beliefIndex = (ulong)ship.GetStateIndex(startCoord);
+                beliefs.Add(ship.GetBelief(beliefIndex));
+                startCoords.Add(startCoord);
             }
-            return pointList;
-        }
-        private bool CheckForOverlap(List<Point> firstPoints, List<Point> secondPoints)
-        {
-            foreach (Point point in firstPoints)
+            for (int i = 0; i < beliefs.Count; i++)
             {
-                if (secondPoints.Contains(point))
+                // Enters if the probability is greater than those already found
+                if (beliefs[i] > bestBelief)
                 {
-                    return true;
+                    bestBelief = beliefs[i];
+                    startCoord = startCoords[i];
                 }
             }
-            return false;
-        }
-        private List<LabelledDCNode> MakeStatesForTiles(List<LabelledDCNode> shipList, string name)
-        {
-            List<LabelledDCNode> tempTileList = new List<LabelledDCNode>();
-            int templistIndex = 0;
-            LabelledDCNode tile;
-            int constraintNumber = 0;
-            tile = new LabelledDCNode(battleship);
-            tile.SetNumberOfStates(2);
-            tile.SetStateLabel(0, "False");
-            tile.SetStateLabel(1, "True");
-            tile.AddParent(shipList[0]);
-            tile.AddParent(shipList[1]);
-            SetAllStatesForTiles(tile, shipList[0], shipList[1], name);
-            tile.SetName($"{name}{constraintNumber++}");
-            tempTileList.Add(tile);
-            for (int i = 2; i < shipList.Count; i++)
+            if (startCoord != "")
             {
-                tile = new LabelledDCNode(battleship);
-                tile.SetNumberOfStates(2);
-                tile.SetStateLabel(0, "False");
-                tile.SetStateLabel(1, "True");
-                tile.AddParent(shipList[i]);
-                tile.AddParent(tempTileList[templistIndex]);
-                SetStatesForTilesWithOnlyOneShip(tile, shipList[i], tempTileList[templistIndex++], name);
-                tile.SetName($"{name}{constraintNumber++}");
-                tempTileList.Add(tile);
+                return startCoord;
             }
-            return tempTileList;
-        }
-        private void MakeStatesForOverlap(List<LabelledDCNode> shipList)
-        {
-            BooleanDCNode overlap;
-            for (int i = 0; i < shipList.Count; i++)
-            {
-                for (int j = i + 1; j < shipList.Count; j++)
-                {
-                    overlap = new BooleanDCNode(battleship);
-                    overlap.SetNumberOfStates(2);
-                    overlap.SetStateLabel(0, "False");
-                    overlap.SetStateLabel(1, "True");
-                    overlap.AddParent(shipList[i]);
-                    overlap.AddParent(shipList[j]);
-                    SetStatesForOverlaps(overlap, shipList[i], shipList[j]);
-                    overlap.SelectState(0);
-                    overlap.SetName($"Overlap{i}_{j}");
-                }
-            }
-        }
-        //Basically copy paste function from "MakeStatesForTiles()" 
-        //it compares to previous nodes instead of a second ship
-        private void SetStatesForTilesWithOnlyOneShip(LabelledDCNode tile, LabelledDCNode ship, LabelledDCNode node, string name)
-        {
-            int shipLength = Settings.boardWidth + 1 - ship.GetTable().GetData().Length
-                                                              / (2 * Settings.boardWidth);
-            int xCoord = name[0] - 'A';
-            int yCoord = name[1] - '0';
-            Point tilePlace = new Point(xCoord, yCoord);
-            List<Point> shipPoints = new List<Point>();
-            bool labelIsTrue;
-            string shipName;
-            ulong count = 0;
-            for (ulong i = 0; i < 2; i++)
-            {
-                labelIsTrue = node.GetStateLabel(i) == "True";
-                for (ulong j = 0; j < ship.GetNumberOfStates(); j++)
-                {
-                    shipName = ship.GetStateLabel(j);
-                    shipPoints = ReturnCoordinates(shipLength, shipName);
-                    if (labelIsTrue || shipPoints.Contains(tilePlace))
-                    {
-                        tile.GetTable().SetDataItem(count++, 0);
-                        tile.GetTable().SetDataItem(count++, 1);
-                    }
-                    else
-                    {
-                        tile.GetTable().SetDataItem(count++, 1);
-                        tile.GetTable().SetDataItem(count++, 0);
-                    }
-                }
-            }
-        }
-        private void SetAllStatesForTiles(LabelledDCNode tile, LabelledDCNode secondShip,
-                                          LabelledDCNode firstShip, string name)
-        {
-            List<Point> firstPoints = new List<Point>();
-            List<Point> secondPoints = new List<Point>();
-            int xCoord = name[0] - 'A';
-            int yCoord = name[1] - '0';
-            string firstName, secondName;
-            Point tilePlace = new Point(xCoord, yCoord);
-            int firstLength = Settings.boardWidth + 1 - firstShip.GetTable().GetData().Length
-                                                  / (2 * Settings.boardWidth);
-            int secondLength = Settings.boardWidth + 1 - secondShip.GetTable().GetData().Length
-                                                   / (2 * Settings.boardWidth);
-            ulong count = 0;
-            for (int i = 0; i < (int)firstShip.GetNumberOfStates(); i++)
-            {
-                firstName = firstShip.GetStateLabel((ulong)i);
-                //Gives coordinates for first ship
-                firstPoints = ReturnCoordinates(firstLength, firstName);
-                for (int j = 0; j < (int)secondShip.GetNumberOfStates(); j++)
-                {
-                    //secondShip.GetTable().GetData().Length
-                    secondName = secondShip.GetStateLabel((ulong)j);
-                    //Gives coordinates for second ship
-                    secondPoints = ReturnCoordinates(secondLength, secondName);
-                    if (secondPoints.Contains(tilePlace) || firstPoints.Contains(tilePlace))
-                    {
-                        tile.GetTable().SetDataItem(count++, 0);
-                        tile.GetTable().SetDataItem(count++, 1);
-                    }
-                    else
-                    {
-                        tile.GetTable().SetDataItem(count++, 1);
-                        tile.GetTable().SetDataItem(count++, 0);
-                    }
-                }
-            }
-        }
-        private bool IsAnyShipOnTile(string name, List<List<Point>> shipList)
-        {
-            Point getCord = new Point(name[0], name[1]);
-            foreach (List<Point> list in shipList)
-            {
-                if (list.Contains(getCord))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public override void SetShips()
-        {
-            int orientation;
-            for (int i = 0; i < Settings.shipCount; i++)
-            {
-                bool correctlyPlaced = false;
-                while (!correctlyPlaced)
-                {
-                    Point point = new Point();
-                    point.X = new Random().Next(0, Settings.boardWidth);
-                    point.Y = new Random().Next(0, Settings.boardWidth);
-                    orientation = new Random().Next(0, 2);
-                    correctlyPlaced = board.PlaceShips(new Ship(Settings.shipNames[i], Settings.shipLengths[i], point,
-                                                       orientation == 0 ? 'H' : 'V'));
-                }
-            }
+            throw new ArgumentException("Something went wrong while trying to find sunken ship's start coordinate.");
         }
         public void DeleteDomain()
         {
