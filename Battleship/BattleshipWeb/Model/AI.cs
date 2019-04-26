@@ -13,7 +13,7 @@ namespace BattleshipWeb
         private List<LabelledDCNode> shipList = new List<LabelledDCNode>();
         private List<List<BooleanDCNode>> tilesList = new List<List<BooleanDCNode>>();
         private List<Point> previousHits = new List<Point>();
-        private List<int> Indexes = new List<int>();
+        private SortedDictionary<int, int> Indexes = new SortedDictionary<int, int>();
 
         public AI(string name) : base(name)
         {
@@ -34,12 +34,13 @@ namespace BattleshipWeb
         // Initializes ships
         public void InitShips()
         {
-            for (int i = 0; i < Settings.shipCount; i++)
+            int i = 0;
+            foreach (KeyValuePair<string, int> ship in Settings.ships)
             {
                 shipList.Add(new LabelledDCNode(battleship));
-                shipList[i].SetName(Settings.shipNames[i]);
+                shipList[i].SetName(ship.Key);
                 // Set states and tables for all ships
-                SetAllStatesForShips(shipList[i], Settings.shipLengths[i]);
+                SetAllStatesForShips(shipList[i++], ship.Value);
             }
         }
         private void SetAllStatesForShips(LabelledDCNode ship, int length)
@@ -270,9 +271,10 @@ namespace BattleshipWeb
         {
             int orientation;
             char orientationLetter;
-            for (int i = 0; i < Settings.shipCount; i++)
+            bool correctlyPlaced;
+            foreach (KeyValuePair<string, int> ship in Settings.ships)
             {
-                bool correctlyPlaced = false;
+                correctlyPlaced = false;
                 while (!correctlyPlaced)
                 {
                     Point point = new Point
@@ -282,8 +284,7 @@ namespace BattleshipWeb
                     };
                     orientation = new Random().Next(0, 2);
                     orientationLetter = orientation == 0 ? 'H' : 'V';
-                    correctlyPlaced = board.PlaceShips(new Ship(Settings.shipNames[i], Settings.shipLengths[i], point,
-                                                       orientationLetter));
+                    correctlyPlaced = board.PlaceShips(new Ship(ship.Key, ship.Value, point, orientationLetter));
                 }
             }
         }
@@ -356,24 +357,19 @@ namespace BattleshipWeb
             {
                 string shipName = shootingResult.Split(' ')[2];
                 int totalShipLengths = 0;
+                int i = 0;
 
                 previousHits.Add(shootingPoint);
                 previousHits.OrderBy(p => p.X).ThenBy(p => p.Y).Reverse();
                 tilesList[index][divorcedTiles].SelectState(1);
-                for (int i = 0; i < Settings.shipCount; i++)
-                {
-                    if (Settings.shipNames[i] == shipName)
-                    {
-                        totalShipLengths = 0;
-                        // Indexes keeps track of where in the list of ship names the sunken ship is
-                        Indexes.Add(i);
-                        // Sorts so evidence is set for the largest ships first
-                        Indexes.Sort();
 
-                        foreach (int shipIndex in Indexes)
-                        {
-                            totalShipLengths += Settings.shipLengths[shipIndex];
-                        }
+                foreach (KeyValuePair<string, int> ship in Settings.ships)
+                {
+                    if (ship.Key == shipName)
+                    {
+                        Indexes.Add(i++, ship.Value);
+                        totalShipLengths += ship.Value;
+
                         /*****************************************************
                         * REEEET!!!!!!                                       *
                         * Sunken ships bliver ikke fjernet fra previouseHits *                       
@@ -384,16 +380,17 @@ namespace BattleshipWeb
                         {
                             string shipPos;
 
-                            foreach (int shipIndex in Indexes)
+                            foreach (KeyValuePair<int, int> shipIndex in Indexes)
                             {
-                                shipPos = FindShipPos(Settings.shipLengths[shipIndex], shipList[shipIndex]);
-                                shipStateIndex = shipList[shipIndex].GetStateIndex(shipPos);
+                                shipPos = FindShipPos(shipIndex.Value, shipList[shipIndex.Key]);
+                                shipStateIndex = shipList[shipIndex.Key].GetStateIndex(shipPos);
                                 // Inserts evidence
-                                shipList[shipIndex].SelectState((ulong)shipStateIndex);
+                                shipList[shipIndex.Key].SelectState((ulong)shipStateIndex);
                             }
                             Indexes.Clear();
                         }
                     }
+                    totalShipLengths = 0;
                 }
             }
         }
@@ -492,6 +489,7 @@ namespace BattleshipWeb
                     startCoord = startCoords[i];
                 }
             }
+
             if (startCoord != "")
             {
                 return startCoord;

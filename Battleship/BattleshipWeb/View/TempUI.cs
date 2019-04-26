@@ -18,8 +18,8 @@ namespace BattleshipWeb
         {
             shipNames = new List<string>();
             shipLengths = new List<int>();
-            foreach (string name in Settings.shipNames) shipNames.Add(name);
-            foreach (int integer in Settings.shipLengths) shipLengths.Add(integer);
+            foreach (string name in Settings.ships.Keys) shipNames.Add(name);
+            foreach (int integer in Settings.ships.Values) shipLengths.Add(integer);
             shipCount = Settings.shipCount;
         }
         public Player[] InitializePlayers(IUserInterface UI)

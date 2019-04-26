@@ -18,8 +18,11 @@ namespace BattleshipTest
         {
             shipNames = new List<string>();
             shipLengths = new List<int>();
-            foreach (string name in Settings.shipNames) shipNames.Add(name);
-            foreach (int integer in Settings.shipLengths) shipLengths.Add(integer);
+            foreach (KeyValuePair<string, int> ship in Settings.ships)
+            {
+                shipNames.Add(ship.Key);
+                shipLengths.Add(ship.Value);
+            }
             shipCount = Settings.shipCount;
             shipNumber = 0;
         }
