@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using HAPI;
+﻿using System.Drawing;
 using System.Diagnostics;
-using System.IO;
+
 namespace BattleshipWeb
 {
     public class Human : Player
@@ -18,26 +12,27 @@ namespace BattleshipWeb
         }
         public override void YourTurn()
         {
-            //target represents the coordinates the player wants to shoot at
-            Point target = UI.MakeTargetPoint(points, playerName);
-            //The point is added to a player's list of points they've shot at
-            points.Add(target);
+            // Target represents the coordinates the player wants to shoot at
+            Point target = UI.MakeTargetPoint(pointsShot, playerName);
+            // The point is added to a player's list of points they've shot at
+            pointsShot.Add(target);
+            Debug.WriteLine(playerName + " shoots at " + target);
             UI.ReturnInformation(target, ShootOpponent(target));
         }
         public override void SetShips()
         {
             Ship ship;
-            bool correctlyPlaced = false;
+            bool correctlyPlaced;
             bool lastShipCorrectlyPlaced = false;
-            //Places five ships
+            // Places five ships
             for (int i = 0; i < Settings.shipCount; i++)
             {
                 correctlyPlaced = false;
                 while (!correctlyPlaced)
                 {
-                    //Gets a ship from player
+                    // Gets a ship from player
                     ship = UI.GetShips(lastShipCorrectlyPlaced, playerName);
-                    //Validates ship location and places if possible
+                    // Validates ship location and places if possible
                     correctlyPlaced = board.PlaceShips(ship);
                     lastShipCorrectlyPlaced = correctlyPlaced;
                 }

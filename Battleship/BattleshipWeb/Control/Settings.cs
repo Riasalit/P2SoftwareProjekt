@@ -8,20 +8,16 @@ namespace BattleshipWeb
     public static class Settings
     {
         public const int boardWidth = 7;
+        public const int dimension = 2;
         public const int boardSize = boardWidth * boardWidth;
         //largest ships first for ai purposes
-        public static readonly string[] shipNames = 
-            {
-                "Carrier",
-                "Battleship",
-                "Submarine"
-            };
-        public static readonly int[] shipLengths =
-            {
-                 5, 4, 3
-            };
+        public static readonly Dictionary<string, int> ships = new Dictionary<string, int>
+        {
+            {"Carrier", 5},
+            {"Battleship", 4},
+            {"Submarine", 3}
+        };
         public const int shipCount = 3;
-
     }
 }
 //"Destroyer",

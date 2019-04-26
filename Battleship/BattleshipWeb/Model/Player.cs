@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Drawing;
 
 namespace BattleshipWeb
 {
     public abstract class Player
     {
-        public List<Point> points;
+        public List<Point> pointsShot;
         public Board board { get; }
         private Player opponent;
         public string playerName { get; }
@@ -19,7 +15,7 @@ namespace BattleshipWeb
         {
             playerName = name;
             board = new Board();
-            points = new List<Point>();
+            pointsShot = new List<Point>();
             turnCounter = 0;
         }
         public void SetOpponent(Player opponent)
@@ -29,6 +25,7 @@ namespace BattleshipWeb
         public string ShootOpponent(Point point)
         {
             turnCounter++;
+
             return opponent.board.ShootAt(point);
         }
         public abstract void YourTurn();

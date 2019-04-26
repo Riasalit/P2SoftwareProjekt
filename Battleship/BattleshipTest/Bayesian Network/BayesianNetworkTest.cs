@@ -20,9 +20,11 @@ namespace BattleshipTest.BayesianNetworkTest
         {
             Player testAI = new AI("TestAI");
             Player testHuman = new AI("TestHuman");
-            for (int i = 0; i < Settings.shipCount; i++)
+            int i = 0;
+
+            foreach (KeyValuePair<string, int> ship in Settings.ships)
             {
-                testHuman.board.PlaceShips(new Ship(Settings.shipNames[i], Settings.shipLengths[i], new Point(i, 0), 'V'));
+                testHuman.board.PlaceShips(new Ship(ship.Key, ship.Value, new Point(i++, 0), 'V'));
             }
             testAI.SetOpponent(testHuman);
 

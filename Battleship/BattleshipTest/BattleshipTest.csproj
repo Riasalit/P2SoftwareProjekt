@@ -20,6 +20,18 @@
     <Reference Include="HAPI">
       <HintPath>..\BattleshipWeb\HAPI.dll</HintPath>
     </Reference>
+    <Reference Include="HelloAngular.Views">
+      <HintPath>..\BattleshipWeb\HelloAngular.Views.dll</HintPath>
+    </Reference>
+    <Reference Include="HelloAngular">
+      <HintPath>..\BattleshipWeb\HelloAngular.dll</HintPath>
+    </Reference>
+    <Reference Include="BattleshipWeb">
+      <HintPath>..\BattleshipWeb\bin\Debug\netcoreapp2.1\BattleshipWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="BattleshipWeb.Views">
+      <HintPath>..\BattleshipWeb\bin\Debug\netcoreapp2.1\BattleshipWeb.Views.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
