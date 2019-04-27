@@ -181,7 +181,7 @@ namespace BattleshipWeb
             int constraintNumber = 1;
             // Sets states for the two first tiles
             tile.AddParent(shipList[1]);
-            MakeStatesHelper(tile, 0, $"{name}{constraintNumber}");
+            MakeStatesHelper(tile, 0, $"{name}{constraintNumber++}");
             SetTileStateWithTwoShips(tile, shipList[0], shipList[1], name);
             tileList.Add(tile);
             // Sets states for the rest of the tiles
@@ -189,6 +189,7 @@ namespace BattleshipWeb
             {
                 tile = new BooleanDCNode(battleship);
                 tile.AddParent(tileList[templistIndex]);
+                tile.AddParent(shipList[i]);
                 MakeStatesHelper(tile, 0, $"{name}{constraintNumber++}");
                 SetTileStateWithOneShip(tile, shipList[i], tileList[templistIndex++], name);
                 tileList.Add(tile);

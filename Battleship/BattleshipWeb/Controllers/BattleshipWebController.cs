@@ -30,8 +30,8 @@ namespace BattleshipWeb
         {
             return Enumerable.Range(0, Settings.shipCount).Select(index => new ShipInfo
             {
-                name = Settings.shipNames[index],
-                length = Settings.shipLengths[index]
+                name = Settings.ships.ElementAt(index).Key,
+                length = Settings.ships.ElementAt(index).Value
             });
         }
         public class ShipInfo

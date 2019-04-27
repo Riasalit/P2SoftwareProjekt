@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { renderTemplate } from '@angular/core/src/render3/instructions';
+import { forEach } from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'home',
@@ -39,12 +40,8 @@ export class BattleshipsComponent {
     this.username = htmltext.value;
     this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();
     this.gameState = 1;
-    console.log(this.gameState);
-
-    
     this.DrawBoard();
   }
-
 
   private DrawBoard() {
     this.tiles = [];
@@ -52,7 +49,6 @@ export class BattleshipsComponent {
       this.tiles[i] = []
       for (var j = 0; j < this.boardSize; j++) {
         this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + (j + 1), tileHit: 0 };
-        console.log(this.tiles[i][j].tileName);
       }
     }
   }
@@ -61,9 +57,10 @@ export class BattleshipsComponent {
     this.currentShipLength = length;
   }
 
-  public ChooseTile(coord: string) {
+  public ChooseTile(tile: NodeData) {
     if (this.firstShipPos) {
-      this.CalcSecondTiles(coord);
+      tile.tileHit = 3;
+      this.CalcSecondTiles(tile.tileName);
     } else {
 
     }
@@ -71,9 +68,24 @@ export class BattleshipsComponent {
   }
 
   private CalcSecondTiles(coord: string) {
-
+    let baseRow = coord.charCodeAt(0) - 65;
+    let baseCol = Number.parseInt(coord[1]);
+    for (var i = 0; i < this.tiles.length; i++) {
+      for (var j = 0; j < this.tiles[i].length; j++) {
+        let tempFullname = this.tiles[i][j].tileName;
+        let tempRow = tempFullname.charCodeAt(0) - 65;
+        let tempCol = Number.parseInt(tempFullname[1]);
+        if (!this.testTiles(baseRow, tempRow, baseCol, tempCol)) {
+          this.tiles[i][j].tileHit = 3;
+        }
+      }
+    }
   }
 
+  private testTiles(baseRow: Number, tempRow: Number, baseCol: Number, tempCol: Number) {
+
+    return true;
+  }
 
 }
 

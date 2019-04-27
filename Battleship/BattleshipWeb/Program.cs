@@ -16,12 +16,12 @@ namespace BattleshipWeb
         {
             IUserInterface UI = new TempUI();
             Game game = new Game(UI);
-            //CreateWebHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args).Build().Run();
             game.Start();
         }
 
-        //public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            //WebHost.CreateDefaultBuilder(args)
-                //.UseStartup<Startup>();
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
     }
 }
