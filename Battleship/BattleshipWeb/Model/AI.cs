@@ -344,19 +344,16 @@ namespace BattleshipWeb
 
             if (shootingResult == "You hit a ship")
             {
-                Console.WriteLine(playerName + " hit a ship");
                 // Only sets evidence for the last tile node
                 tilesList[index][divorcedTiles].SelectState(1);
                 previousHits.Add(shootingPoint);
             }
             else if (shootingResult == "You missed")
             {
-                Console.WriteLine(playerName + " missed");
                 tilesList[index][divorcedTiles].SelectState(0);
             }
             else
             {
-                Console.WriteLine(playerName + " sunk a ship");
                 string shipName = shootingResult.Split(' ')[2];
                 int totalShipLengths = 0;
                 int i = 0;
