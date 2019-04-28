@@ -27,7 +27,6 @@ namespace BattleshipWeb
             MakeStatesForOverlap(shipList);
             InitTiles();
             battleship.Compile();
-            battleship.Compress();
 
             return battleship;
         }
@@ -180,16 +179,16 @@ namespace BattleshipWeb
             int templistIndex = 0;
             int constraintNumber = 1;
             // Sets states for the two first tiles
-            tile.AddParent(shipList[1]);
             MakeStatesHelper(tile, 0, $"{name}{constraintNumber++}");
+            tile.AddParent(shipList[1]);
             SetTileStateWithTwoShips(tile, shipList[0], shipList[1], name);
             tileList.Add(tile);
             // Sets states for the rest of the tiles
             for (int i = 2; i < shipList.Count; i++)
             {
                 tile = new BooleanDCNode(battleship);
-                tile.AddParent(tileList[templistIndex]);
                 MakeStatesHelper(tile, i, $"{name}{constraintNumber++}");
+                tile.AddParent(tileList[templistIndex]);
                 SetTileStateWithOneShip(tile, shipList[i], tileList[templistIndex++], name);
                 tileList.Add(tile);
             }
@@ -345,16 +344,19 @@ namespace BattleshipWeb
 
             if (shootingResult == "You hit a ship")
             {
+                Console.WriteLine(playerName + " hit a ship");
                 // Only sets evidence for the last tile node
                 tilesList[index][divorcedTiles].SelectState(1);
                 previousHits.Add(shootingPoint);
             }
             else if (shootingResult == "You missed")
             {
+                Console.WriteLine(playerName + " missed");
                 tilesList[index][divorcedTiles].SelectState(0);
             }
             else
             {
+                Console.WriteLine(playerName + " sunk a ship");
                 string shipName = shootingResult.Split(' ')[2];
                 int totalShipLengths = 0;
                 int i = 0;
@@ -367,7 +369,8 @@ namespace BattleshipWeb
                 {
                     if (ship.Key == shipName)
                     {
-                        Indexes.Add(i++, ship.Value);
+                        while (shipList[i].GetName() != shipName) i++;
+                        Indexes.Add(i, ship.Value);
                         totalShipLengths += ship.Value;
 
                         /*****************************************************
@@ -388,6 +391,7 @@ namespace BattleshipWeb
                                 shipList[shipIndex.Key].SelectState((ulong)shipStateIndex);
                             }
                             Indexes.Clear();
+                            previousHits.Clear();
                         }
                     }
                     totalShipLengths = 0;
@@ -463,7 +467,7 @@ namespace BattleshipWeb
             List<string> startCoords = new List<string>();
             double bestBelief = 0;
             string startCoord = "";
-            ulong beliefIndex;
+            long beliefIndex = 0;
             // Runs through all possible ship positions
             foreach (List<Point> list in allPossiblePos)
             {
@@ -476,8 +480,8 @@ namespace BattleshipWeb
                 {
                     startCoord = $"V_{list[0].X}{list[0].Y}";
                 }
-                beliefIndex = (ulong)ship.GetStateIndex(startCoord);
-                beliefs.Add(ship.GetBelief(beliefIndex));
+                beliefIndex = ship.GetStateIndex(startCoord);
+                beliefs.Add(ship.GetBelief((ulong)beliefIndex));
                 startCoords.Add(startCoord);
             }
             for (int i = 0; i < beliefs.Count; i++)
