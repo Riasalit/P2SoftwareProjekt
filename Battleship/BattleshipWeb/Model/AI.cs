@@ -354,44 +354,29 @@ namespace BattleshipWeb
             }
             else
             {
-                string shipName = shootingResult.Split(' ')[2];
-                int totalShipLengths = 0;
-                int i = 0;
+                string sunkenShipName = shootingResult.Split(' ')[2];
+                var sunkenShipLength = Settings.ships.Where(p => p.Key == sunkenShipName).Select(p => p.Value).ElementAt(0);
+                int shipNumber = 0;
+                while (shipList[shipNumber].GetName() != sunkenShipName) shipNumber++;
+                Indexes.Add(shipNumber, sunkenShipLength);
 
                 previousHits.Add(shootingPoint);
                 previousHits.OrderBy(p => p.X).ThenBy(p => p.Y).Reverse();
                 tilesList[index][divorcedTiles].SelectState(1);
 
-                foreach (KeyValuePair<string, int> ship in Settings.ships)
+                // Inserts evidence only if there is one possible position
+                if (sunkenShipLength == previousHits.Count)
                 {
-                    if (ship.Key == shipName)
+                    string shipPos;
+                    foreach (KeyValuePair<int, int> shipIndex in Indexes)
                     {
-                        while (shipList[i].GetName() != shipName) i++;
-                        Indexes.Add(i, ship.Value);
-                        totalShipLengths += ship.Value;
-
-                        /*****************************************************
-                        * REEEET!!!!!!                                       *
-                        * Sunken ships bliver ikke fjernet fra previouseHits *
-                        ******************************************************/
-
-                        // Inserts evidence only if there is one possible position
-                        if (totalShipLengths == previousHits.Count)
-                        {
-                            string shipPos;
-
-                            foreach (KeyValuePair<int, int> shipIndex in Indexes)
-                            {
-                                shipPos = FindShipPos(shipIndex.Value, shipList[shipIndex.Key]);
-                                shipStateIndex = shipList[shipIndex.Key].GetStateIndex(shipPos);
-                                // Inserts evidence
-                                shipList[shipIndex.Key].SelectState((ulong)shipStateIndex);
-                            }
-                            Indexes.Clear();
-                            previousHits.Clear();
-                        }
+                        shipPos = FindShipPos(shipIndex.Value, shipList[shipIndex.Key]);
+                        shipStateIndex = shipList[shipIndex.Key].GetStateIndex(shipPos);
+                        // Inserts evidence
+                        shipList[shipIndex.Key].SelectState((ulong)shipStateIndex);
                     }
-                    totalShipLengths = 0;
+                    Indexes.Clear();
+                    previousHits.Clear();
                 }
             }
         }
