@@ -38,7 +38,6 @@ namespace BattleshipWeb
         }
         private void NextPlayer()
         {
-            Console.WriteLine("test");
             // Runs the game and swaps turns between players
             players[turn].YourTurn();
             if (players[(turn + 1) % 2].board.sunkenShips == Settings.shipCount)
