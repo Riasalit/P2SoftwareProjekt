@@ -90,24 +90,22 @@ namespace BattleshipWeb
             }
             return false;
         }
-        public string ShootAt(Point point)
+        public Tile ShootAt(Point point)
         {
-            string returnString;
+            Tile shootingTile = gameBoard[point.X, point.Y];
             // Shoots at x, y on the board if not already shot
-            if (gameBoard[point.X, point.Y].tile == (int)Tile.TileState.unknown)
+            if (shootingTile.tile == (int)Tile.TileState.unknown)
             {
-                yourShots.Add(gameBoard[point.X, point.Y]);
-                returnString = gameBoard[point.X, point.Y].ShotInformation();
-                if (gameBoard[point.X, point.Y].GetShipStatus())
+                yourShots.Add(shootingTile);
+                shootingTile.SetTileState();
+                if (shootingTile.tile == (int)Tile.TileState.sunk)
                 {
                     sunkenShips++;
                 }
-                return returnString;
+                return shootingTile;
             }
-            else
-            {
-                return "Already hit";
-            }
+            // Returns -1 if the tile is already hit
+            return new Tile();
         }
     }
 }

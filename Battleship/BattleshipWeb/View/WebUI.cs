@@ -36,7 +36,7 @@ namespace BattleshipWeb
             throw new NotImplementedException();
         }
 
-        public void ReturnInformation(Point point, string info)
+        public void ReturnInformation(Point point, Tile info)
         {
             throw new NotImplementedException();
         }

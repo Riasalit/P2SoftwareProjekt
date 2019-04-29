@@ -47,7 +47,6 @@ namespace BattleshipWeb
         }
         private void ContinueGameOrExit(bool restartChoice)
         {
-
             // Resets the domain for all AI players
             foreach (Player player in players)
             {

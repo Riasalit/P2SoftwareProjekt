@@ -10,7 +10,7 @@ namespace BattleshipTest
 {
     public class TestUI : IUserInterface
     {
-        static int shipNumber = 0;
+        static int shipNumber;
         List<string> shipNames;
         List<int> shipLengths;
         private int shipCount;
@@ -53,7 +53,7 @@ namespace BattleshipTest
         {
             return new Point(new Random().Next(0, Settings.boardWidth), new Random().Next(0, Settings.boardWidth));
         }
-        public void ReturnInformation(Point point, string info)
+        public void ReturnInformation(Point point, Tile info)
         {
             
         }
