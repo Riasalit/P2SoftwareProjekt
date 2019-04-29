@@ -16,7 +16,7 @@ namespace BattleshipTest.BayesianNetworkTest
     public class BayesianNetworkTest
     {
         [TestMethod]
-        public void DoesAIWorkIfShipsArePlacedBesidesEachOther()
+        public void CanAIShootIfShipsArePlacedBesideEachOther()
         {
             Player testHuman = new AI("TestHuman");
             Player testAI = new AI("TestAI");
