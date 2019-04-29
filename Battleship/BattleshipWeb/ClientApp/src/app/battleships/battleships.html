@@ -33,15 +33,18 @@
 
   <div *ngIf="gameState == 1">
     <h2>Hello {{username}}</h2>
-    <h3>Place your ships</h3>
+    <h3>Place your ships {{currentShipLength}}</h3>
     <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
       <tr *ngFor="let row of tiles">
-        <td width="61px" *ngFor="let tile of row">
-          <button id="tileButton" style="height:60px;width:60px">{{tile.tileName}}</button>
+        <td width="61px" height="61px" *ngFor="let tile of row">
+          <div *ngIf="BoolCheck(tile); else elseBlock">
+            <button (click)="ChooseTile(tile)" id="tileButton" style="height:60px;width:60px">{{tile.tileHit}} {{tile.tileName}}</button>
+          </div>
+          <ng-template #elseBlock>{{tile.tileHit}}</ng-template>
         </td>
       </tr>
     </table>
-    <button *ngFor="let info of shipInfos">{{info.name}}</button>
+    <button (click)="ChooseShip(info)" *ngFor="let info of shipInfos" >{{info.name}}</button>
   </div>
 </body>
 </html>
