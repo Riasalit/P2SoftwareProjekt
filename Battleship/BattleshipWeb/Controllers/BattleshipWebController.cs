@@ -11,8 +11,8 @@ namespace BattleshipWeb
     [Route("api/[controller]")]
     public class BattleshipWebController : Controller
     {
-        private WebUI webUI;
-        private Game game;
+        private static WebUI webUI;
+        private static Game game;
         [HttpGet("[action]")]
         public int StartData()
         {
@@ -28,16 +28,41 @@ namespace BattleshipWeb
         [HttpGet("[action]")]
         public IEnumerable<ShipInfo> GetShipnamesAndLengths()
         {
+            
             return Enumerable.Range(0, Settings.shipCount).Select(index => new ShipInfo
             {
                 name = Settings.ships.ElementAt(index).Key,
                 length = Settings.ships.ElementAt(index).Value
             });
         }
+        [HttpPost("[action]")]
+        public void SendShips([FromBody]ShipInfo info)
+        {
+            Ship ship;
+            ship = new Ship(info.name, info.length, new Point(info.xStart, info.yStart), info.orientation[0]);
+            webUI.ShipsToUI(ship);
+        }
+        [HttpPost("[action]")]
+        public string SendShootingCoords([FromBody]ShootingCoords coord)
+        {
+            Point shootingPoint = new Point(coord.x, coord.y);
+            webUI.CoordToUI(shootingPoint);
+            while (!webUI.returnInformationIsready) ;
+            return webUI.returnInformation;
+        }
         public class ShipInfo
         {
             public string name;
             public int length;
+            public int xStart;
+            public int yStart;
+            public string orientation;
+            public bool isPlaced;
+        }
+        public class ShootingCoords
+        {
+            public int x;
+            public int y;
         }
     }
 }

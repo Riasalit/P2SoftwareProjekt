@@ -34,17 +34,27 @@
   <div *ngIf="gameState == 1">
     <h2>Hello {{username}}</h2>
     <h3>Place your ships {{currentShipLength}}</h3>
+    <button *ngIf="amountOfShipsPlaced == shipInfos.length" (click)="ShipsEntered()" style="height:100px;width:100px">DONE!!!</button>
     <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
       <tr *ngFor="let row of tiles">
         <td width="61px" height="61px" *ngFor="let tile of row">
           <div *ngIf="BoolCheck(tile); else elseBlock">
-            <button (click)="ChooseTile(tile)" id="tileButton" style="height:60px;width:60px">{{tile.tileHit}} {{tile.tileName}}</button>
+            <button (click)="ChooseTile(tile)" style="height:60px;width:60px" [disabled]="tilesDisabled">{{tile.tileName}}</button>
           </div>
-          <ng-template #elseBlock>{{tile.tileHit}}</ng-template>
+          <ng-template #elseBlock>
+            <button (click)="ChooseTile(tile)" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.53)" disabled>{{tile.tileName}}</button>
+          </ng-template>
         </td>
       </tr>
     </table>
-    <button (click)="ChooseShip(info)" *ngFor="let info of shipInfos" >{{info.name}}</button>
+    <div *ngFor="let info of shipInfos">
+      <button (click)="ChooseShip(info)" id="shipButton" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
+    </div>
+    <h3>Reset section</h3>
+    <div *ngFor="let info of shipInfos">
+      <button (click)="resetShip(info)" id="resetShipButton" *ngIf="info.isPlaced">Reset {{info.name}}</button>
+    </div>
+    <button (click)="resetBoard()"> RESET ALL!!! </button>
   </div>
 </body>
 </html>

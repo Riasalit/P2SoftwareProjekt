@@ -17,10 +17,12 @@ export class BattleshipsComponent {
   private currentShip: ShipInfo;
   private firstTileRow: number;
   private firstTileCol: number;
-  private firstTileClick: boolean;
   private currentShipLength: number;
+  private amountOfShipsPlaced: number;
   private url: string;
   private htClient: HttpClient;
+  private firstTileClick: boolean;
+  private tilesDisabled: boolean;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.url = baseUrl;
@@ -33,17 +35,26 @@ export class BattleshipsComponent {
     }, error => console.error(error));
     this.htClient.get<ShipInfo[]>(this.url + 'api/BattleshipWeb/GetShipnamesAndLengths').subscribe(result => {
       this.shipInfos = result;
+      for (var i = 0; i < this.shipInfos.length; i++) {
+        this.shipInfos[i].isPlaced = false;
+      }
     }, error => console.error(error));
+
     console.log(this.gameState);
   }
-  public StartGame() {
 
-    let htmltext: HTMLTextAreaElement;
-    htmltext = <HTMLTextAreaElement>document.getElementById("nameField");
+  public StartGame() {
+    let htmltext = <HTMLTextAreaElement>document.getElementById("nameField");
     this.username = htmltext.value;
+    this.amountOfShipsPlaced = 0;
     this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();
     this.gameState = 1;
+    this.tilesDisabled = true;
     this.DrawBoard();
+    let tileButtons = document.getElementsByClassName("tileButton");
+    for (var i = 0; i < tileButtons.length; i++) {
+      tileButtons[i].setAttribute("disabled", "disabled");
+    }
   }
 
   private DrawBoard() {
@@ -59,6 +70,7 @@ export class BattleshipsComponent {
   public ChooseShip(ship: ShipInfo) {
     this.currentShipLength = ship.length;
     this.currentShip = ship;
+    this.tilesDisabled = false;
   }
 
   public ChooseTile(tile: NodeData) {
@@ -66,7 +78,8 @@ export class BattleshipsComponent {
     if (this.firstTileClick) {
       this.CalcSecondTiles(tile.tileName);
     } else {
-      this.shipInfos.splice(this.shipInfos.indexOf(this.currentShip),1);
+      this.currentShip.isPlaced = true;
+      this.tilesDisabled = true;
       this.SetShipStatesBetweenPoints(tile.tileName);
       for (var i = 0; i < this.tiles.length; i++) {
         for (var j = 0; j < this.tiles[i].length; j++) {
@@ -75,6 +88,7 @@ export class BattleshipsComponent {
           }
         }
       }
+      this.amountOfShipsPlaced++;
     }
     this.firstTileClick = !this.firstTileClick;
   }
@@ -96,7 +110,7 @@ export class BattleshipsComponent {
   }
 
   private SetPossibleShipStatesOnTiles(xDir: number, yDir: number, xStart: number, yStart: number) {
-    var canBePlaced = (xStart + xDir * (this.currentShipLength-1) >= 0 && xStart + xDir * (this.currentShipLength-1) < this.boardSize && yStart + yDir * (this.currentShipLength-1) >= 0 && yStart + yDir * (this.currentShipLength-1) < this.boardSize);
+    var canBePlaced = (xStart + xDir * (this.currentShipLength - 1) >= 0 && xStart + xDir * (this.currentShipLength - 1) < this.boardSize && yStart + yDir * (this.currentShipLength - 1) >= 0 && yStart + yDir * (this.currentShipLength - 1) < this.boardSize);
     if (canBePlaced) {
       for (var i = 1; i < this.currentShipLength; i++) {
         if (this.tiles[xStart + xDir * i][yStart + yDir * i].tileHit == 3) {
@@ -106,8 +120,7 @@ export class BattleshipsComponent {
       }
     }
     if (canBePlaced) {
-
-        this.tiles[xStart + xDir * (this.currentShipLength-1)][yStart + yDir * (this.currentShipLength-1)].tileHit = 0;
+      this.tiles[xStart + xDir * (this.currentShipLength - 1)][yStart + yDir * (this.currentShipLength - 1)].tileHit = 0;
     }
   }
 
@@ -115,21 +128,32 @@ export class BattleshipsComponent {
     let secondRow = coord.charCodeAt(0) - 65;
     let secondCol = Number.parseInt(coord[1]) - 1;
     if (secondRow - this.firstTileRow == 0) {
+      this.currentShip.orientation = "H";
       if (this.firstTileCol > secondCol) {
+        this.currentShip.yStart = secondCol;
+        this.currentShip.xStart = secondRow;
+        this.currentShip
         for (var i = secondCol + 1; i < this.firstTileCol; i++) {
           this.tiles[secondRow][i].tileHit = 3;
         }
       } else {
+        this.currentShip.yStart = this.firstTileCol;
+        this.currentShip.xStart = this.firstTileRow;
         for (var i = this.firstTileCol + 1; i < secondCol; i++) {
           this.tiles[secondRow][i].tileHit = 3;
         }
       }
     } else {
+      this.currentShip.orientation = "V";
       if (this.firstTileRow > secondRow) {
+        this.currentShip.yStart = secondCol;
+        this.currentShip.xStart = secondRow;
         for (var i = secondRow + 1; i < this.firstTileRow; i++) {
           this.tiles[i][secondCol].tileHit = 3;
         }
       } else {
+        this.currentShip.yStart = this.firstTileCol;
+        this.currentShip.xStart = this.firstTileRow;
         for (var i = this.firstTileRow + 1; i < secondRow; i++) {
           this.tiles[i][secondCol].tileHit = 3;
         }
@@ -137,11 +161,43 @@ export class BattleshipsComponent {
     }
   }
 
+  public resetBoard() {
+    for (var i = 0; i < this.boardSize; i++) {
+      for (var j = 0; j < this.boardSize; j++) {
+        this.tiles[i][j].tileHit = 0;
+      }
+    }
+    for (var i = 0; i < this.shipInfos.length; i++) {
+      this.shipInfos[i].isPlaced = false;
+    }
+    this.amountOfShipsPlaced = 0;
+  }
+
+  public resetShip(ship: ShipInfo) {
+    ship.isPlaced = false;
+    for (var i = 0; i < ship.length; i++) {
+      if (ship.orientation == "H") {
+        this.tiles[ship.xStart][ship.yStart + i].tileHit = 0;
+      } else {
+        this.tiles[ship.xStart + i][ship.yStart].tileHit = 0;
+      }
+    }
+    this.amountOfShipsPlaced--;
+  }
+
   public BoolCheck(tile: NodeData) {
     return tile.tileHit == 0;
   }
 
+  public ShipsEntered() {
+    this.gameState = 2;
+    for (var i = 0; i < this.shipInfos.length; i++) {
+      console.log(this.shipInfos[i]);
+      this.htClient.post<void>(this.url + 'api/BattleshipWeb/SendShips', this.shipInfos[i]).subscribe();
+    }
+  }
 }
+
 
 interface NodeData {
   tileName: string;
@@ -151,5 +207,9 @@ interface NodeData {
 interface ShipInfo {
   name: string;
   length: number;
+  xStart: number;
+  yStart: number;
+  orientation: string;
+  isPlaced: boolean; 
 }
 

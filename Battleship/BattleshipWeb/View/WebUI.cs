@@ -8,10 +8,16 @@ namespace BattleshipWeb
 {
     public class WebUI : IUserInterface
     {
+        private List<Ship> ships;
+        private bool recievedShips;
+        private int shipIndex;
         private string username;
         public WebUI(string username)
         {
+            ships = new List<Ship>();
             this.username = username;
+            recievedShips = false;
+            shipIndex = 0;
         }
         public bool GameComplete(Player[] players, int playerWon)
         {
@@ -20,7 +26,9 @@ namespace BattleshipWeb
 
         public Ship GetShips(bool correctlyPlaced, string name)
         {
-            throw new NotImplementedException();
+            while (!recievedShips) ;
+            return ships[shipIndex++];
+            
         }
 
         public Player[] InitializePlayers(IUserInterface UI)
@@ -39,6 +47,11 @@ namespace BattleshipWeb
         public void ReturnInformation(Point point, string info)
         {
             throw new NotImplementedException();
+        }
+        public void ShipsToUI(Ship ship)
+        {
+            ships.Add(ship);
+            if(ships.Count == Settings.shipCount) recievedShips = true;
         }
     }
 }
