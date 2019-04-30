@@ -9,13 +9,19 @@ namespace BattleshipWeb
     public class WebUI : IUserInterface
     {
         private List<Ship> ships;
+        private Point currentShootingPoint;
         private bool recievedShips;
+        private bool recievedShootingPoint;
         private int shipIndex;
         private string username;
+        public bool returnInformationIsReady;
+        public string returnInformation;
         public WebUI(string username)
         {
             ships = new List<Ship>();
             this.username = username;
+            returnInformationIsReady = false;
+            recievedShootingPoint = false;
             recievedShips = false;
             shipIndex = 0;
         }
@@ -41,17 +47,36 @@ namespace BattleshipWeb
 
         public Point MakeTargetPoint(List<Point> points, string name)
         {
-            throw new NotImplementedException();
+            while (!recievedShootingPoint) ;
+            recievedShootingPoint = false;
+            return currentShootingPoint;
         }
 
         public void ReturnInformation(Point point, Tile info)
         {
-            throw new NotImplementedException();
+            if(info.tile == (int)Tile.TileState.sunk)
+            {
+                returnInformation = $"{info.GetSunkenShip()}";
+            }
+            else if(info.tile == (int)Tile.TileState.hit)
+            {
+                returnInformation = "Hit a ship";
+            }
+            else
+            {
+                returnInformation = "Missed";
+            }
+            returnInformationIsReady = true;
         }
         public void ShipsToUI(Ship ship)
         {
             ships.Add(ship);
             if(ships.Count == Settings.shipCount) recievedShips = true;
+        }
+        public void CoordToUI(Point shootingPoint)
+        {
+            currentShootingPoint = shootingPoint;
+            recievedShootingPoint = true;
         }
     }
 }

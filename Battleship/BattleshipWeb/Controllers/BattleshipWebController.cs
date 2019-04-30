@@ -39,7 +39,7 @@ namespace BattleshipWeb
         public void SendShips([FromBody]ShipInfo info)
         {
             Ship ship;
-            ship = new Ship(info.name, info.length, new Point(info.xStart, info.yStart), info.orientation[0]);
+            ship = new Ship(info.name, info.length, new Point(info.yStart, info.xStart), info.orientation[0]);
             webUI.ShipsToUI(ship);
         }
         [HttpPost("[action]")]
@@ -47,7 +47,8 @@ namespace BattleshipWeb
         {
             Point shootingPoint = new Point(coord.x, coord.y);
             webUI.CoordToUI(shootingPoint);
-            while (!webUI.returnInformationIsready) ;
+            while (!webUI.returnInformationIsReady) ;
+            webUI.returnInformationIsReady = false;
             return webUI.returnInformation;
         }
         public class ShipInfo

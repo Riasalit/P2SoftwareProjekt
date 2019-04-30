@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { renderTemplate } from '@angular/core/src/render3/instructions';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { renderTemplate, text } from '@angular/core/src/render3/instructions';
 import { forEach } from '@angular/router/src/utils/collection';
 
 @Component({
@@ -11,9 +11,11 @@ import { forEach } from '@angular/router/src/utils/collection';
 export class BattleshipsComponent {
   public tiles: NodeData[][];
   public shipInfos: ShipInfo[];
+  public shootingCoords: ReturnCoords;
   public gameState: number; // {0: not startet, 1: waiting for name}
   public boardSize: number;
   public username: string;
+  public sunkenShips: string[];
   private currentShip: ShipInfo;
   private firstTileRow: number;
   private firstTileCol: number;
@@ -23,6 +25,7 @@ export class BattleshipsComponent {
   private htClient: HttpClient;
   private firstTileClick: boolean;
   private tilesDisabled: boolean;
+  private readyForShot: boolean;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.url = baseUrl;
@@ -39,7 +42,7 @@ export class BattleshipsComponent {
         this.shipInfos[i].isPlaced = false;
       }
     }, error => console.error(error));
-
+    this.sunkenShips = [];
     console.log(this.gameState);
   }
 
@@ -62,7 +65,7 @@ export class BattleshipsComponent {
     for (var i = 0; i < this.boardSize; i++) {
       this.tiles[i] = []
       for (var j = 0; j < this.boardSize; j++) {
-        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + (j + 1), tileHit: 0 };
+        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + (j + 1), tileHit: 0, x: j, y:i};
       }
     }
   }
@@ -76,11 +79,11 @@ export class BattleshipsComponent {
   public ChooseTile(tile: NodeData) {
     tile.tileHit = 3;
     if (this.firstTileClick) {
-      this.CalcSecondTiles(tile.tileName);
+      this.CalcSecondTiles(tile);
     } else {
       this.currentShip.isPlaced = true;
       this.tilesDisabled = true;
-      this.SetShipStatesBetweenPoints(tile.tileName);
+      this.SetShipStatesBetweenPoints(tile);
       for (var i = 0; i < this.tiles.length; i++) {
         for (var j = 0; j < this.tiles[i].length; j++) {
           if (this.tiles[i][j].tileHit == 4) {
@@ -93,9 +96,9 @@ export class BattleshipsComponent {
     this.firstTileClick = !this.firstTileClick;
   }
 
-  private CalcSecondTiles(coord: string) {
-    this.firstTileRow = coord.charCodeAt(0) - 65;
-    this.firstTileCol = Number.parseInt(coord[1]) - 1;
+  private CalcSecondTiles(tile: NodeData) {
+    this.firstTileRow = tile.y;
+    this.firstTileCol = tile.x;
     for (var i = 0; i < this.tiles.length; i++) {
       for (var j = 0; j < this.tiles[i].length; j++) {
         if (this.tiles[i][j].tileHit == 0) {
@@ -124,9 +127,9 @@ export class BattleshipsComponent {
     }
   }
 
-  private SetShipStatesBetweenPoints(coord: string) {
-    let secondRow = coord.charCodeAt(0) - 65;
-    let secondCol = Number.parseInt(coord[1]) - 1;
+  private SetShipStatesBetweenPoints(tile: NodeData) {
+    let secondRow = tile.y;
+    let secondCol = tile.x;
     if (secondRow - this.firstTileRow == 0) {
       this.currentShip.orientation = "H";
       if (this.firstTileCol > secondCol) {
@@ -191,17 +194,46 @@ export class BattleshipsComponent {
 
   public ShipsEntered() {
     this.gameState = 2;
+    this.readyForShot = true;
+    for (var i = 0; i < this.tiles.length; i++) {
+      for (var j = 0; j < this.tiles[i].length; j++) {
+        this.tiles[i][j].tileHit = 0;
+      }
+    }
     for (var i = 0; i < this.shipInfos.length; i++) {
       console.log(this.shipInfos[i]);
       this.htClient.post<void>(this.url + 'api/BattleshipWeb/SendShips', this.shipInfos[i]).subscribe();
     }
   }
+
+  public ShootAtTile(tile: NodeData) {
+    this.readyForShot = false;
+    this.shootingCoords = { x: tile.x, y: tile.y };
+    this.htClient.post<string>(this.url + 'api/BattleshipWeb/SendShootingCoords', this.shootingCoords, {responseType: 'text' as 'json'}).subscribe(result => {
+      console.log(result);
+      if (result == 'Missed') {
+        tile.tileHit = 1;
+      } else if (result == 'Hit a ship') {
+        tile.tileHit = 2;
+      } else {
+        tile.tileHit = 2;
+        this.sunkenShips.push(result);
+      }
+      this.readyForShot = true;
+    }, error => console.error(error));
+  }
 }
 
+interface ReturnCoords {
+  x: number;
+  y: number; 
+}
 
 interface NodeData {
   tileName: string;
   tileHit: number;
+  x: number;
+  y: number;
 }
 
 interface ShipInfo {
@@ -211,5 +243,8 @@ interface ShipInfo {
   yStart: number;
   orientation: string;
   isPlaced: boolean; 
+}
+interface ShootingResult {
+  result: string;
 }
 
