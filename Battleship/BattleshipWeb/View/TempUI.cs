@@ -27,7 +27,7 @@ namespace BattleshipWeb
             Player[] players = new Player[2];
             for (int i = 0; i < players.Length; i++)
             {
-                Console.WriteLine("AI or Human (0 or 1)");
+                Console.WriteLine("AI, Human or Random (0, 1 or 2)");
                 int answer = int.Parse(Console.ReadLine());
                 Console.WriteLine("What is your name");
                 string playername = Console.ReadLine();
@@ -39,6 +39,10 @@ namespace BattleshipWeb
                 else if (answer == 0)
                 {
                     players[i] = new AI(playername);
+                }
+                else if (answer == 2)
+                {
+                    players[i] = new RandomAI(playername);
                 }
                 else
                 {
