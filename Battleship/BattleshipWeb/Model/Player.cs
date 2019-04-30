@@ -22,7 +22,7 @@ namespace BattleshipWeb
         {
             this.opponent = opponent;
         }
-        public string ShootOpponent(Point point)
+        public Tile ShootOpponent(Point point)
         {
             turnCounter++;
 

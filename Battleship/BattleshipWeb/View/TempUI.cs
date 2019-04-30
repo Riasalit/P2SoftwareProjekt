@@ -127,9 +127,25 @@ namespace BattleshipWeb
             }
             return returnPoint;
         }
-        public void ReturnInformation(Point point, string info)
+        public void ReturnInformation(Point point, Tile shootingTile)
         {
-            Console.WriteLine(info);
+            if (shootingTile.tile == (int)Tile.TileState.sunk)
+            {
+                string sunkenShipName = shootingTile.GetSunkenShip();
+                Console.WriteLine("You sunk" + sunkenShipName);
+            }
+            else if (shootingTile.tile == (int)Tile.TileState.hit)
+            {
+                Console.WriteLine("You hit");
+            }
+            else if (shootingTile.tile == (int)Tile.TileState.missed)
+            {
+                Console.WriteLine("You missed");
+            }
+            else if (shootingTile.tile == (int)Tile.TileState.unknown)
+            {
+                Console.WriteLine("Already hit. Please shoot again.");
+            }
             Console.WriteLine();
         }
         public bool GameComplete(Player[] players, int playerWon)

@@ -18,7 +18,7 @@ namespace BattleshipWeb
         Player[] InitializePlayers(IUserInterface UI);
         Ship GetShips(bool correctlyPlaced, string name);
         Point MakeTargetPoint(List<Point> points, string name);
-        void ReturnInformation(Point point, string info);
+        void ReturnInformation(Point point, Tile info);
         bool GameComplete(Player[] players, int playerWon);
 
     }

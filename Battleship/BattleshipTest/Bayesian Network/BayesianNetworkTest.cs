@@ -16,10 +16,10 @@ namespace BattleshipTest.BayesianNetworkTest
     public class BayesianNetworkTest
     {
         [TestMethod]
-        public void DoesAIWorkIfShipsArePlacedBesidesEachOther()
+        public void CanAIShootIfShipsArePlacedBesideEachOther()
         {
-            Player testAI = new AI("TestAI");
             Player testHuman = new AI("TestHuman");
+            Player testAI = new AI("TestAI");
             int i = 0;
 
             foreach (KeyValuePair<string, int> ship in Settings.ships)
