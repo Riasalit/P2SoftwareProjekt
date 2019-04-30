@@ -55,7 +55,11 @@ namespace BattleshipWeb
         }
         public string GetSunkenShip()
         {
-            return ship.name;
+            if (ship.IsSunken())
+            {
+                return ship.name;
+            }
+            return "Can't access ship name";
         }
     }
 }
