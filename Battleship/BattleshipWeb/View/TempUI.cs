@@ -44,6 +44,10 @@ namespace BattleshipWeb
                 {
                     players[i] = new RandomAI(playername);
                 }
+                else if (answer == 3)
+                {
+                    players[i] = new HuntTargetAI(playername);
+                }
                 else
                 {
                     Console.WriteLine("Type again - you dun goofed capri son");

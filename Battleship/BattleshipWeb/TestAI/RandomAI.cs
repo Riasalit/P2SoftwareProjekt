@@ -6,12 +6,10 @@ namespace BattleshipWeb
 {
     public class RandomAI : Player
     {
-        AI bayesianAI = new AI("Bayesian");
         List<Point> shootingPoints;
 
-        public RandomAI() : base("Random")
+        public RandomAI(string name) : base(name)
         {
-            bayesianAI = new AI("Bayesian");
             shootingPoints = new List<Point>();
             for (int i = 0; i < Settings.boardWidth; i++)
             {
@@ -25,7 +23,24 @@ namespace BattleshipWeb
 
         public override void SetShips()
         {
-            bayesianAI.SetShips();
+            int orientation;
+            char orientationLetter;
+            bool correctlyPlaced;
+            foreach (KeyValuePair<string, int> ship in Settings.ships)
+            {
+                correctlyPlaced = false;
+                while (!correctlyPlaced)
+                {
+                    Point point = new Point
+                    {
+                        X = new Random().Next(0, Settings.boardWidth),
+                        Y = new Random().Next(0, Settings.boardWidth)
+                    };
+                    orientation = new Random().Next(0, 2);
+                    orientationLetter = orientation == 0 ? 'H' : 'V';
+                    correctlyPlaced = board.PlaceShips(new Ship(ship.Key, ship.Value, point, orientationLetter));
+                }
+            }
         }
 
         public override void YourTurn()
