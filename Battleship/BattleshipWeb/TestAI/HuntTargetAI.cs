@@ -7,9 +7,9 @@ namespace BattleshipWeb
     public class HuntTargetAI : Player
     {
         List<Point> shootingPoints;
-        bool target = false;
+        bool target;
         Point huntPoint;
-        int huntDirection = 0;
+        int huntDirection;
         Point originalPoint;
 
         public HuntTargetAI(string name) : base(name)
@@ -19,10 +19,12 @@ namespace BattleshipWeb
             {
                 for (int j = 0; j < Settings.boardWidth; j++)
                 {
-                    shootingPoints.Add(new Point(i + 1, j + 1));
+                    shootingPoints.Add(new Point(i, j));
                 }
             }
             SetShips();
+            target = false;
+            huntDirection = 0;
         }
 
         public override void SetShips()
@@ -64,41 +66,64 @@ namespace BattleshipWeb
         {
             Point point;
             Tile shootTile;
-
-            do
+            if(shootingPoints.Count < (Settings.boardWidth* Settings.boardWidth) / Settings.dimension)
             {
-                point = new Point
+                do
                 {
-                    X = new Random().Next(0, Settings.boardWidth),
-                    Y = new Random().Next(0, Settings.boardWidth)
-                };
-            }
-            while (!shootingPoints.Contains(point) && (((point.Y % 2 == 0) && (point.X % 2 == 1)) || ((point.Y % 2 == 1) && (point.X % 2 == 0))));
+                    point = new Point
+                    {
+                        X = new Random().Next(0, Settings.boardWidth),
+                        Y = new Random().Next(0, Settings.boardWidth)
+                    };
+                }
+                while (!shootingPoints.Contains(point));
 
-            shootTile = ShootOpponent(point);
-            shootingPoints.Remove(point);
-            if (shootTile.tile == (int)Tile.TileState.hit)
-            {
-                target = true;
-                huntPoint = point;
-                originalPoint = point;
+                ShootOpponent(point);
+                shootingPoints.Remove(point);
+
             }
+            else
+            {
+                do
+                {
+                    point = new Point
+                    {
+                        X = new Random().Next(0, Settings.boardWidth),
+                        Y = new Random().Next(0, Settings.boardWidth)
+                    };
+                }
+                while (!shootingPoints.Contains(point) && (((point.Y % 2 == 0) && (point.X % 2 == 1)) || ((point.Y % 2 == 1) && (point.X % 2 == 0))));
+
+                shootTile = ShootOpponent(point);
+                shootingPoints.Remove(point);
+                if (shootTile.tile == (int)Tile.TileState.hit)
+                {
+                    target = true;
+                    huntPoint = point;
+                    originalPoint = point;
+                }
+            }
+            
         }
         private void Target()
         {
             switch (huntDirection)
             {
-                case 1:
+                case 0:
                    TargetHelper(new Point(huntPoint.X, huntPoint.Y - 1)); 
                     break;
-                case 2:
+                case 1:
                     TargetHelper(new Point(huntPoint.X, huntPoint.Y + 1));
                     break;
-                case 3:
+                case 2:
                     TargetHelper(new Point(huntPoint.X - 1, huntPoint.Y));
                     break;
-                case 4:
+                case 3:
                     TargetHelper(new Point(huntPoint.X + 1, huntPoint.Y));
+                    break;
+                case 4:
+                    huntDirection = 0;
+                    huntPoint = originalPoint;
                     break;
             }
 
@@ -106,27 +131,47 @@ namespace BattleshipWeb
         }
         private void TargetHelper(Point point)
         {
-            Tile tile = ShootOpponent(point);
-
-            if (tile.tile == (int)Tile.TileState.hit)
+            if (point.X >= 0 && point.X <= 9 && point.Y >= 0 && point.Y <= 9 && shootingPoints.Contains(point))
             {
-                huntPoint = point;
+                Tile tile = ShootOpponent(point);
+                shootingPoints.Remove(point);
+                if (tile.tile == (int)Tile.TileState.hit)
+                {
+                    huntPoint = point;
+                    huntDirection = 0;
+                }
+                else if (tile.tile == (int)Tile.TileState.sunk)
+                {
+                    target = false;
+                    huntDirection = 0;
+                }
+                else if (huntDirection > 3)
+                {
+                    huntPoint = originalPoint;
+                    huntDirection = 0;
+                }
+                else
+                {
+                    huntDirection++;
+                }
             }
-            else if (tile.tile == (int)Tile.TileState.sunk)
+            else if (huntPoint == originalPoint && huntDirection > 3)
             {
                 target = false;
-                huntDirection = 0;
             }
-            else if (huntDirection > 4)
+            else if (huntDirection > 3)
             {
                 huntPoint = originalPoint;
+                huntDirection = 0;
+                Target();
             }
             else
             {
                 huntDirection++;
+                Target();
             }
-        }
 
+        }
     }
 }
 

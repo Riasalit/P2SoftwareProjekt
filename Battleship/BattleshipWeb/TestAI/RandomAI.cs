@@ -15,7 +15,7 @@ namespace BattleshipWeb
             {
                 for (int j = 0; j < Settings.boardWidth; j++)
                 {
-                    shootingPoints.Add(new Point(i + 1, j + 1));
+                    shootingPoints.Add(new Point(i, j));
                 }
             }
             SetShips();
