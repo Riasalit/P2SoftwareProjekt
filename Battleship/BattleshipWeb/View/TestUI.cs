@@ -9,7 +9,7 @@ namespace BattleshipWeb
 {
     public class TestUI : IUserInterface
     {
-        private int numberOfGames = 1000;
+        private int numberOfGames = 5000;
         private int counter = 0;
         private int choice;
         private string playerName;
@@ -19,7 +19,7 @@ namespace BattleshipWeb
             if (counter == 0)
             {
                 Console.WriteLine("AI, Random or Hunt/target (0, 1 or 2)");
-                choice = int.Parse(Console.ReadLine());
+                choice = int.Parse(playerName + Console.ReadLine());
                 Console.WriteLine("What is your name");
                 playerName = Console.ReadLine();
             }
