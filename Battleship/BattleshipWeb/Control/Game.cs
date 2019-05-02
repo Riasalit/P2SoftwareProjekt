@@ -13,7 +13,7 @@ namespace BattleshipWeb
         {
             players = new Player[2];
             // Random player starts
-            turn = new Random().Next(0,2);
+            turn = 0;
             running = true;
             this.UI = UI;
         }

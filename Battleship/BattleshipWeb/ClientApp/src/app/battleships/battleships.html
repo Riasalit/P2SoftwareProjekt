@@ -59,7 +59,7 @@
 
 
 
-  <div *ngIf="gameState == 2">
+  <div *ngIf="gameState == 2 || gamestate == 3">
     <h2>Hello {{username}}</h2>
     <h3>Click the tile you want to shoot</h3>
 
@@ -67,12 +67,34 @@
       <tr *ngFor="let row of tiles">
         <td width="61px" height="61px" *ngFor="let tile of row">
           <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px" [disabled]="!readyForShot">{{tile.tileName}}</button>
-          <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.53)" disabled>{{tile.tileName}}</button>
-          <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgba(26, 219, 52, 0.72)" disabled>{{tile.tileName}}</button>
+          <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.70)" disabled>{{tile.tileName}}</button>
+          <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgba(26, 219, 52, 0.70)" disabled>{{tile.tileName}}</button>
         </td>
       </tr>
     </table>
     <div *ngFor="let sunkenShip of sunkenShips">{{sunkenShip}}</div>
+    <table *ngIf="gameState == 2" style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+      <tr *ngFor="let row of aiTargetBoard">
+        <td width="61px" height="61px" *ngFor="let tile of row">
+          <button style="height:60px;width:60px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
+        </td>
+      </tr>
+    </table>
+    <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+      <tr *ngFor="let row of tiles">
+        <td width="61px" height="61px" *ngFor="let tile of row">
+          <button style="height:60px;width:60px;" [style.background-color]="isShipOnTile(tile.x, tile.y)" disabled>
+            <div *ngIf="tile.tileShot">X</div>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div *ngIf="gameState == 3">
+    <h4>{{GetPlayerWhoWon()}} won the game!!!</h4>
+    Do you want to restart the game?
+    <button (click)="RestartOrEndGame(true)">Restart Game</button>
+    <button (click)="RestartOrEndGame(false)">End Game</button>
   </div>
 </body>
 </html>

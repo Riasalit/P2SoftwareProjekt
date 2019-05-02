@@ -45,11 +45,42 @@ namespace BattleshipWeb
         [HttpPost("[action]")]
         public string SendShootingCoords([FromBody]ShootingCoords coord)
         {
-            Point shootingPoint = new Point(coord.x, coord.y);
+            Point shootingPoint = new Point(coord.y, coord.x); //The board is transposed in the game
             webUI.CoordToUI(shootingPoint);
             while (!webUI.returnInformationIsReady) ;
             webUI.returnInformationIsReady = false;
             return webUI.returnInformation;
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<IEnumerable<HumanBoardAndProb>> getHumanBoardAndProb()
+        {
+            while (!webUI.ai.probabilitiesReady) ;
+            webUI.ai.probabilitiesReady = false;
+            return Enumerable.Range(0, Settings.boardWidth).Select(index1 => Enumerable.Range(0, Settings.boardWidth).Select(index2 =>
+                new HumanBoardAndProb
+                {
+                    tilesShot = webUI.ai.pointsShot.Contains(new Point(index2, index1)) ? true : false,
+                    probability = webUI.ai.probabilities.Where(p => p.Key == new Point(index2, index1))
+                                          .Select(p => p.Value)
+                                          .Max()
+                }
+            ));
+        }
+        [HttpGet("[action]")]
+        public GameOverInfo GetGameOverInfo()
+        {
+            return new GameOverInfo
+            {
+                playerWhoWon = webUI.playerWhoWon,
+                gameOver = webUI.gameOver
+            };
+        }
+        [HttpPost("[action]")]
+        public void RestartOrEndGame(bool restart)
+        {
+            webUI.restartGame = restart;
+            webUI.gotRestartInfo = true;
         }
         public class ShipInfo
         {
@@ -64,6 +95,16 @@ namespace BattleshipWeb
         {
             public int x;
             public int y;
+        }
+        public class HumanBoardAndProb
+        {
+            public bool tilesShot;
+            public double probability;
+        }
+        public class GameOverInfo
+        {
+            public int playerWhoWon;
+            public bool gameOver;
         }
     }
 }

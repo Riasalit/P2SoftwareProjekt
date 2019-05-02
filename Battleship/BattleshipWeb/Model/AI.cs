@@ -14,11 +14,17 @@ namespace BattleshipWeb
         private List<List<BooleanDCNode>> tilesList = new List<List<BooleanDCNode>>();
         private List<Point> previousHits = new List<Point>();
         private SortedDictionary<int, int> indexes = new SortedDictionary<int, int>();
+        public Dictionary<Point, double> probabilities { get; private set; }
+        public bool probabilitiesReady;
 
         public AI(string name) : base(name)
         {
+            probabilitiesReady = false;
             battleship = new Domain();
+            probabilities = new Dictionary<Point, double>();
             InitBayesianNetwork();
+            CalculateProbabilities(probabilities);
+            probabilitiesReady = true;
         }
         public Domain InitBayesianNetwork()
         {
@@ -290,9 +296,7 @@ namespace BattleshipWeb
         {
             Point shootingPoint;
             Tile shootingTile;
-            Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
-
-            CalculateProbabilities(probabilities);
+            probabilitiesReady = false;
             // Finds point with highest probability to contain a ship
             shootingPoint = FindShootingPoint(probabilities);
             pointsShot.Add(shootingPoint);
@@ -306,6 +310,9 @@ namespace BattleshipWeb
             SetEvidence(shootingTile, shootingPoint);
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
                                  Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
+
+            CalculateProbabilities(probabilities);
+            probabilitiesReady = true;
         }
         // Calculates the probablility for each tile and adds the result to the dictionary
         private void CalculateProbabilities(Dictionary<Point, double> probabilities)
