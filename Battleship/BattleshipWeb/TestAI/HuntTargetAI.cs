@@ -22,11 +22,9 @@ namespace BattleshipWeb
                     shootingPoints.Add(new Point(i, j));
                 }
             }
-            SetShips();
             target = false;
             huntDirection = 0;
         }
-
         public override void SetShips()
         {
             int orientation;
@@ -48,7 +46,6 @@ namespace BattleshipWeb
                 }
             }
         }
-
         public override void YourTurn()
         {
             if (!target)
@@ -58,10 +55,8 @@ namespace BattleshipWeb
             else
             {
                 Target();
-            }
-           
+            }  
         }
-
         private void Hunt()
         {
             Point point;
@@ -78,9 +73,14 @@ namespace BattleshipWeb
                 }
                 while (!shootingPoints.Contains(point));
 
-                ShootOpponent(point);
+                shootTile = ShootOpponent(point);
                 shootingPoints.Remove(point);
-
+                if (shootTile.tile == (int)Tile.TileState.hit)
+                {
+                    target = true;
+                    huntPoint = point;
+                    originalPoint = point;
+                }
             }
             else
             {
@@ -103,14 +103,13 @@ namespace BattleshipWeb
                     originalPoint = point;
                 }
             }
-            
         }
         private void Target()
         {
             switch (huntDirection)
             {
                 case 0:
-                   TargetHelper(new Point(huntPoint.X, huntPoint.Y - 1)); 
+                    TargetHelper(new Point(huntPoint.X, huntPoint.Y - 1));
                     break;
                 case 1:
                     TargetHelper(new Point(huntPoint.X, huntPoint.Y + 1));
@@ -126,8 +125,6 @@ namespace BattleshipWeb
                     huntPoint = originalPoint;
                     break;
             }
-
-           
         }
         private void TargetHelper(Point point)
         {
@@ -170,7 +167,6 @@ namespace BattleshipWeb
                 huntDirection++;
                 Target();
             }
-
         }
     }
 }

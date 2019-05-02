@@ -18,7 +18,6 @@ namespace BattleshipWeb
                     shootingPoints.Add(new Point(i, j));
                 }
             }
-            SetShips();
         }
 
         public override void SetShips()

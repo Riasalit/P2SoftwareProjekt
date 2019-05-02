@@ -107,5 +107,9 @@ namespace BattleshipWeb
             // Returns -1 if the tile is already hit
             return new Tile();
         }
+        public void ClearShipList()
+        {
+            ships.Clear();
+        }
     }
 }

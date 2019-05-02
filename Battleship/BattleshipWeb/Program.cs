@@ -14,7 +14,7 @@ namespace BattleshipWeb
     {
         public static void Main(string[] args)
         {
-            IUserInterface UI = new TempUI();
+            IUserInterface UI = new TestUI();
             Game game = new Game(UI);
             //CreateWebHostBuilder(args).Build().Run();
             game.Start();
