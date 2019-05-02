@@ -12,11 +12,11 @@
       margin: 0px 0px;
       cursor: pointer;
     }
+    .table {
+      width:unset;
+    }
     table td {
-      width: 62px;
       overflow: hidden;
-      display: inline-block;
-      white-space: nowrap;
       padding: 1px;
       border: 1px thin transparent;
     }
@@ -59,36 +59,41 @@
 
 
 
-  <div *ngIf="gameState == 2 || gamestate == 3">
+  <div *ngIf="gameState == 2 || gameState == 3" style="overflow:hidden; display:inline-block">
+
     <h2>Hello {{username}}</h2>
     <h3>Click the tile you want to shoot</h3>
-
-    <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
-      <tr *ngFor="let row of tiles">
-        <td width="61px" height="61px" *ngFor="let tile of row">
-          <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px" [disabled]="!readyForShot">{{tile.tileName}}</button>
-          <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.70)" disabled>{{tile.tileName}}</button>
-          <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgba(26, 219, 52, 0.70)" disabled>{{tile.tileName}}</button>
-        </td>
-      </tr>
-    </table>
-    <div *ngFor="let sunkenShip of sunkenShips">{{sunkenShip}}</div>
-    <table *ngIf="gameState == 2" style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
-      <tr *ngFor="let row of aiTargetBoard">
-        <td width="61px" height="61px" *ngFor="let tile of row">
-          <button style="height:60px;width:60px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
-        </td>
-      </tr>
-    </table>
-    <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
-      <tr *ngFor="let row of tiles">
-        <td width="61px" height="61px" *ngFor="let tile of row">
-          <button style="height:60px;width:60px;" [style.background-color]="isShipOnTile(tile.x, tile.y)" disabled>
-            <div *ngIf="tile.tileShot">X</div>
-          </button>
-        </td>
-      </tr>
-    </table>
+    <div style="float:left">
+      <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of tiles">
+          <td width="61px" height="61px" *ngFor="let tile of row">
+            <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px;background:rgba(24, 90, 226, 0.79)" [disabled]="!readyForShot">{{tile.tileName}}</button>
+            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.70)" disabled>{{tile.tileName}}</button>
+            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgba(26, 219, 52, 0.70)" disabled>{{tile.tileName}}</button>
+          </td>
+        </tr>
+      </table>
+      <h3>Sunken ships:</h3>
+      <div *ngFor="let sunkenShip of sunkenShips">- {{sunkenShip}}</div>
+    </div>
+    <div style="float:left;font-size:10px">
+      <h5>AI Probabilities:</h5>
+      <table *ngIf="gameState == 2" style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of aiTargetBoard">
+          <td width="26px" height="26px" *ngFor="let tile of row">
+            <button style="height:25px;width:25px;font-size:10px;padding:1px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
+          </td>
+        </tr>
+      </table>
+      <h5>Your board</h5>
+      <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of aiTargetBoard">
+          <td width="25px" height="25px" *ngFor="let tile of row">
+            <button style="height:25px;width:25px;padding:0px;font-size:14px" [style.background-color]="isShipOnTile(tile)" disabled> {{PrintX(tile.tileShot)}}</button>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
   <div *ngIf="gameState == 3">
     <h4>{{GetPlayerWhoWon()}} won the game!!!</h4>

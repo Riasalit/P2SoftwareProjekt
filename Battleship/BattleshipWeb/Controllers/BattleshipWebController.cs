@@ -60,10 +60,12 @@ namespace BattleshipWeb
             return Enumerable.Range(0, Settings.boardWidth).Select(index1 => Enumerable.Range(0, Settings.boardWidth).Select(index2 =>
                 new HumanBoardAndProb
                 {
-                    tilesShot = webUI.ai.pointsShot.Contains(new Point(index2, index1)) ? true : false,
+                    tileShot = webUI.ai.pointsShot.Contains(new Point(index2, index1)),
                     probability = webUI.ai.probabilities.Where(p => p.Key == new Point(index2, index1))
                                           .Select(p => p.Value)
-                                          .Max()
+                                          .Max(),
+                    x = index2,
+                    y = index1
                 }
             ));
         }
@@ -98,8 +100,10 @@ namespace BattleshipWeb
         }
         public class HumanBoardAndProb
         {
-            public bool tilesShot;
+            public bool tileShot;
             public double probability;
+            public int x;
+            public int y;
         }
         public class GameOverInfo
         {

@@ -36,6 +36,7 @@ namespace BattleshipWeb
         }
         public bool GameComplete(Player[] players, int playerWon)
         {
+            ai.probabilitiesReady = true;
             gameOver = true;
             playerWhoWon = playerWon;
             while (!gotRestartInfo) ;
