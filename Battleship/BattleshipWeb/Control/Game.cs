@@ -24,7 +24,7 @@ namespace BattleshipWeb
             // Places Ships
             players[0].SetShips();
             // Swaps turns and shoots until all ships are gone
-            while (running)
+            while (running && !players[0].turnFailed)
             {
                 NextPlayer();
             }

@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace BattleshipWeb
 {
-    public class HuntTargetAI : Player
+    public class HumanAI : Player
     {
         List<Point> shootingPoints;
         bool target = false;
@@ -12,7 +12,7 @@ namespace BattleshipWeb
         int huntDirection;
         Point originalPoint;
 
-        public HuntTargetAI(string name) : base(name)
+        public HumanAI(string name) : base(name)
         {
             shootingPoints = new List<Point>();
             for (int i = 0; i < Settings.boardWidth; i++)
@@ -22,11 +22,9 @@ namespace BattleshipWeb
                     shootingPoints.Add(new Point(i, j));
                 }
             }
-            SetShips();
             target = false;
             huntDirection = 0;
         }
-
         public override void SetShips()
         {
             int orientation;
@@ -48,7 +46,6 @@ namespace BattleshipWeb
                 }
             }
         }
-
         public override void YourTurn()
         {
             if (!target)
@@ -59,9 +56,7 @@ namespace BattleshipWeb
             {
                 Target();
             }
-
         }
-
         private void Hunt()
         {
             Point point;
@@ -70,6 +65,10 @@ namespace BattleshipWeb
             {
                 do
                 {
+                    if (turnCounter > Settings.boardSize)
+                    {
+                        turnFailed = true;
+                    }
                     point = new Point
                     {
                         X = new Random().Next(0, Settings.boardWidth),
@@ -80,7 +79,6 @@ namespace BattleshipWeb
 
                 ShootOpponent(point);
                 shootingPoints.Remove(point);
-
             }
             else
             {
@@ -103,7 +101,6 @@ namespace BattleshipWeb
                     originalPoint = point;
                 }
             }
-
         }
         private void Target()
         {
@@ -132,10 +129,8 @@ namespace BattleshipWeb
                         huntDirection = 0;
                         Target();
                     }
-                        break;
+                    break;
             }
-
-
         }
         private void TargetHelper(Point point)
         {

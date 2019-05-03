@@ -10,6 +10,7 @@ namespace BattleshipWeb
         private Player opponent;
         public string playerName { get; }
         public int turnCounter { get; private set; }
+        public bool turnFailed;
 
         public Player(string name)
         {
@@ -17,6 +18,7 @@ namespace BattleshipWeb
             board = new Board();
             pointsShot = new List<Point>();
             turnCounter = 0;
+            turnFailed = false;
         }
         public void SetOpponent(Player opponent)
         {
