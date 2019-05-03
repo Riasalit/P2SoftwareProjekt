@@ -65,7 +65,7 @@
 
 
 
-  <div *ngIf="gameState == 1">
+  <div *ngIf="gameState == 1" style="float:left">
     <h2>Hello {{username}}</h2>
     <h3>Place your ships</h3>
     <button *ngIf="amountOfShipsPlaced == shipInfos.length" (click)="ShipsEntered()" style="height:100px;width:100px">DONE!!!</button>
@@ -81,8 +81,11 @@
         </td>
       </tr>
     </table>
+  </div>
+  <div *ngIf="gameState == 1" style="float:left;padding-top:55px;padding-left:20px">
+    <h3>Ships to place</h3>
     <div *ngFor="let info of shipInfos">
-      <button (click)="ChooseShip(info)" id="shipButton" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
+      <button (click)="ChooseShip(info)" id="shipButton" style="width:120px;height:60px;margin-bottom:2px" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
     </div>
     <h3>Reset section</h3>
     <div *ngFor="let info of shipInfos">

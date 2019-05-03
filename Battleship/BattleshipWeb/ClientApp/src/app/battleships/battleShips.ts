@@ -42,29 +42,29 @@ export class BattleshipsComponent {
     this.firstTileClick = true;
 
     //while (this.serverBusy && this.callDone) {
-      let timeLeft = 5;
-      let interval = setInterval(() => {
-        if (timeLeft > 0) {
-          timeLeft--
-        } else {
-          http.get<boolean>(baseUrl + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
-            if (!result) {
-              http.get<number>(baseUrl + 'api/BattleshipWeb/StartData').subscribe(result => {
-                this.boardSize = result;
-              }, error => console.error(error));
-              this.htClient.get<ShipInfo[]>(this.url + 'api/BattleshipWeb/GetShipnamesAndLengths').subscribe(result => {
-                this.gameState = 0;
-                this.shipInfos = result;
-                for (var i = 0; i < this.shipInfos.length; i++) {
-                  this.shipInfos[i].isPlaced = false;
-                }
-              }, error => console.error(error));
-              clearInterval(interval);
-            }
-          })
-        }
-      },1000)
-    
+    let timeLeft = 5;
+    let interval = setInterval(() => {
+      if (timeLeft > 0) {
+        timeLeft--
+      } else {
+        http.get<boolean>(baseUrl + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
+          if (!result) {
+            http.get<number>(baseUrl + 'api/BattleshipWeb/StartData').subscribe(result => {
+              this.boardSize = result;
+            }, error => console.error(error));
+            this.htClient.get<ShipInfo[]>(this.url + 'api/BattleshipWeb/GetShipnamesAndLengths').subscribe(result => {
+              this.gameState = 0;
+              this.shipInfos = result;
+              for (var i = 0; i < this.shipInfos.length; i++) {
+                this.shipInfos[i].isPlaced = false;
+              }
+            }, error => console.error(error));
+            clearInterval(interval);
+          }
+        })
+      }
+    }, 1000)
+
 
     this.sunkenShips = [];
   }
@@ -88,7 +88,7 @@ export class BattleshipsComponent {
     for (var i = 0; i < this.boardSize; i++) {
       this.tiles[i] = []
       for (var j = 0; j < this.boardSize; j++) {
-        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + (j + 1), tileHit: 0, x: j, y:i};
+        this.tiles[i][j] = { tileName: String.fromCharCode(65 + i) + (j + 1), tileHit: 0, x: j, y: i };
       }
     }
   }
@@ -234,7 +234,7 @@ export class BattleshipsComponent {
     this.turnCounter++;
     this.readyForShot = false;
     this.shootingCoords = { x: tile.x, y: tile.y };
-    this.htClient.post<string>(this.url + 'api/BattleshipWeb/SendShootingCoords', this.shootingCoords, {responseType: 'text' as 'json'}).subscribe(result => {
+    this.htClient.post<string>(this.url + 'api/BattleshipWeb/SendShootingCoords', this.shootingCoords, { responseType: 'text' as 'json' }).subscribe(result => {
       if (result == 'Missed') {
         tile.tileHit = 1;
       } else if (result == 'Hit a ship') {
@@ -244,34 +244,34 @@ export class BattleshipsComponent {
         this.sunkenShips.push(result);
       }
     }, error => console.error(error));
-    
-      let timeLeft = 5;
-      let interval = setInterval(() => {
-        if (timeLeft > 0) {
-          timeLeft--
-        } else {
-          this.htClient.get<boolean>(this.url + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
-            if (!result) {
-              this.htClient.get<HumanBoardAndProb[][]>(this.url + 'api/BattleshipWeb/getHumanBoardAndProb').subscribe(result => {
-                this.aiTargetBoard = result;
-                this.htClient.get<GameOverInfo>(this.url + 'api/BattleshipWeb/GetGameOverInfo').subscribe(result => {
-                  console.log(result.gameOver);
-                  if (result.gameOver) {
-                    this.playerWhoWon = result.playerWhoWon;
-                    this.gameState = 3;
-                  } else {
-                    this.readyForShot = true;
-                  }
-                }, error => console.error(error));
+
+    let timeLeft = 5;
+    let interval = setInterval(() => {
+      if (timeLeft > 0) {
+        timeLeft--
+      } else {
+        this.htClient.get<boolean>(this.url + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
+          if (!result) {
+            this.htClient.get<HumanBoardAndProb[][]>(this.url + 'api/BattleshipWeb/getHumanBoardAndProb').subscribe(result => {
+              this.aiTargetBoard = result;
+              this.htClient.get<GameOverInfo>(this.url + 'api/BattleshipWeb/GetGameOverInfo').subscribe(result => {
+                console.log(result.gameOver);
+                if (result.gameOver) {
+                  this.playerWhoWon = result.playerWhoWon;
+                  this.gameState = 3;
+                } else {
+                  this.readyForShot = true;
+                }
               }, error => console.error(error));
-              clearInterval(interval);
-            }
-          })
-        }
-      },1000)
-    
+            }, error => console.error(error));
+            clearInterval(interval);
+          }
+        })
+      }
+    }, 1000)
+
   }
-  public isShipOnTile(tile: HumanBoardAndProb){
+  public isShipOnTile(tile: HumanBoardAndProb) {
     let isShip = false;
     for (var i = 0; i < this.shipInfos.length; i++) {
       for (var j = 0; j < this.shipInfos[i].length; j++) {
@@ -298,7 +298,7 @@ export class BattleshipsComponent {
     return newVal.toFixed(0) + "%";
   }
 
-  public MakebackgroundColor(button: HTMLButtonElement, probability:number){
+  public MakebackgroundColor(button: HTMLButtonElement, probability: number) {
     return "rgb(" + (255 - (255 * probability)) + "," + 255 * probability + ",0,0.70)";
   }
 
@@ -330,7 +330,7 @@ export class BattleshipsComponent {
     }
   }
 
-  public PrintX(tile:HumanBoardAndProb) {
+  public PrintX(tile: HumanBoardAndProb) {
     if (tile.tileShot) {
       console.log(this.CalculateProbabilities(tile.probability));
       if (tile.probability == 1) {
@@ -346,7 +346,7 @@ export class BattleshipsComponent {
 
 interface ReturnCoords {
   x: number;
-  y: number; 
+  y: number;
 }
 
 interface NodeData {
@@ -362,7 +362,7 @@ interface ShipInfo {
   xStart: number;
   yStart: number;
   orientation: string;
-  isPlaced: boolean; 
+  isPlaced: boolean;
 }
 
 interface HumanBoardAndProb {
