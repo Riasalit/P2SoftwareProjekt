@@ -18,7 +18,7 @@ namespace BattleshipWeb
         {
             if (counter == 0)
             {
-                Console.WriteLine("AI, Random or Hunt/target (0, 1 or 2)");
+                Console.WriteLine("AI, Random, HumanAI or Hunt/target (0, 1 or 2)");
                 choice = int.Parse(playerName + Console.ReadLine());
                 Console.WriteLine("What is your name");
                 playerName = Console.ReadLine();
@@ -33,6 +33,10 @@ namespace BattleshipWeb
                 players[0] = new RandomAI(playerName);
             }
             else if (choice == 2)
+            {
+                players[0] = new HumanAI(playerName);
+            }
+            else if (choice == 3)
             {
                 players[0] = new HuntTargetAI(playerName);
             }
@@ -56,6 +60,10 @@ namespace BattleshipWeb
                 File.AppendAllText("BattleshipResult.txt", players[0].playerName + Environment.NewLine);
             }
             //Pass the filepath and filename to the StreamWriter Constructor
+            if(players[0].turnCounter > Settings.boardSize)
+            {
+                return true;
+            }
             if (counter < numberOfGames)
             {
                 //Write a second line of text
