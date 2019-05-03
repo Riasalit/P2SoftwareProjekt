@@ -33,8 +33,6 @@ export class BattleshipsComponent {
   private readyForShot: boolean;
   private showProbabilities: boolean;
   private turnCounter: number;
-  private serverBusy: boolean;
-  private callDone: boolean;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.turnCounter = 0;
@@ -42,21 +40,14 @@ export class BattleshipsComponent {
     this.htClient = http;
     this.gameState = -1;
     this.firstTileClick = true;
-    this.serverBusy = true;
-    this.callDone = true;
 
-    while (this.serverBusy && this.callDone) {
-      this.callDone = false;
+    //while (this.serverBusy && this.callDone) {
       let timeLeft = 5;
-      let interval;
-      interval = setInterval(() => {
+      let interval = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--
         } else {
           http.get<boolean>(baseUrl + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
-            this.serverBusy = result;
-            this.callDone = true;
-            this.serverBusy = result;
             if (!result) {
               http.get<number>(baseUrl + 'api/BattleshipWeb/StartData').subscribe(result => {
                 this.boardSize = result;
@@ -68,11 +59,12 @@ export class BattleshipsComponent {
                   this.shipInfos[i].isPlaced = false;
                 }
               }, error => console.error(error));
+              clearInterval(interval);
             }
           })
         }
       },1000)
-    }
+    
 
     this.sunkenShips = [];
   }
@@ -252,18 +244,13 @@ export class BattleshipsComponent {
         this.sunkenShips.push(result);
       }
     }, error => console.error(error));
-
-    while (this.serverBusy && this.callDone) {
-      this.callDone = false;
-      let interval;
+    
       let timeLeft = 5;
-      interval = setInterval(() => {
+      let interval = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--
         } else {
           this.htClient.get<boolean>(this.url + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
-            this.serverBusy = result;
-            this.callDone = true;
             if (!result) {
               this.htClient.get<HumanBoardAndProb[][]>(this.url + 'api/BattleshipWeb/getHumanBoardAndProb').subscribe(result => {
                 this.aiTargetBoard = result;
@@ -277,11 +264,12 @@ export class BattleshipsComponent {
                   }
                 }, error => console.error(error));
               }, error => console.error(error));
+              clearInterval(interval);
             }
           })
         }
       },1000)
-    }
+    
   }
   public isShipOnTile(tile: HumanBoardAndProb){
     let isShip = false;
