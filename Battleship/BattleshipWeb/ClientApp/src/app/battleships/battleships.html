@@ -20,6 +20,40 @@
       padding: 1px;
       border: 1px thin transparent;
     }
+    .modal {
+      /* detach from rest of the document */
+      position: fixed;
+      /* center */
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width:20%;
+      height:20%
+      /* ensure in front of rest of page -- increase as needed */
+      z-index: 1001;
+      /* visual illusion of being in front -- alter to taste */
+      box-shadow: rgba(0,0,0,0.4) 10px 10px 4px;
+      /* visual illusion of being a solid object -- alter to taste */
+      background-color: lightblue;
+      border: 5px solid darkblue;
+      /* visual preference of don't crowd the contents -- alter to taste */
+      padding: 10px;
+      display: inline-grid;
+    }
+    .overlay {
+      /* detach from document */
+      position: fixed;
+      /* ensure in front of rest of page except modal */
+      z-index: 1000;
+      /* fill screen to catch mice */
+      top: 0;
+      left: 0;
+      width: 9999px;
+      height: 9999px;
+      /* dim screen 20% -- alter to taste */
+      opacity: 0.2;
+      background-color: black;
+    }
   </style>
 </head>
 <body>
@@ -59,11 +93,11 @@
 
 
 
-  <div *ngIf="gameState == 2 || gameState == 3" style="overflow:hidden; display:inline-block">
+  <div *ngIf="gameState == 2 || gameState == 3" style="overflow:hidden; display:inline-block;float:left">
 
     <h2>Hello {{username}}</h2>
     <h3>Click the tile you want to shoot</h3>
-    <div style="float:left">
+    <div >
       <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of tiles">
           <td width="61px" height="61px" *ngFor="let tile of row">
@@ -76,31 +110,38 @@
       <h3>Sunken ships:</h3>
       <div *ngFor="let sunkenShip of sunkenShips">- {{sunkenShip}}</div>
     </div>
-    <div style="float:left;font-size:10px">
-      <h5>AI Probabilities:</h5>
-      <table *ngIf="gameState == 2" style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+  </div>
+  <div *ngIf="gameState == 2 || gameState == 3" style="float:left;font-size:10px;margin-top:63px; margin-left:70px">
+    <div *ngIf="showProbabilities" id="ProbabilitiesTable">
+      <h3>AI Probabilities:</h3>
+      <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of aiTargetBoard">
-          <td width="26px" height="26px" *ngFor="let tile of row">
-            <button style="height:25px;width:25px;font-size:10px;padding:1px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
-          </td>
-        </tr>
-      </table>
-      <h5>Your board</h5>
-      <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
-        <tr *ngFor="let row of aiTargetBoard">
-          <td width="25px" height="25px" *ngFor="let tile of row">
-            <button style="height:25px;width:25px;padding:0px;font-size:14px" [style.background-color]="isShipOnTile(tile)" disabled> {{PrintX(tile.tileShot)}}</button>
+          <td width="61px" height="61px" *ngFor="let tile of row">
+            <button style="height:60px;width:60px;font-size:10px;padding:1px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
           </td>
         </tr>
       </table>
     </div>
+    <div *ngIf="!showProbabilities" id="YourBoardTable">
+      <h3>Your board</h3>
+      <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of aiTargetBoard">
+          <td width="61px" height="61px" *ngFor="let tile of row">
+            <button style="height:60px;width:60px;padding:0px;font-size:20px" [style.background-color]="isShipOnTile(tile)" disabled> {{PrintX(tile)}}</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button *ngIf="showProbabilities" (click)="showProbabilities = !showProbabilities">Show AI shots</button>
+    <button *ngIf="!showProbabilities" (click)="showProbabilities = !showProbabilities">Show AI probabilities</button>
   </div>
-  <div *ngIf="gameState == 3">
-    <h4>{{GetPlayerWhoWon()}} won the game!!!</h4>
+  <div *ngIf="gameState == 3" class="modal">
+    <h4>{{GetPlayerWhoWon()}} won the game in {{turnCounter}} turns!!!</h4>
     Do you want to restart the game?
     <button (click)="RestartOrEndGame(true)">Restart Game</button>
     <button (click)="RestartOrEndGame(false)">End Game</button>
   </div>
+  <div *ngIf="gameState == 3" class="overlay"></div>
 </body>
 </html>
 
