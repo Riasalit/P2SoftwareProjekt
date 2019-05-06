@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BattleshipWeb
@@ -11,6 +12,7 @@ namespace BattleshipWeb
         public string playerName { get; }
         public int turnCounter { get; private set; }
         public bool turnFailed;
+        public static Random random;
 
         public Player(string name)
         {
@@ -19,6 +21,7 @@ namespace BattleshipWeb
             pointsShot = new List<Point>();
             turnCounter = 0;
             turnFailed = false;
+            random = new Random();
         }
         public void SetOpponent(Player opponent)
         {

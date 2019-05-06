@@ -277,10 +277,10 @@ namespace BattleshipWeb
                 {
                     Point point = new Point
                     {
-                        X = new Random().Next(0, Settings.boardWidth),
-                        Y = new Random().Next(0, Settings.boardWidth)
+                        X = random.Next(0, Settings.boardWidth),
+                        Y = random.Next(0, Settings.boardWidth)
                     };
-                    orientation = new Random().Next(0, 2);
+                    orientation = random.Next(0, 2);
                     orientationLetter = orientation == 0 ? 'H' : 'V';
                     correctlyPlaced = board.PlaceShips(new Ship(ship.Key, ship.Value, point, orientationLetter));
                 }
@@ -333,7 +333,7 @@ namespace BattleshipWeb
             maxValue = temp.Values.Max();
             Point[] shootingPoints = temp.Where(p => p.Value == maxValue).Select(p => p.Key).ToArray();
 
-            return shootingPoints[new Random().Next(0, shootingPoints.Length)];
+            return shootingPoints[random.Next(0, shootingPoints.Length)];
         }
         private void SetEvidence(Tile shootingTile, Point shootingPoint)
         {

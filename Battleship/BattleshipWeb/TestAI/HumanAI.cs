@@ -37,10 +37,10 @@ namespace BattleshipWeb
                 {
                     Point point = new Point
                     {
-                        X = new Random().Next(0, Settings.boardWidth),
-                        Y = new Random().Next(0, Settings.boardWidth)
+                        X = random.Next(0, Settings.boardWidth),
+                        Y = random.Next(0, Settings.boardWidth)
                     };
-                    orientation = new Random().Next(0, 2);
+                    orientation = random.Next(0, 2);
                     orientationLetter = orientation == 0 ? 'H' : 'V';
                     correctlyPlaced = board.PlaceShips(new Ship(ship.Key, ship.Value, point, orientationLetter));
                 }
@@ -61,46 +61,38 @@ namespace BattleshipWeb
         {
             Point point;
             Tile shootTile;
-            if (shootingPoints.Count < (Settings.boardWidth * Settings.boardWidth) / Settings.dimension)
-            {
-                do
-                {
-                    if (turnCounter > Settings.boardSize)
-                    {
-                        turnFailed = true;
-                    }
-                    point = new Point
-                    {
-                        X = new Random().Next(0, Settings.boardWidth),
-                        Y = new Random().Next(0, Settings.boardWidth)
-                    };
-                }
-                while (!shootingPoints.Contains(point));
+            bool switchToRandom = shootingPoints.Count < Settings.boardWidth * Settings.boardWidth / Settings.dimension;
 
-                ShootOpponent(point);
-                shootingPoints.Remove(point);
-            }
-            else
+            do
             {
-                do
+                point = new Point
                 {
-                    point = new Point
-                    {
-                        X = new Random().Next(0, Settings.boardWidth),
-                        Y = new Random().Next(0, Settings.boardWidth)
-                    };
-                }
-                while (!shootingPoints.Contains(point) && (((point.Y % 2 == 0) && (point.X % 2 == 1)) || ((point.Y % 2 == 1) && (point.X % 2 == 0))));
-
-                shootTile = ShootOpponent(point);
-                shootingPoints.Remove(point);
-                if (shootTile.tile == (int)Tile.TileState.hit)
-                {
-                    target = true;
-                    huntPoint = point;
-                    originalPoint = point;
-                }
+                    X = random.Next(0, Settings.boardWidth),
+                    Y = random.Next(0, Settings.boardWidth)
+                };
             }
+            while (CheckPoint(point, switchToRandom));
+
+            shootTile = ShootOpponent(point);
+            shootingPoints.Remove(point);
+
+
+            if (shootTile.tile == (int)Tile.TileState.hit && !switchToRandom)
+            {
+                target = true;
+                huntPoint = point;
+                originalPoint = point;
+            }
+            
+        }
+        private bool CheckPoint(Point point, bool expr)
+        {
+            if (expr)
+            {
+                return !shootingPoints.Contains(point);
+            }
+            return !shootingPoints.Contains(point) || (point.X % 2 == 1 && point.Y % 2 == 0) ||
+                                                      (point.X % 2 == 0 && point.Y % 2 == 1);
         }
         private void Target()
         {
