@@ -15,14 +15,14 @@ namespace BattleshipWeb
         private static Timer resetTimer;
         private static WebUI webUI;
         private static Game game;
-        private static int gameRunning; //1 = not running, 2 = running;
-        private static bool userDidSomething;
+        private static int gameRunning; //0 = null, 1 = not running, 2 = running;
         [HttpGet("[action]")]
         public bool GetGameRunning()
         {
-            if (gameRunning == 0) gameRunning = 1;
+            if (gameRunning != 1 && gameRunning != 2) gameRunning = 1;
             if(gameRunning == 1)
             {
+                gameRunning = 2;
                 return false;
             }
             else
@@ -34,13 +34,13 @@ namespace BattleshipWeb
         [HttpGet("[action]")]
         public int StartData()
         {
-            
+            gameRunning = 2;
             return Settings.boardWidth;
         }
         [HttpPost("[action]")]
         public void StartGame(string username)
         {
-            createTimer();
+            CreateTimer();
             webUI = new WebUI(username);
             game = new Game(webUI);
             game.Start();
@@ -48,7 +48,7 @@ namespace BattleshipWeb
         [HttpGet("[action]")]
         public IEnumerable<ShipInfo> GetShipnamesAndLengths()
         {
-            createTimer();
+            CreateTimer();
             return Enumerable.Range(0, Settings.shipCount).Select(index => new ShipInfo
             {
                 name = Settings.ships.ElementAt(index).Key,
@@ -58,7 +58,7 @@ namespace BattleshipWeb
         [HttpPost("[action]")]
         public void SendShips([FromBody]ShipInfo info)
         {
-            createTimer();
+            CreateTimer();
             Ship ship;
             ship = new Ship(info.name, info.length, new Point(info.yStart, info.xStart), info.orientation[0]);
             webUI.ShipsToUI(ship);
@@ -66,7 +66,7 @@ namespace BattleshipWeb
         [HttpPost("[action]")]
         public string SendShootingCoords([FromBody]ShootingCoords coord)
         {
-            createTimer();
+            CreateTimer();
             Point shootingPoint = new Point(coord.y, coord.x); //The board is transposed in the game
             webUI.CoordToUI(shootingPoint);
             while (!webUI.returnInformationIsReady) ;
@@ -77,7 +77,7 @@ namespace BattleshipWeb
         [HttpGet("[action]")]
         public IEnumerable<IEnumerable<HumanBoardAndProb>> getHumanBoardAndProb()
         {
-            createTimer();
+            CreateTimer();
             while (!webUI.ai.probabilitiesReady) ;
             webUI.ai.probabilitiesReady = false;
             return Enumerable.Range(0, Settings.boardWidth).Select(index1 => Enumerable.Range(0, Settings.boardWidth).Select(index2 =>
@@ -99,6 +99,10 @@ namespace BattleshipWeb
             {
                 gameRunning = 1;
             }
+            else
+            {
+                CreateTimer();
+            }
             return new GameOverInfo
             {
                 playerWhoWon = webUI.playerWhoWon,
@@ -112,7 +116,7 @@ namespace BattleshipWeb
             webUI.gotRestartInfo = true;
         }
 
-        private void createTimer()
+        private void CreateTimer()
         {
             resetTimer = new Timer(120000);
             resetTimer.Elapsed += OnTimedEvent;

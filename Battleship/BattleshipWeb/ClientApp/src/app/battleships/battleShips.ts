@@ -17,7 +17,7 @@ export class BattleshipsComponent {
   public shipInfos: ShipInfo[];
   public shootingCoords: ReturnCoords;
   public playerWhoWon: number;
-  public gameState: number; // {0: not startet, 1: waiting for name}
+  public gameState: number; // {-1: prestart screen, 0: get username, 1: place ships, 2: game running}
   public boardSize: number;
   public username: string;
   public sunkenShips: string[];
@@ -33,6 +33,7 @@ export class BattleshipsComponent {
   private readyForShot: boolean;
   private showProbabilities: boolean;
   private turnCounter: number;
+  private resetTimeLeft: number;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.turnCounter = 0;
@@ -40,15 +41,19 @@ export class BattleshipsComponent {
     this.htClient = http;
     this.gameState = -1;
     this.firstTileClick = true;
+    this.resetTimeLeft = 120; // 120 sec = 2 min
 
     //while (this.serverBusy && this.callDone) {
     let timeLeft = 5;
     let interval = setInterval(() => {
       if (timeLeft > 0) {
-        timeLeft--
+        timeLeft--;
       } else {
         http.get<boolean>(baseUrl + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
-          if (!result) {
+          console.log(result.valueOf());
+          if (result) {
+            timeLeft = 5;
+          } else {
             http.get<number>(baseUrl + 'api/BattleshipWeb/StartData').subscribe(result => {
               this.boardSize = result;
             }, error => console.error(error));
@@ -59,6 +64,7 @@ export class BattleshipsComponent {
                 this.shipInfos[i].isPlaced = false;
               }
             }, error => console.error(error));
+            this.StartAFKTimer();
             clearInterval(interval);
           }
         })
@@ -70,6 +76,7 @@ export class BattleshipsComponent {
   }
 
   public StartGame() {
+    this.resetTimeLeft = 120000;
     let htmltext = <HTMLTextAreaElement>document.getElementById("nameField");
     this.username = htmltext.value;
     this.amountOfShipsPlaced = 0;
@@ -215,6 +222,7 @@ export class BattleshipsComponent {
   }
 
   public ShipsEntered() {
+    this.resetTimeLeft = 120000;
     this.gameState = 2;
     this.readyForShot = true;
     for (var i = 0; i < this.tiles.length; i++) {
@@ -231,6 +239,7 @@ export class BattleshipsComponent {
   }
 
   public ShootAtTile(tile: NodeData) {
+    this.resetTimeLeft = 120000;
     this.turnCounter++;
     this.readyForShot = false;
     this.shootingCoords = { x: tile.x, y: tile.y };
@@ -244,32 +253,18 @@ export class BattleshipsComponent {
         this.sunkenShips.push(result);
       }
     }, error => console.error(error));
-
-    let timeLeft = 5;
-    let interval = setInterval(() => {
-      if (timeLeft > 0) {
-        timeLeft--
-      } else {
-        this.htClient.get<boolean>(this.url + 'api/BattleshipWeb/GetGameRunning').subscribe(result => {
-          if (!result) {
-            this.htClient.get<HumanBoardAndProb[][]>(this.url + 'api/BattleshipWeb/getHumanBoardAndProb').subscribe(result => {
-              this.aiTargetBoard = result;
-              this.htClient.get<GameOverInfo>(this.url + 'api/BattleshipWeb/GetGameOverInfo').subscribe(result => {
-                console.log(result.gameOver);
-                if (result.gameOver) {
-                  this.playerWhoWon = result.playerWhoWon;
-                  this.gameState = 3;
-                } else {
-                  this.readyForShot = true;
-                }
-              }, error => console.error(error));
-            }, error => console.error(error));
-            clearInterval(interval);
-          }
-        })
-      }
-    }, 1000)
-
+    this.htClient.get<HumanBoardAndProb[][]>(this.url + 'api/BattleshipWeb/getHumanBoardAndProb').subscribe(result => {
+      this.aiTargetBoard = result;
+      this.htClient.get<GameOverInfo>(this.url + 'api/BattleshipWeb/GetGameOverInfo').subscribe(result => {
+        console.log(result.gameOver);
+        if (result.gameOver) {
+          this.playerWhoWon = result.playerWhoWon;
+          this.gameState = 3;
+        } else {
+          this.readyForShot = true;
+        }
+      }, error => console.error(error));
+    }, error => console.error(error));
   }
   public isShipOnTile(tile: HumanBoardAndProb) {
     let isShip = false;
@@ -311,6 +306,7 @@ export class BattleshipsComponent {
   }
 
   public RestartOrEndGame(restart: boolean) {
+    this.resetTimeLeft = 120000;
     this.htClient.post<void>(this.url + 'api/BattleshipWeb/RestartOrEndGame', restart).subscribe();
     if (restart) {
       this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();
@@ -341,6 +337,17 @@ export class BattleshipsComponent {
     } else {
       return " ";
     }
+  }
+
+  private StartAFKTimer() {
+
+    let afkTimer = setInterval(() => {
+      if (this.resetTimeLeft <= 0) {
+        this.gameState = -1;
+      } else {
+        this.resetTimeLeft--;
+      }
+    }, 1000)
   }
 }
 
