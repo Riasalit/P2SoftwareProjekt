@@ -58,6 +58,7 @@ namespace BattleshipWeb
         [HttpPost("[action]")]
         public void SendShips([FromBody]ShipInfo info)
         {
+            while (webUI == null) ;
             CreateTimer();
             Ship ship;
             ship = new Ship(info.name, info.length, new Point(info.yStart, info.xStart), info.orientation[0]);
@@ -77,6 +78,7 @@ namespace BattleshipWeb
         [HttpGet("[action]")]
         public IEnumerable<IEnumerable<HumanBoardAndProb>> getHumanBoardAndProb()
         {
+            while (webUI == null) ;
             CreateTimer();
             while (!webUI.ai.probabilitiesReady) ;
             webUI.ai.probabilitiesReady = false;

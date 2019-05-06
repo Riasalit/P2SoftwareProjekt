@@ -28,7 +28,7 @@
       top: 50%;
       transform: translate(-50%, -50%);
       width:20%;
-      height:20%
+      height:20%;
       /* ensure in front of rest of page -- increase as needed */
       z-index: 1001;
       /* visual illusion of being in front -- alter to taste */
@@ -57,18 +57,39 @@
   </style>
 </head>
 <body>
+
+
   <div *ngIf="gameState == 0">
+    <h1> Battleships! </h1>
+    Welcome to 'Battleship!'.
+    On this page you will find an example of a Bayesian Network built with the Hugin C# API provided to us by the company themselves.
+    The game is simple and fast. Place your ships on the board and try to eliminate the opponents ships by shooting at a coordinate.
+    You and the opponent take turns. Whoever sinks all ships on the opponents board, wins a glorious victory.
+    You will be playing against an artificial inteligence who uses a Bayesian Network to calculate the probability of your ship-positions
+    At any point of the game you can click the 'Show AI probabilities' button, and it will show you the propagated probabilities.
+
+    On this page you will also find some statistics about the AI, that showcases that it is generally better than other AI's in the field.
+    It is also quite a bit better than humans on average. Don't believe me? Give it a try.
+
+    The reason for the game is to showcase one of the many posibilities that the use of Bayesian networks provides.
     <h1>Enter your name and press Start</h1>
     <textarea id="nameField" autofocus></textarea>
-    <button (click)="StartGame()"> Start </button>
+    <button (click)="StartGame()" [disabled]="!gameIsReady"> Start </button>
+    <div *ngIf="!gameIsReady"> Please wait, another user is playing the game</div>
   </div>
 
+  <div *ngIf="playerAFK">
+    <div class="modal">
+      You were AFK for too long
+      <button (click)="Refresh()"> OK </button>
+    </div>
+    <div class="overlay"></div>
+  </div>
 
 
   <div *ngIf="gameState == 1" style="float:left">
     <h2>Hello {{username}}</h2>
     <h3>Place your ships</h3>
-    <button *ngIf="amountOfShipsPlaced == shipInfos.length" (click)="ShipsEntered()" style="height:100px;width:100px">DONE!!!</button>
     <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
       <tr *ngFor="let row of tiles">
         <td width="61px" height="61px" *ngFor="let tile of row">
@@ -85,13 +106,16 @@
   <div *ngIf="gameState == 1" style="float:left;padding-top:55px;padding-left:20px">
     <h3>Ships to place</h3>
     <div *ngFor="let info of shipInfos">
-      <button (click)="ChooseShip(info)" id="shipButton" style="width:120px;height:60px;margin-bottom:2px" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
+      <button (click)="ChooseShip(info)" id="shipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
     </div>
     <h3>Reset section</h3>
     <div *ngFor="let info of shipInfos">
-      <button (click)="resetShip(info)" id="resetShipButton" *ngIf="info.isPlaced">Reset {{info.name}}</button>
+      <button (click)="resetShip(info)" id="resetShipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" *ngIf="info.isPlaced">Reset {{info.name}}</button>
     </div>
-    <button (click)="resetBoard()"> RESET ALL!!! </button>
+    <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px"> RESET ALL!!! </button>
+    <div *ngIf="amountOfShipsPlaced == shipInfos.length">
+      <button (click)="ShipsEntered()" style="height:100px;width:100px">DONE!!!</button>
+    </div>
   </div>
 
 
@@ -135,8 +159,8 @@
         </tr>
       </table>
     </div>
-    <button *ngIf="showProbabilities" (click)="showProbabilities = !showProbabilities">Show AI shots</button>
-    <button *ngIf="!showProbabilities" (click)="showProbabilities = !showProbabilities">Show AI probabilities</button>
+    <button *ngIf="showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" (click)="showProbabilities = !showProbabilities">Show AI shots</button>
+    <button *ngIf="!showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" (click)="showProbabilities = !showProbabilities">Show AI probabilities</button>
   </div>
   <div *ngIf="gameState == 3" class="modal">
     <h4>{{GetPlayerWhoWon()}} won the game in {{turnCounter}} turns!!!</h4>

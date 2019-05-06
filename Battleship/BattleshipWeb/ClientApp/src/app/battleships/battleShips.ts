@@ -17,7 +17,7 @@ export class BattleshipsComponent {
   public shipInfos: ShipInfo[];
   public shootingCoords: ReturnCoords;
   public playerWhoWon: number;
-  public gameState: number; // {-1: prestart screen, 0: get username, 1: place ships, 2: game running}
+  public gameState: number; // {0: get username, 1: place ships, 2: game running}
   public boardSize: number;
   public username: string;
   public sunkenShips: string[];
@@ -32,16 +32,23 @@ export class BattleshipsComponent {
   private tilesDisabled: boolean;
   private readyForShot: boolean;
   private showProbabilities: boolean;
+  private gameIsReady: boolean;
   private turnCounter: number;
   private resetTimeLeft: number;
+  private playerAFK: boolean;
+  private audio: HTMLAudioElement;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.turnCounter = 0;
     this.url = baseUrl;
     this.htClient = http;
-    this.gameState = -1;
+    this.gameState = 0;
     this.firstTileClick = true;
     this.resetTimeLeft = 120; // 120 sec = 2 min
+    this.playerAFK = false;
+    this.gameIsReady = false;
+    this.PlayAudio(0);
+    this.audio.loop = true;
 
     //while (this.serverBusy && this.callDone) {
     let timeLeft = 5;
@@ -65,22 +72,23 @@ export class BattleshipsComponent {
               }
             }, error => console.error(error));
             this.StartAFKTimer();
+            this.gameIsReady = true;
             clearInterval(interval);
           }
         })
       }
-    }, 1000)
+    }, 1000) //1000 milisec = 1 sec
 
 
     this.sunkenShips = [];
   }
 
   public StartGame() {
-    this.resetTimeLeft = 120000;
+    this.resetTimeLeft = 120;
     let htmltext = <HTMLTextAreaElement>document.getElementById("nameField");
     this.username = htmltext.value;
     this.amountOfShipsPlaced = 0;
-    this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();
+    this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe(error => console.error(error));
     this.gameState = 1;
     this.tilesDisabled = true;
     this.DrawBoard();
@@ -222,7 +230,8 @@ export class BattleshipsComponent {
   }
 
   public ShipsEntered() {
-    this.resetTimeLeft = 120000;
+    this.audio.pause();
+    this.resetTimeLeft = 120;
     this.gameState = 2;
     this.readyForShot = true;
     for (var i = 0; i < this.tiles.length; i++) {
@@ -239,18 +248,21 @@ export class BattleshipsComponent {
   }
 
   public ShootAtTile(tile: NodeData) {
-    this.resetTimeLeft = 120000;
+    this.resetTimeLeft = 120;
     this.turnCounter++;
     this.readyForShot = false;
     this.shootingCoords = { x: tile.x, y: tile.y };
     this.htClient.post<string>(this.url + 'api/BattleshipWeb/SendShootingCoords', this.shootingCoords, { responseType: 'text' as 'json' }).subscribe(result => {
       if (result == 'Missed') {
         tile.tileHit = 1;
+        this.PlayAudio(1);
       } else if (result == 'Hit a ship') {
         tile.tileHit = 2;
+        this.PlayAudio(2)
       } else {
         tile.tileHit = 2;
         this.sunkenShips.push(result);
+        this.PlayAudio(3);
       }
     }, error => console.error(error));
     this.htClient.get<HumanBoardAndProb[][]>(this.url + 'api/BattleshipWeb/getHumanBoardAndProb').subscribe(result => {
@@ -299,30 +311,22 @@ export class BattleshipsComponent {
 
   public GetPlayerWhoWon() {
     if (this.playerWhoWon == 0) {
+      this.PlayAudio(5);
       return "The best AI ever :3 ";
     } else {
+      this.PlayAudio(4);
       return "" + name;
     }
   }
 
   public RestartOrEndGame(restart: boolean) {
-    this.resetTimeLeft = 120000;
+    this.resetTimeLeft = 120;
     this.htClient.post<void>(this.url + 'api/BattleshipWeb/RestartOrEndGame', restart).subscribe();
+    this.audio.pause();
     if (restart) {
-      this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();
-      this.turnCounter = 0;
-      this.gameState = 1;
-      this.sunkenShips.splice(0, this.sunkenShips.length);
-      this.firstTileClick = true;
-      this.htClient.get<ShipInfo[]>(this.url + 'api/BattleshipWeb/GetShipnamesAndLengths').subscribe(result => {
-        this.shipInfos = result;
-        for (var i = 0; i < this.shipInfos.length; i++) {
-          this.shipInfos[i].isPlaced = false;
-        }
-      }, error => console.error(error));
-      this.amountOfShipsPlaced = 0;
-      this.tilesDisabled = true;
-      this.DrawBoard();
+      this.ResetClient();
+    } else {
+      window.location.href = this.url + "/battleships";
     }
   }
 
@@ -339,16 +343,59 @@ export class BattleshipsComponent {
     }
   }
 
+  private ResetClient() {
+    this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();
+    this.turnCounter = 0;
+    this.gameState = 1;
+    this.sunkenShips.splice(0, this.sunkenShips.length);
+    this.firstTileClick = true;
+    this.htClient.get<ShipInfo[]>(this.url + 'api/BattleshipWeb/GetShipnamesAndLengths').subscribe(result => {
+      this.shipInfos = result;
+      for (var i = 0; i < this.shipInfos.length; i++) {
+        this.shipInfos[i].isPlaced = false;
+      }
+    }, error => console.error(error));
+    this.amountOfShipsPlaced = 0;
+    this.tilesDisabled = true;
+    this.DrawBoard();
+  }
+
   private StartAFKTimer() {
 
     let afkTimer = setInterval(() => {
       if (this.resetTimeLeft <= 0) {
-        this.gameState = -1;
+        this.playerAFK = true;
+        this.resetTimeLeft = 120
       } else {
         this.resetTimeLeft--;
       }
     }, 1000)
   }
+
+  public Refresh() {
+    window.location.reload();
+  }
+
+  public PlayAudio(sound: number) {
+    this.audio = new Audio();
+    if (sound == 0) { //intro
+      this.audio.src = "../assets/SoundEffects/IntroSound.wav";
+    } else if (sound == 1) { //Hit
+      this.audio.src = "../assets/SoundEffects/Hit.wav";
+    } else if (sound == 2) { //Miss
+      this.audio.src = "../assets/SoundEffects/Miss.wav";
+    } else if (sound == 3) { //Sunk
+      this.audio.src = "../assets/SoundEffects/Sunk.wav";
+    } else if (sound == 4) { //Game Won
+      this.audio.src = "../assets/SoundEffects/GladVictory.wav";
+    } else if (sound == 5) {
+      this.audio.src = "../assets/SoundEffects/SadVictory.wav";
+    }
+    this.audio.load();
+    this.audio.loop = false;
+    this.audio.play();
+  }
+
 }
 
 interface ReturnCoords {

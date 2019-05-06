@@ -13,9 +13,9 @@ namespace BattleshipWeb
         //largest ships first for ai purposes
         public static readonly Dictionary<string, int> ships = new Dictionary<string, int>
         {
+            {"Battleship", 4},
             {"Cruiser", 3},
-            {"Submarine", 3},
-            {"Destroyer", 2}
+            {"Submarine", 3}
         };
         public const int shipCount = 3;
     }
