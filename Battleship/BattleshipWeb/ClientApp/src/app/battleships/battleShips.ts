@@ -4,7 +4,7 @@ import { renderTemplate, text } from '@angular/core/src/render3/instructions';
 import { forEach } from '@angular/router/src/utils/collection';
 
 @Component({
-  selector: 'home',
+  selector: 'Battleships',
   templateUrl: './battleships.html'
 })
 
@@ -85,7 +85,7 @@ export class BattleshipsComponent {
 
   public StartGame() {
     this.resetTimeLeft = 120;
-    let htmltext = <HTMLTextAreaElement>document.getElementById("nameField");
+    let htmltext = <HTMLInputElement>document.getElementById("name");
     this.username = htmltext.value;
     this.amountOfShipsPlaced = 0;
     this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe(error => console.error(error));
@@ -294,9 +294,9 @@ export class BattleshipsComponent {
       }
     }
     if (isShip) {
-      return "rgba(111, 106, 106, 0.76)";
+      return "rgb(111, 106, 106)";
     } else {
-      return "rgba(24, 90, 226, 0.79)";
+      return "rgba(24, 90, 226, 0.4)";
     }
 
   }

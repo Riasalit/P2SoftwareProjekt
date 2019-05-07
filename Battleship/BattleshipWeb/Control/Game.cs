@@ -52,7 +52,8 @@ namespace BattleshipWeb
             {
                 if (player is AI)
                 {
-                    (player as AI).DeleteDomain();
+                    AI temp = player as AI;
+                    if(temp.GetDomainStatus()) temp.DeleteDomain();
                 }
             }
             if (restartChoice == true)

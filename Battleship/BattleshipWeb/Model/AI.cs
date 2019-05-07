@@ -492,5 +492,9 @@ namespace BattleshipWeb
         {
             battleship.Delete();
         }
+        public bool GetDomainStatus()
+        {
+            return battleship.IsAlive();
+        }
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+
 <head>
   <meta charset="utf-8" />
   <title>Battleship</title>
@@ -11,24 +11,32 @@
       display: inline-block;
       margin: 0px 0px;
       cursor: pointer;
+      color: black;
+    }
+    button {
+      color: black;
     }
     .table {
-      width:unset;
+      width: unset;
+      border:none;
+      border-top:none;
     }
+
     table td {
       overflow: hidden;
       padding: 1px;
-      border: 1px thin transparent;
+      border: none;
     }
+
     .modal {
       /* detach from rest of the document */
       position: fixed;
       /* center */
-      left: 50%;
-      top: 50%;
+      left: 600px;
+      top: 400px;
       transform: translate(-50%, -50%);
-      width:20%;
-      height:20%;
+      width: 20%;
+      height: 20%;
       /* ensure in front of rest of page -- increase as needed */
       z-index: 1001;
       /* visual illusion of being in front -- alter to taste */
@@ -40,6 +48,7 @@
       padding: 10px;
       display: inline-grid;
     }
+
     .overlay {
       /* detach from document */
       position: fixed;
@@ -54,26 +63,36 @@
       opacity: 0.2;
       background-color: black;
     }
+    .newBody {
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      font-weight: 500;
+      color: white;
+      text-align: center;
+    }
+
   </style>
 </head>
-<body>
 
 
+<div class="newBody">
   <div *ngIf="gameState == 0">
-    <h1> Battleships! </h1>
-    Welcome to 'Battleship!'.
-    On this page you will find an example of a Bayesian Network built with the Hugin C# API provided to us by the company themselves.
-    The game is simple and fast. Place your ships on the board and try to eliminate the opponents ships by shooting at a coordinate.
-    You and the opponent take turns. Whoever sinks all ships on the opponents board, wins a glorious victory.
-    You will be playing against an artificial inteligence who uses a Bayesian Network to calculate the probability of your ship-positions
-    At any point of the game you can click the 'Show AI probabilities' button, and it will show you the propagated probabilities.
+    <h1 style="font-family: Jokerman"> Battleships! </h1>
+    <div style="padding:8px; margin-left:60px; margin-right:60px; margin-top:30px;">
+      Welcome to 'Battleship!'.
+      On this page you will find an example of a Bayesian Network built with the Hugin C# API provided to us by the company themselves.
+      The game is simple and fast. Place your ships on the board and try to eliminate the opponents ships by shooting at a coordinate.
+      You and the opponent take turns. Whoever sinks all ships on the opponents board, wins a glorious victory.
+      You will be playing against an artificial inteligence who uses a Bayesian Network to calculate the probability of your ship-positions
+      At any point of the game you can click the 'Show AI probabilities' button, and it will show you the propagated probabilities.
 
-    On this page you will also find some statistics about the AI, that showcases that it is generally better than other AI's in the field.
-    It is also quite a bit better than humans on average. Don't believe me? Give it a try.
+      On this page you will also find some statistics about the AI, that showcases that it is generally better than other AI's in the field.
+      It is also quite a bit better than humans on average. Don't believe me? Give it a try.
 
-    The reason for the game is to showcase one of the many posibilities that the use of Bayesian networks provides.
-    <h1>Enter your name and press Start</h1>
-    <textarea id="nameField" autofocus></textarea>
+      The reason for the game is to showcase one of the many posibilities that the use of Bayesian networks provides.
+    </div>
+    <h3 style="font-weight:900">Enter your name and press Start</h3>
+    <input style="color:black; width:150px"type="text" id="name" name="name" required
+           minlength="1" maxlength="20" size="10">
     <button (click)="StartGame()" [disabled]="!gameIsReady"> Start </button>
     <div *ngIf="!gameIsReady"> Please wait, another user is playing the game</div>
   </div>
@@ -87,17 +106,17 @@
   </div>
 
 
-  <div *ngIf="gameState == 1" style="float:left">
+  <div *ngIf="gameState == 1" style="float:left; margin-left:20%">
     <h2>Hello {{username}}</h2>
     <h3>Place your ships</h3>
-    <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+    <table cellpadding="1" cellspacing="1" class='table'>
       <tr *ngFor="let row of tiles">
         <td width="61px" height="61px" *ngFor="let tile of row">
           <div *ngIf="BoolCheck(tile); else elseBlock">
             <button (click)="ChooseTile(tile)" style="height:60px;width:60px" [disabled]="tilesDisabled">{{tile.tileName}}</button>
           </div>
           <ng-template #elseBlock>
-            <button (click)="ChooseTile(tile)" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.53)" disabled>{{tile.tileName}}</button>
+            <button (click)="ChooseTile(tile)" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.4)" disabled>{{tile.tileName}}</button>
           </ng-template>
         </td>
       </tr>
@@ -114,23 +133,23 @@
     </div>
     <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px"> RESET ALL!!! </button>
     <div *ngIf="amountOfShipsPlaced == shipInfos.length">
-      <button (click)="ShipsEntered()" style="height:100px;width:100px">DONE!!!</button>
+      <button (click)="ShipsEntered()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px">DONE!!!</button>
     </div>
   </div>
 
 
 
-  <div *ngIf="gameState == 2 || gameState == 3" style="overflow:hidden; display:inline-block;float:left">
+  <div *ngIf="gameState == 2 || gameState == 3" style="overflow:hidden; display:inline-block;float:left;margin-left:25%">
 
     <h2>Hello {{username}}</h2>
     <h3>Click the tile you want to shoot</h3>
-    <div >
+    <div>
       <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of tiles">
           <td width="61px" height="61px" *ngFor="let tile of row">
             <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px;background:rgba(24, 90, 226, 0.79)" [disabled]="!readyForShot">{{tile.tileName}}</button>
-            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.70)" disabled>{{tile.tileName}}</button>
-            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgba(26, 219, 52, 0.70)" disabled>{{tile.tileName}}</button>
+            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:rgba(230, 46, 0, 0.40)" disabled>{{tile.tileName}}</button>
+            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgb(26, 219, 52)" disabled>{{tile.tileName}}</button>
           </td>
         </tr>
       </table>
@@ -169,6 +188,5 @@
     <button (click)="RestartOrEndGame(false)">End Game</button>
   </div>
   <div *ngIf="gameState == 3" class="overlay"></div>
-</body>
-</html>
+</div>
 

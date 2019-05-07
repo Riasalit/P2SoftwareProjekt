@@ -120,13 +120,19 @@ namespace BattleshipWeb
 
         private void CreateTimer()
         {
+            if(resetTimer != null) resetTimer.Enabled = false;
             resetTimer = new Timer(120000);
             resetTimer.Elapsed += OnTimedEvent;
             resetTimer.Enabled = true;
         }
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
+            if(webUI.ai.GetDomainStatus())
+            {
+                webUI.ai.DeleteDomain();
+            }
             gameRunning = 1;
+            resetTimer.Enabled = false;
         }
         public class ShipInfo
         {
