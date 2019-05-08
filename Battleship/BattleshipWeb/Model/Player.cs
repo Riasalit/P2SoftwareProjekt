@@ -35,5 +35,36 @@ namespace BattleshipWeb
         }
         public abstract void YourTurn();
         public abstract void SetShips();
+
+        public void SetMidStackShip()
+        {
+            board.PlaceShips(new Ship("Battleship", 4, new Point(2, 2), 'H'));
+            board.PlaceShips(new Ship("Cruiser", 3, new Point(3, 3), 'V'));
+            board.PlaceShips(new Ship("Submarine", 3, new Point(4, 3), 'V'));
+        }
+        public void SetCornerStackShip()
+        {
+            board.PlaceShips(new Ship("Battleship", 4, new Point(0, 0), 'H'));
+            board.PlaceShips(new Ship("Cruiser", 3, new Point(0, 1), 'H'));
+            board.PlaceShips(new Ship("Submarine", 3, new Point(0, 2), 'H'));
+        }
+        public void SetCornerSpreadShip()
+        {
+            board.PlaceShips(new Ship("Battleship", 4, new Point(0, 0), 'H'));
+            board.PlaceShips(new Ship("Cruiser", 3, new Point(7, 0), 'V'));
+            board.PlaceShips(new Ship("Submarine", 3, new Point(0, 7), 'H'));
+        }
+        public void SetBorderStackShip()
+        {
+            board.PlaceShips(new Ship("Battleship", 4, new Point(0, 7), 'H'));
+            board.PlaceShips(new Ship("Cruiser", 3, new Point(4, 7), 'H'));
+            board.PlaceShips(new Ship("Submarine", 3, new Point(7, 5), 'V'));
+        }
+        public void SetMidSpreadShip()
+        {
+            board.PlaceShips(new Ship("Battleship", 4, new Point(2, 1), 'H'));
+            board.PlaceShips(new Ship("Cruiser", 3, new Point(6, 3), 'V'));
+            board.PlaceShips(new Ship("Submarine", 3, new Point(1, 4), 'V'));
+        }
     }
 }

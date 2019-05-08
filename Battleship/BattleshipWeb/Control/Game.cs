@@ -22,7 +22,7 @@ namespace BattleshipWeb
             // Sets opponent
             players[0].SetOpponent(players[0]);
             // Places Ships
-            players[0].SetShips();
+            players[0].SetMidSpreadShip();
             // Swaps turns and shoots until all ships are gone
             while (running && !players[0].turnFailed)
             {
