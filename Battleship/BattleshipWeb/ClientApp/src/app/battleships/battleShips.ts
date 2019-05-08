@@ -294,9 +294,9 @@ export class BattleshipsComponent {
       }
     }
     if (isShip) {
-      return "rgb(111, 106, 106)";
+      return "rgb(93, 93, 93)";
     } else {
-      return "rgba(24, 90, 226, 0.4)";
+      return "#436B98";
     }
 
   }
@@ -306,7 +306,12 @@ export class BattleshipsComponent {
   }
 
   public MakebackgroundColor(button: HTMLButtonElement, probability: number) {
-    return "rgb(" + (255 - (255 * probability)) + "," + 255 * probability + ",0,0.70)";
+    if (probability < (1/3)) {
+      return "rgb(180," + 180 * (3 * probability) + ",0)";
+    } else {
+      return "rgb(" + (180 - (180*(probability-(1/3))*(3))) + ",180,0)";
+    }
+    
   }
 
   public GetPlayerWhoWon() {
@@ -326,22 +331,19 @@ export class BattleshipsComponent {
     if (restart) {
       this.ResetClient();
     } else {
-      window.location.href = this.url + "/battleships";
+      window.location.href = this.url;
     }
   }
 
-  public PrintX(tile: HumanBoardAndProb) {
-    if (tile.tileShot) {
-      console.log(this.CalculateProbabilities(tile.probability));
-      if (tile.probability == 1) {
-        return "X";
-      } else {
-        return "O"
-      }
+  public PrintImage(tile: HumanBoardAndProb) {
+    console.log(this.CalculateProbabilities(tile.probability));
+    if (tile.probability == 1) {
+      return "../../assets/Images/green_dot.png";
     } else {
-      return " ";
+      return "../../assets/Images/red_dot.png"
     }
   }
+
 
   private ResetClient() {
     this.htClient.post<void>(this.url + 'api/BattleshipWeb/StartGame', this.username).subscribe();

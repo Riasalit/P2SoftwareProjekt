@@ -27,7 +27,7 @@ namespace BattleshipWeb
             }
             else
             {
-                return true;
+                return false;
             }
         }
 
@@ -121,18 +121,19 @@ namespace BattleshipWeb
         private void CreateTimer()
         {
             if(resetTimer != null) resetTimer.Enabled = false;
-            resetTimer = new Timer(120000);
+            resetTimer = new Timer(10000);
             resetTimer.Elapsed += OnTimedEvent;
             resetTimer.Enabled = true;
         }
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            if(webUI.ai.GetDomainStatus())
+            if (webUI != null)
             {
-                webUI.ai.DeleteDomain();
+                gameRunning = 1;
+                game.running = false;
+                webUI.gameTimedOut = true;
+                resetTimer.Enabled = false;
             }
-            gameRunning = 1;
-            resetTimer.Enabled = false;
         }
         public class ShipInfo
         {

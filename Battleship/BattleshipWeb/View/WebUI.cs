@@ -21,6 +21,7 @@ namespace BattleshipWeb
         public int playerWhoWon { get; private set; }
         public string returnInformation;
         public AI ai { get; private set; }
+        public bool gameTimedOut;
         public WebUI(string username)
         {
             gotRestartInfo = false;
@@ -33,19 +34,32 @@ namespace BattleshipWeb
             recievedShootingPoint = false;
             recievedShips = false;
             shipIndex = 0;
+            gameTimedOut = false;
         }
         public bool GameComplete(Player[] players, int playerWon)
         {
             ai.probabilitiesReady = true;
             gameOver = true;
             playerWhoWon = playerWon;
-            while (!gotRestartInfo) ;
+            while (!gotRestartInfo) if (gameTimedOut) return false; ;
             return restartGame;
         }
 
         public Ship GetShips(bool correctlyPlaced, string name)
         {
-            while (!recievedShips) ;
+            while (!recievedShips)
+            {
+                if (gameTimedOut)
+                {
+                    ships = new List<Ship>
+                    {
+                        new Ship("Cruiser",1, new Point(0,0), 'V'),
+                        new Ship("Cruiser",1, new Point(0,1), 'V'),
+                        new Ship("Cruiser",1, new Point(0,2), 'V')
+                    };
+                    recievedShips = true;
+                }
+            }
             return ships[shipIndex++];
         }
 
@@ -59,7 +73,18 @@ namespace BattleshipWeb
 
         public Point MakeTargetPoint(List<Point> points, string name)
         {
-            while (!recievedShootingPoint) ;
+            while (!recievedShootingPoint)
+            {
+                if (gameTimedOut)
+                {
+                    Random rand = new Random();
+                    while (points.Contains(currentShootingPoint))
+                    {
+                        currentShootingPoint = new Point(rand.Next(Settings.boardWidth), rand.Next(Settings.boardWidth));
+                    }
+                    recievedShootingPoint = true;
+                }
+            }
             recievedShootingPoint = false;
             return currentShootingPoint;
         }
