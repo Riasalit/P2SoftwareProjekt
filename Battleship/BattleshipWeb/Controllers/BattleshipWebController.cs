@@ -121,7 +121,7 @@ namespace BattleshipWeb
         private void CreateTimer()
         {
             if(resetTimer != null) resetTimer.Enabled = false;
-            resetTimer = new Timer(10000);
+            resetTimer = new Timer(120000);
             resetTimer.Elapsed += OnTimedEvent;
             resetTimer.Enabled = true;
         }
