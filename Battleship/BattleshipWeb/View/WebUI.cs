@@ -41,7 +41,7 @@ namespace BattleshipWeb
             ai.probabilitiesReady = true;
             gameOver = true;
             playerWhoWon = playerWon;
-            while (!gotRestartInfo) if (gameTimedOut) return false; ;
+            while (!gotRestartInfo) if (gameTimedOut) return false;
             return restartGame;
         }
 

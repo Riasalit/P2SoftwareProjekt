@@ -27,14 +27,13 @@ namespace BattleshipWeb
             }
             else
             {
-                return false;
+                return true;
             }
         }
 
         [HttpGet("[action]")]
         public int StartData()
         {
-            gameRunning = 2;
             return Settings.boardWidth;
         }
         [HttpPost("[action]")]
@@ -79,6 +78,7 @@ namespace BattleshipWeb
         public IEnumerable<IEnumerable<HumanBoardAndProb>> getHumanBoardAndProb()
         {
             while (webUI == null) ;
+            while (webUI.ai == null) ;
             CreateTimer();
             while (!webUI.ai.probabilitiesReady) ;
             webUI.ai.probabilitiesReady = false;
@@ -97,14 +97,6 @@ namespace BattleshipWeb
         [HttpGet("[action]")]
         public GameOverInfo GetGameOverInfo()
         {
-            if (webUI.gameOver)
-            {
-                gameRunning = 1;
-            }
-            else
-            {
-                CreateTimer();
-            }
             return new GameOverInfo
             {
                 playerWhoWon = webUI.playerWhoWon,
@@ -116,6 +108,14 @@ namespace BattleshipWeb
         {
             webUI.restartGame = restart;
             webUI.gotRestartInfo = true;
+            if (restart)
+            {
+                CreateTimer();
+            }
+            else
+            {
+                gameRunning = 1;
+            }
         }
 
         private void CreateTimer()
@@ -127,9 +127,9 @@ namespace BattleshipWeb
         }
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
+            gameRunning = 1;
             if (webUI != null)
             {
-                gameRunning = 1;
                 game.running = false;
                 webUI.gameTimedOut = true;
                 resetTimer.Enabled = false;

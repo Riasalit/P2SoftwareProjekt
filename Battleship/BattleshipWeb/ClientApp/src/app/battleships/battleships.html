@@ -32,18 +32,18 @@
       /* detach from rest of the document */
       position: fixed;
       /* center */
-      left: 600px;
-      top: 400px;
+      left: 50%;
+      top: 50%;
       transform: translate(-50%, -50%);
-      width: 20%;
-      height: 20%;
+      width: max-content;
+      height: 150px;
       /* ensure in front of rest of page -- increase as needed */
       z-index: 1001;
       /* visual illusion of being in front -- alter to taste */
       box-shadow: rgba(0,0,0,0.4) 10px 10px 4px;
       /* visual illusion of being a solid object -- alter to taste */
-      background-color: lightblue;
-      border: 5px solid darkblue;
+      background-color: #E6E6E6;
+      border: 5px solid #292929;
       /* visual preference of don't crowd the contents -- alter to taste */
       padding: 10px;
       display: inline-grid;
@@ -99,11 +99,11 @@
   </div>
 
   <div *ngIf="playerAFK">
-    <div class="modal">
-      You were AFK for too long
+    <div class="modal" style="font-size:x-large; ">
+      <div style="margin-top:20px">You were AFK for too long</div>
       <button (click)="Refresh()"> OK </button>
     </div>
-    <div class="overlay"></div>
+    <div class="overlay"></div> <!-- pls dont slet me :'( -->
   </div>
 
 
@@ -126,15 +126,15 @@
   <div *ngIf="gameState == 1" style="float:left;padding-top:55px;padding-left:20px">
     <h3>Ships to place</h3>
     <div *ngFor="let info of shipInfos">
-      <button (click)="ChooseShip(info)" id="shipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
+      <button (click)="ChooseShip(info)" id="shipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
     </div>
     <h3>Reset section</h3>
     <div *ngFor="let info of shipInfos">
-      <button (click)="resetShip(info)" id="resetShipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" *ngIf="info.isPlaced">Reset {{info.name}}</button>
+      <button (click)="resetShip(info)" id="resetShipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" *ngIf="info.isPlaced" [disabled]="!tilesDisabled">Reset {{info.name}}</button>
     </div>
-    <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px"> RESET ALL!!! </button>
+    <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)"> RESET ALL!!! </button>
     <div *ngIf="amountOfShipsPlaced == shipInfos.length">
-      <button (click)="ShipsEntered()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px">DONE!!!</button>
+      <button (click)="ShipsEntered()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)">DONE!!!</button>
     </div>
   </div>
 
@@ -149,8 +149,8 @@
         <tr *ngFor="let row of tiles">
           <td width="61px" height="61px" *ngFor="let tile of row">
             <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px;background:#436B98" [disabled]="!readyForShot"></button>
-            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:#BD564C" disabled></button>
-            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:#62a74f" disabled></button>
+            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:#436B98; padding:0px" disabled><img src="../../assets/Images/red_dot.png" /></button>
+            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgb(93, 93, 93); padding:0px" disabled><img src="../../assets/Images/green_dot.png" /></button>
           </td>
         </tr>
       </table>
@@ -179,11 +179,11 @@
         </tr>
       </table>
     </div>
-    <button *ngIf="showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" (click)="showProbabilities = !showProbabilities">Show AI shots</button>
-    <button *ngIf="!showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px" (click)="showProbabilities = !showProbabilities">Show AI probabilities</button>
+    <button *ngIf="showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" (click)="showProbabilities = !showProbabilities">Show AI shots</button>
+    <button *ngIf="!showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" (click)="showProbabilities = !showProbabilities">Show AI probabilities</button>
   </div>
   <div *ngIf="gameState == 3" class="modal">
-    <h4>{{GetPlayerWhoWon()}} won the game in {{turnCounter}} turns!!!</h4>
+    <h4>{{GetPlayerWhoWon()}} won the game in {{turnCounter}} turns!</h4>
     Do you want to restart or end the game?
     <button (click)="RestartOrEndGame(true)">Restart Game</button>
     <button (click)="RestartOrEndGame(false)">End Game</button>

@@ -211,6 +211,8 @@ export class BattleshipsComponent {
       this.shipInfos[i].isPlaced = false;
     }
     this.amountOfShipsPlaced = 0;
+    this.firstTileClick = true;
+    this.tilesDisabled = true;
   }
 
   public resetShip(ship: ShipInfo) {
@@ -271,6 +273,11 @@ export class BattleshipsComponent {
         console.log(result.gameOver);
         if (result.gameOver) {
           this.playerWhoWon = result.playerWhoWon;
+          if (result.playerWhoWon == 0) {
+            this.PlayAudio(5);
+          } else {
+            this.PlayAudio(4);
+          }
           this.gameState = 3;
         } else {
           this.readyForShot = true;
@@ -316,11 +323,9 @@ export class BattleshipsComponent {
 
   public GetPlayerWhoWon() {
     if (this.playerWhoWon == 0) {
-      this.PlayAudio(5);
-      return "The best AI ever :3 ";
+      return "The AI";
     } else {
-      this.PlayAudio(4);
-      return "" + name;
+      return "" + this.username;
     }
   }
 

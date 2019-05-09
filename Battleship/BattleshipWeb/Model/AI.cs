@@ -14,6 +14,7 @@ namespace BattleshipWeb
         private List<List<BooleanDCNode>> tilesList = new List<List<BooleanDCNode>>();
         private List<Point> previousHits = new List<Point>();
         private SortedDictionary<int, int> indexes = new SortedDictionary<int, int>();
+        private static Random random = new Random();
         public Dictionary<Point, double> probabilities { get; private set; }
         public bool probabilitiesReady;
 
@@ -330,17 +331,19 @@ namespace BattleshipWeb
         // Finds the points with the greatest probablities and returns one of these randomly
         private Point FindShootingPoint(Dictionary<Point, double> probabilities)
         {
+            
             Dictionary<Point, double> temp = probabilities;
             double maxValue = 0;
+
             // Removes points already shot from the dictionary
             foreach (Point point in pointsShot)
             {
                 temp.Remove(point);
             }
             maxValue = temp.Values.Max();
-            Point[] shootingPoints = temp.Where(p => p.Value == maxValue).Select(p => p.Key).ToArray();
+            Point[] shootingPoints = temp.Where(p => Math.Abs(p.Value - maxValue) < 0.0000000001).Select(p => p.Key).ToArray();
 
-            return shootingPoints[new Random().Next(0, shootingPoints.Length)];
+            return shootingPoints[random.Next(0, shootingPoints.Length)];
         }
         private void SetEvidence(Tile shootingTile, Point shootingPoint)
         {
