@@ -331,7 +331,7 @@ namespace BattleshipWeb
                 temp.Remove(point);
             }
             maxValue = temp.Values.Max();
-            Point[] shootingPoints = temp.Where(p => p.Value == maxValue).Select(p => p.Key).ToArray();
+            Point[] shootingPoints = temp.Where(p => Math.Abs(p.Value - maxValue) < 0.0000000001).Select(p => p.Key).ToArray();
 
             return shootingPoints[random.Next(0, shootingPoints.Length)];
         }
