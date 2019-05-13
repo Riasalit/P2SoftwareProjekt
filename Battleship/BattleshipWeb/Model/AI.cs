@@ -303,10 +303,6 @@ namespace BattleshipWeb
             pointsShot.Add(shootingPoint);
             // Shoots at the board
             shootingTile = ShootOpponent(shootingPoint);
-            /***************
-            * Slet!!!!!!   *
-            ****************/
-            battleship.SaveAsKB("TestStuffswithevidence.hkb");
             // Inserts evidence to the bayesian network
             SetEvidence(shootingTile, shootingPoint);
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
