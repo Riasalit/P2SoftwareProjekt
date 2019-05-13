@@ -34,7 +34,6 @@ namespace BattleshipWeb
                 NextPlayer();
             }
             ContinueGameOrExit(UI.GameComplete(players, turn));
-            Console.ReadKey();
         }
         private void NextPlayer()
         {
