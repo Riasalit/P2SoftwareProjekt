@@ -7,10 +7,6 @@ Lena Said <br />
 Leon Christensen <br />
 Liv  Holm <br />
 Nina Lyngsie Burmester  <br />
-## Kompilering af programmet
-For at kompilere programmet skal du bruge en kompiler der kan kompilere ANSI C89. <br />
-Vi har selv blot kompileret med GNU's Compiler Collection (GCC). Derfor kompileret med koden: `gcc p1-groupSorting.c -o Gruppedannelse.exe`
-Du kan også blot køre programmet Gruppedannelse.exe.
 
 ## Om programmet
 Programmet er en web-applikation, lavet som et universitets 2.semester projekt, for at undersøge sandsynlighedsfordelingen under et spil Sænke slagskibe. Dette er gjort ved hjælp af et bayesiansk netværk med et API fra Hugin. 
@@ -23,4 +19,5 @@ Hvis der ikke er andre som er i gang med at spille vil brugeren kunne påbegynde
 
 ## Eksperimenter med det Bayesianske netværk
 For at undersøge hvilke svagheder og styrker det Bayesianske netværk har, er netværket blevet testet mod forskellige skipsplaceringer. Herunder er programmet blevet kørt 5000 gange for at få et mere generelt resultat. Efter eksperimenter er udført fandt gruppen ud af at netværket klarer sig dårligst hvis alle skibene er sat i samme hjørne, da der er flest mulige skibsplaceringer i midten og ikke ved siden af de andre skibe. Det eksperiment hvor programmet klarede sig bedst var hvis skibene var placeret i midten af brættet dog uden af de berørte hinanden. Disse resultater stemmer overens med teori om det Bayesianske netværk og var derfor som forventet. 
+
 
