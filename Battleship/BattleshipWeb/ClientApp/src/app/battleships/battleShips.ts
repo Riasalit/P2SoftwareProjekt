@@ -12,15 +12,15 @@ import { forEach } from '@angular/router/src/utils/collection';
 
 
 export class BattleshipsComponent {
-  public aiTargetBoard: HumanBoardAndProb[][];
-  public tiles: NodeData[][];
-  public shipInfos: ShipInfo[];
-  public shootingCoords: ReturnCoords;
-  public playerWhoWon: number;
-  public gameState: number; // {0: get username, 1: place ships, 2: game running}
-  public boardSize: number;
-  public username: string;
-  public sunkenShips: string[];
+  private aiTargetBoard: HumanBoardAndProb[][];
+  private tiles: NodeData[][];
+  private shipInfos: ShipInfo[];
+  private shootingCoords: ReturnCoords;
+  private playerWhoWon: number;
+  private gameState: number; // {0: get username, 1: place ships, 2: game running}
+  private boardSize: number;
+  private username: string;
+  private sunkenShips: string[];
   private currentShip: ShipInfo;
   private firstTileRow: number;
   private firstTileCol: number;
