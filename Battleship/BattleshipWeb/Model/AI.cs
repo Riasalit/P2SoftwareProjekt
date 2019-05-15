@@ -327,7 +327,6 @@ namespace BattleshipWeb
         // Finds the points with the greatest probablities and returns one of these randomly
         private Point FindShootingPoint(Dictionary<Point, double> probabilities)
         {
-            
             Dictionary<Point, double> temp = probabilities;
             double maxValue = 0;
 

@@ -1,12 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Diagnostics;
-using System.IO;
 using BattleshipWeb;
 namespace BattleshipTest.ModelTest
 {
@@ -17,6 +9,7 @@ namespace BattleshipTest.ModelTest
         public void IsHumanMadeCorrectly()
         {
             TestUI testUI = new TestUI();
+
             Player[] players = testUI.InitializePlayers(testUI);
             
             Assert.AreEqual(true, players[0] is Human);
@@ -25,6 +18,7 @@ namespace BattleshipTest.ModelTest
         public void IsAIMadeCorrectly()
         {
             TestUI testUI = new TestUI();
+
             Player[] players = testUI.InitializePlayers(testUI);
 
             Assert.AreEqual(true, players[1] is AI);
@@ -62,6 +56,7 @@ namespace BattleshipTest.ModelTest
             {
                 testPlayer1.YourTurn();
             }
+
             Assert.AreEqual(Settings.shipCount, testPlayer2.board.sunkenShips);
         }
         [TestMethod]
