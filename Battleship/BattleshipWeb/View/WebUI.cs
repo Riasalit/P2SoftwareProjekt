@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BattleshipWeb
 {
@@ -10,31 +8,32 @@ namespace BattleshipWeb
     {
         private List<Ship> ships;
         private Point currentShootingPoint;
+        public AI ai { get; private set; }
         private bool recievedShips;
         private bool recievedShootingPoint;
-        private int shipIndex;
-        private string username;
         public bool returnInformationIsReady;
         public bool gameOver{ get; private set; }
         public bool restartGame;
         public bool gotRestartInfo;
-        public int playerWhoWon { get; private set; }
-        public string returnInformation;
-        public AI ai { get; private set; }
         public bool gameTimedOut;
+        public int playerWhoWon { get; private set; }
+        private int shipIndex;
+        private string username;
+        public string returnInformation;
+
         public WebUI(string username)
         {
-            gotRestartInfo = false;
-            gameOver = false;
-            playerWhoWon = 2;
-            ai = new AI("Strongest AI ever");
             ships = new List<Ship>();
-            this.username = username;
-            returnInformationIsReady = false;
-            recievedShootingPoint = false;
+            ai = new AI("Strongest AI ever");
             recievedShips = false;
-            shipIndex = 0;
+            recievedShootingPoint = false;
+            returnInformationIsReady = false;
+            gameOver = false;
+            gotRestartInfo = false;
             gameTimedOut = false;
+            playerWhoWon = 2;
+            shipIndex = 0;
+            this.username = username;
         }
         public bool GameComplete(Player[] players, int playerWon)
         {
@@ -44,7 +43,6 @@ namespace BattleshipWeb
             while (!gotRestartInfo) if (gameTimedOut) return false;
             return restartGame;
         }
-
         public Ship GetShips(bool correctlyPlaced, string name)
         {
             while (!recievedShips)
@@ -62,7 +60,6 @@ namespace BattleshipWeb
             }
             return ships[shipIndex++];
         }
-
         public Player[] InitializePlayers(IUserInterface UI)
         {
             Player[] players = new Player[2];
@@ -70,7 +67,6 @@ namespace BattleshipWeb
             players[1] = new Human(username, UI);
             return players;
         }
-
         public Point MakeTargetPoint(List<Point> points, string name)
         {
             while (!recievedShootingPoint)
@@ -86,9 +82,9 @@ namespace BattleshipWeb
                 }
             }
             recievedShootingPoint = false;
+
             return currentShootingPoint;
         }
-
         public void ReturnInformation(Point point, Tile info)
         {
             if(info.tile == (int)Tile.TileState.sunk)
@@ -108,7 +104,11 @@ namespace BattleshipWeb
         public void ShipsToUI(Ship ship)
         {
             ships.Add(ship);
-            if(ships.Count == Settings.shipCount) recievedShips = true;
+
+            if (ships.Count == Settings.shipCount)
+            {
+                recievedShips = true;
+            }
         }
         public void CoordToUI(Point shootingPoint)
         {
