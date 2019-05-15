@@ -28,20 +28,9 @@ namespace BattleshipTest.BayesianNetworkTest
             }
             testAI.SetOpponent(testHuman);
 
-            try
+            while (testHuman.board.sunkenShips != Settings.shipCount)
             {
-                while (testHuman.board.sunkenShips != Settings.shipCount)
-                {
-                    testAI.YourTurn();
-                }
-            }
-            catch (ArgumentException e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-            catch (ExceptionInconsistencyOrUnderflow e)
-            {
-                Debug.WriteLine(e.Message);
+                testAI.YourTurn();
             }
 
             Assert.AreEqual(Settings.shipCount, testHuman.board.sunkenShips);

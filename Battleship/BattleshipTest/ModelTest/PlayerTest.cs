@@ -14,13 +14,19 @@ namespace BattleshipTest.ModelTest
     public class PlayerTest
     {
         [TestMethod]
-        public void ArePlayersMadeCorrectly()
+        public void IsHumanMadeCorrectly()
         {
             TestUI testUI = new TestUI();
-            Player[] players = new Player[2];
-            players = testUI.InitializePlayers(testUI);
+            Player[] players = testUI.InitializePlayers(testUI);
             
             Assert.AreEqual(true, players[0] is Human);
+        }
+        [TestMethod]
+        public void IsAIMadeCorrectly()
+        {
+            TestUI testUI = new TestUI();
+            Player[] players = testUI.InitializePlayers(testUI);
+
             Assert.AreEqual(true, players[1] is AI);
         }
         [TestMethod]
