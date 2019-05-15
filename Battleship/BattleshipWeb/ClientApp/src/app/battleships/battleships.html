@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Battleship</title>
+  <!--<link rel="stylesheet" href="../../styles.css"/>-->
+  <style>
+    .button {
+      border: none;
+      padding: 0px 0px;
+      display: inline-block;
+      margin: 0px 0px;
+      cursor: pointer;
+      color: black;
+    }
+    button {
+      color: black;
+    }
+    .table {
+      width: unset;
+      border:none;
+      border-top:none;
+    }
+
+    table td {
+      overflow: hidden;
+      padding: 1px;
+      border: none;
+    }
+
+    .modal {
+      /* detach from rest of the document */
+      position: fixed;
+      /* center */
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: max-content;
+      height: 150px;
+      /* ensure in front of rest of page -- increase as needed */
+      z-index: 1001;
+      /* visual illusion of being in front -- alter to taste */
+      box-shadow: rgba(0,0,0,0.4) 10px 10px 4px;
+      /* visual illusion of being a solid object -- alter to taste */
+      background-color: #E6E6E6;
+      border: 5px solid #292929;
+      /* visual preference of don't crowd the contents -- alter to taste */
+      padding: 10px;
+      display: inline-grid;
+    }
+
+    .overlay {
+      /* detach from document */
+      position: fixed;
+      /* ensure in front of rest of page except modal */
+      z-index: 1000;
+      /* fill screen to catch mice */
+      top: 0;
+      left: 0;
+      width: 9999px;
+      height: 9999px;
+      /* dim screen 20% -- alter to taste */
+      opacity: 0.2;
+      background-color: black;
+    }
+    .newBody {
+      font-family: 'Proxima Nova Soft', 'Helvetica Neue', sans-serif;
+      font-family:
+      font-weight: 500;
+      color: black;
+      text-align: center;
+      padding-bottom: 20px;
+    }
+    
+  </style>
+</head>
+
+
+<div class="newBody">
+  <div *ngIf="gameState == 0" style="background-color:#436B98; padding-bottom:40px;">
+    <h1 style="margin-top:0px; padding-top: 20px; font-weight:900"> Battleships! </h1>
+    <div style="padding:8px; margin-left:60px; margin-right:60px; margin-top:30px;">
+      Welcome to 'Battleship!'.
+      On this page you will find an example of a Bayesian Network built with the Hugin C# API provided to us by HUGIN EXPERT.
+      The game is simple and fast. Place your ships on the board and try to eliminate the opponents ships by shooting at a coordinate.
+      You and the opponent take turns. Whoever sinks all ships on the opponents board, wins a glorious victory.
+      You will be playing against an artificial inteligence which uses a Bayesian Network to calculate the probability of your ship-positions.
+      At any point of the game you can click the 'Show AI probabilities' button, and it will show you the propagated probabilities.
+
+      On this page you will also find some statistics about the AI, that showcases that it is generally better than other AI's in the field.
+      It is also quite a bit better than humans on average. Don't believe us? Give it a try.
+
+      The reason for the game is to showcase one of the many posibilities that the use of Bayesian networks provides.
+    </div>
+    <h3 style="font-weight:900">Enter your name and press Start</h3>
+    <input style="color:black; width:150px"type="text" id="name" name="name" required
+           minlength="1" maxlength="20" size="10">
+    <button (click)="StartGame()" [disabled]="!gameIsReady || playerAFK"> Start </button>
+    <div *ngIf="!gameIsReady"> Please wait, another user is playing the game</div>
+  </div>
+
+  <div *ngIf="playerAFK">
+    <div class="modal" style="font-size:x-large; ">
+      <div style="margin-top:20px">You were inactive for too long</div>
+      <button (click)="Refresh()"> OK </button>
+    </div>
+    <div class="overlay"></div> <!-- pls dont slet me :'( -->
+  </div>
+
+
+  <div *ngIf="gameState == 1" style="float:left; margin-left:20%">
+    <h2>Hello {{username}}</h2>
+    <h3>Place your ships</h3>
+    <table cellpadding="1" cellspacing="1" class='table'>
+      <tr *ngFor="let row of tiles">
+        <td width="61px" height="61px" *ngFor="let tile of row">
+          <div *ngIf="BoolCheck(tile); else elseBlock">
+            <button (click)="ChooseTile(tile)" style="height:60px;width:60px; background-color:#436B98" [disabled]="tilesDisabled"></button>
+          </div>
+          <ng-template #elseBlock>
+            <button (click)="ChooseTile(tile)" style="height:60px;width:60px;background-color:rgb(93, 93, 93)" disabled></button>
+          </ng-template>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div *ngIf="gameState == 1" style="float:left;padding-top:55px;padding-left:20px">
+    <h3>Ships to place</h3>
+    <div *ngFor="let info of shipInfos">
+      <button (click)="ChooseShip(info)" id="shipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" [disabled]="!tilesDisabled" *ngIf="!info.isPlaced">{{info.name}}</button>
+    </div>
+    <h3>Reset section</h3>
+    <div *ngFor="let info of shipInfos">
+      <button (click)="resetShip(info)" id="resetShipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" *ngIf="info.isPlaced" [disabled]="!tilesDisabled">Reset {{info.name}}</button>
+    </div>
+    <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)">Reset all</button>
+    <div *ngIf="amountOfShipsPlaced == shipInfos.length && !playerAFK">
+      <button (click)="ShipsEntered()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)">Done</button>
+    </div>
+  </div>
+
+
+
+  <div *ngIf="gameState == 2 || gameState == 3" style="overflow:hidden; display:inline-block;float:left;margin-left:15%">
+
+    <h2>Hello {{username}}</h2>
+    <h3>Click the tile you want to shoot</h3>
+    <div>
+      <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of tiles">
+          <td width="61px" height="61px" *ngFor="let tile of row">
+            <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px;background:#436B98" [disabled]="!readyForShot"></button>
+            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:#436B98; padding:0px" disabled><img src="../../assets/Images/red_dot.png" /></button>
+            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgb(93, 93, 93); padding:0px" disabled><img src="../../assets/Images/green_dot.png" /></button>
+          </td>
+        </tr>
+      </table>
+      <h3>Sunken ships:</h3>
+      <div *ngFor="let sunkenShip of sunkenShips">- {{sunkenShip}}</div>
+    </div>
+  </div>
+  <div *ngIf="gameState == 2 || gameState == 3" style="float:left;font-size:10px;margin-top:63px; margin-left:70px">
+    <div *ngIf="showProbabilities" id="ProbabilitiesTable">
+      <h3>AI Probabilities</h3>
+      <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of aiTargetBoard">
+          <td width="61px" height="61px" *ngFor="let tile of row">
+            <button style="height:60px;width:60px;font-size:10px;padding:1px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div *ngIf="!showProbabilities" id="YourBoardTable">
+      <h3>Your board</h3>
+      <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
+        <tr *ngFor="let row of aiTargetBoard">
+          <td width="61px" height="61px" *ngFor="let tile of row">
+            <button style="height:60px;width:60px;padding:0px;font-size:20px" [style.background-color]="isShipOnTile(tile)" disabled> <img *ngIf="tile.tileShot"[src]="PrintImage(tile)"/></button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button *ngIf="showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" (click)="showProbabilities = !showProbabilities">Show AI shots</button>
+    <button *ngIf="!showProbabilities" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" (click)="showProbabilities = !showProbabilities">Show AI probabilities</button>
+  </div>
+  <div *ngIf="gameState == 3" class="modal">
+    <h4>{{GetPlayerWhoWon()}} won the game in {{turnCounter}} turns!</h4>
+    Do you want to restart or end the game?
+    <button (click)="RestartOrEndGame(true)">Restart Game</button>
+    <button (click)="RestartOrEndGame(false)">End Game</button>
+  </div>
+  <div *ngIf="gameState == 3" class="overlay"></div>
+</div>
+
