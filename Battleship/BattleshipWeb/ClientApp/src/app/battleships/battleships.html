@@ -64,7 +64,8 @@
       background-color: black;
     }
     .newBody {
-      font-family: Georgia, 'Times New Roman', Times, serif;
+      font-family: 'Proxima Nova Soft', 'Helvetica Neue', sans-serif;
+      font-family:
       font-weight: 500;
       color: black;
       text-align: center;
@@ -94,13 +95,13 @@
     <h3 style="font-weight:900">Enter your name and press Start</h3>
     <input style="color:black; width:150px"type="text" id="name" name="name" required
            minlength="1" maxlength="20" size="10">
-    <button (click)="StartGame()" [disabled]="!gameIsReady"> Start </button>
+    <button (click)="StartGame()" [disabled]="!gameIsReady || playerAFK"> Start </button>
     <div *ngIf="!gameIsReady"> Please wait, another user is playing the game</div>
   </div>
 
   <div *ngIf="playerAFK">
     <div class="modal" style="font-size:x-large; ">
-      <div style="margin-top:20px">You were AFK for too long</div>
+      <div style="margin-top:20px">You were inactive for too long</div>
       <button (click)="Refresh()"> OK </button>
     </div>
     <div class="overlay"></div> <!-- pls dont slet me :'( -->
@@ -132,9 +133,9 @@
     <div *ngFor="let info of shipInfos">
       <button (click)="resetShip(info)" id="resetShipButton" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)" *ngIf="info.isPlaced" [disabled]="!tilesDisabled">Reset {{info.name}}</button>
     </div>
-    <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)"> RESET ALL!!! </button>
-    <div *ngIf="amountOfShipsPlaced == shipInfos.length">
-      <button (click)="ShipsEntered()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)">DONE!!!</button>
+    <button (click)="resetBoard()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)">Reset all</button>
+    <div *ngIf="amountOfShipsPlaced == shipInfos.length && !playerAFK">
+      <button (click)="ShipsEntered()" style="width:120px;height:60px;margin-bottom:2px;font-size:14px; background-color:rgb(190, 190, 190)">Done</button>
     </div>
   </div>
 
@@ -160,7 +161,7 @@
   </div>
   <div *ngIf="gameState == 2 || gameState == 3" style="float:left;font-size:10px;margin-top:63px; margin-left:70px">
     <div *ngIf="showProbabilities" id="ProbabilitiesTable">
-      <h3>AI Probabilities:</h3>
+      <h3>AI Probabilities</h3>
       <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of aiTargetBoard">
           <td width="61px" height="61px" *ngFor="let tile of row">
