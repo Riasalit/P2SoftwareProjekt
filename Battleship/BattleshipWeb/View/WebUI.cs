@@ -38,24 +38,24 @@ namespace BattleshipWeb
         }
         public bool GameComplete(Player[] players, int playerWon)
         {
-            ai.probabilitiesReady = true;
+            ai.probabilitiesReady = true; //prevents controller from being stuck
             gameOver = true;
             playerWhoWon = playerWon;
-            while (!gotRestartInfo) if (gameTimedOut) return false;
+            while (!gotRestartInfo) if (gameTimedOut) return false; //if server times out before receiving user input, just end the game
             return restartGame;
         }
 
         public Ship GetShips(bool correctlyPlaced, string name)
         {
-            while (!recievedShips)
+            while (!recievedShips) 
             {
                 if (gameTimedOut)
                 {
-                    ships = new List<Ship>
+                    ships = new List<Ship> //if game times out before all ships are recieved, then just create some dummy ships to get the game to move on and end
                     {
-                        new Ship("Cruiser",1, new Point(0,0), 'V'),
-                        new Ship("Cruiser",1, new Point(0,1), 'V'),
-                        new Ship("Cruiser",1, new Point(0,2), 'V')
+                        new Ship("Dummy",1, new Point(0,0), 'V'),
+                        new Ship("Dummy",1, new Point(0,1), 'V'),
+                        new Ship("Dummy",1, new Point(0,2), 'V')
                     };
                     recievedShips = true;
                 }
@@ -75,9 +75,10 @@ namespace BattleshipWeb
         {
             while (!recievedShootingPoint)
             {
-                if (gameTimedOut)
+                if (gameTimedOut) //if the server times out while waiting for a shot, generate a random valid shot so the gameflow can end
                 {
                     Random rand = new Random();
+                    currentShootingPoint = new Point(rand.Next(Settings.boardWidth), rand.Next(Settings.boardWidth));
                     while (points.Contains(currentShootingPoint))
                     {
                         currentShootingPoint = new Point(rand.Next(Settings.boardWidth), rand.Next(Settings.boardWidth));
@@ -89,7 +90,7 @@ namespace BattleshipWeb
             return currentShootingPoint;
         }
 
-        public void ReturnInformation(Point point, Tile info)
+        public void ReturnInformation(Point point, Tile info) //returns "Missed", "Hit a ship" or the name of a sunken ship
         {
             if(info.tile == (int)Tile.TileState.sunk)
             {
@@ -103,14 +104,14 @@ namespace BattleshipWeb
             {
                 returnInformation = "Missed";
             }
-            returnInformationIsReady = true;
+            returnInformationIsReady = true; //tells the web controller that returninformation is ready
         }
-        public void ShipsToUI(Ship ship)
+        public void ShipsToUI(Ship ship) //is used by the controller to send ships to ui
         {
             ships.Add(ship);
-            if(ships.Count == Settings.shipCount) recievedShips = true;
+            if(ships.Count == Settings.shipCount) recievedShips = true; //is true when all ships are received
         }
-        public void CoordToUI(Point shootingPoint)
+        public void CoordToUI(Point shootingPoint) //is used by the controller to send shooting point to ui
         {
             currentShootingPoint = shootingPoint;
             recievedShootingPoint = true;
