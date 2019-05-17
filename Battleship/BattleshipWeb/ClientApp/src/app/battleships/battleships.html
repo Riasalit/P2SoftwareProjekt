@@ -114,7 +114,7 @@
     <table cellpadding="1" cellspacing="1" class='table'>
       <tr *ngFor="let row of tiles">
         <td width="61px" height="61px" *ngFor="let tile of row">
-          <div *ngIf="BoolCheck(tile); else elseBlock">
+          <div *ngIf="tile.tileState == 0; else elseBlock">
             <button (click)="ChooseTile(tile)" style="height:60px;width:60px; background-color:#436B98" [disabled]="tilesDisabled"></button>
           </div>
           <ng-template #elseBlock>
@@ -149,9 +149,9 @@
       <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of tiles">
           <td width="61px" height="61px" *ngFor="let tile of row">
-            <button *ngIf="tile.tileHit == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px;background:#436B98" [disabled]="!readyForShot"></button>
-            <button *ngIf="tile.tileHit == 1" style="height:60px;width:60px;background:#436B98; padding:0px" disabled><img src="../../assets/Images/red_dot.png" /></button>
-            <button *ngIf="tile.tileHit == 2" style="height:60px;width:60px;background:rgb(93, 93, 93); padding:0px" disabled><img src="../../assets/Images/green_dot.png" /></button>
+            <button *ngIf="tile.tileState == 0" (click)="ShootAtTile(tile)" style="height:60px;width:60px;background:#436B98" [disabled]="!readyForShot"></button>
+            <button *ngIf="tile.tileState == 1" style="height:60px;width:60px;background:#436B98; padding:0px" disabled><img src="../../assets/Images/red_dot.png" /></button>
+            <button *ngIf="tile.tileState == 2" style="height:60px;width:60px;background:rgb(93, 93, 93); padding:0px" disabled><img src="../../assets/Images/green_dot.png" /></button>
           </td>
         </tr>
       </table>
@@ -165,7 +165,7 @@
       <table style="table-layout: fixed; border: 1px thin transparent;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of aiTargetBoard">
           <td width="61px" height="61px" *ngFor="let tile of row">
-            <button style="height:60px;width:60px;font-size:10px;padding:1px;" [style.background-color]="MakebackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
+            <button style="height:60px;width:60px;font-size:10px;padding:1px;" [style.background-color]="MakeBackgroundColor(this, tile.probability)" disabled>{{CalculateProbabilities(tile.probability)}}</button>
           </td>
         </tr>
       </table>
@@ -175,7 +175,7 @@
       <table style="table-layout: fixed; border: 1px thin transparent; float:left;" cellpadding="1" cellspacing="1" class='table'>
         <tr *ngFor="let row of aiTargetBoard">
           <td width="61px" height="61px" *ngFor="let tile of row">
-            <button style="height:60px;width:60px;padding:0px;font-size:20px" [style.background-color]="isShipOnTile(tile)" disabled> <img *ngIf="tile.tileShot"[src]="PrintImage(tile)"/></button>
+            <button style="height:60px;width:60px;padding:0px;font-size:20px" [style.background-color]="isShipOnTile(tile)" disabled> <img *ngIf="tile.tileShot" [src]="PrintImage(tile)"/></button>
           </td>
         </tr>
       </table>

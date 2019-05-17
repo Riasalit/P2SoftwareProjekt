@@ -24,7 +24,7 @@ namespace BattleshipWeb
             Ship ship;
             bool correctlyPlaced;
             bool lastShipCorrectlyPlaced = false;
-            // Places five ships
+            // Places all ships from settings
             for (int i = 0; i < Settings.shipCount; i++)
             {
                 correctlyPlaced = false;

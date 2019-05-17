@@ -25,7 +25,7 @@ namespace BattleshipTest.ModelTest
 
             testPlayer.board.PlaceShips(new Ship("TestShip", 3, point, 'H'));
             Tile hitTile = testPlayer.board.ShootAt(new Point(4, 3));
-            Tile missTile = testPlayer.board.ShootAt(new Point(5, 3));
+            Tile missTile = testPlayer.board.ShootAt(new Point(2, 5));
 
             Assert.AreEqual(true, hitTile.tile == (int) Tile.TileState.hit && missTile.tile == (int) Tile.TileState.missed);
         }

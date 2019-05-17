@@ -246,3 +246,7 @@ paket-files/
 *.dll
 *.hkb
 *.hkb
+Battleship/.DS_Store
+Battleship/BattleshipTest/.DS_Store
+Battleship/BattleshipWeb/.DS_Store
+.DS_Store
