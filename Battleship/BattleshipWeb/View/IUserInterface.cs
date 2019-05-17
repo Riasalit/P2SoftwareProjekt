@@ -20,6 +20,5 @@ namespace BattleshipWeb
         Point MakeTargetPoint(List<Point> points, string name);
         void ReturnInformation(Point point, Tile info);
         bool GameComplete(Player[] players, int playerWon);
-
     }
 }

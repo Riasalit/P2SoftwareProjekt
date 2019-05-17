@@ -209,8 +209,8 @@ namespace BattleshipWeb
                                   (Settings.dimension * Settings.boardWidth);
             int xCoord = name[0] - 'A';
             int yCoord = name[1] - '0';
-            List<Point> firstPoints = new List<Point>();
-            List<Point> secondPoints = new List<Point>();
+            List<Point> firstPoints;
+            List<Point> secondPoints;
             Point tilePlace = new Point(xCoord, yCoord);
             ulong count = 0;
             string firstName, secondName;
@@ -453,7 +453,7 @@ namespace BattleshipWeb
             List<string> startCoords = new List<string>();
             double bestBelief = 0;
             string startCoord = "";
-            long beliefIndex = 0;
+            long beliefIndex;
             // Runs through all possible ship positions
             foreach (List<Point> list in allPossiblePos)
             {

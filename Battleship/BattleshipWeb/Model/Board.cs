@@ -27,7 +27,7 @@ namespace BattleshipWeb
         }
         public bool PlaceShips(Ship ship)
         {
-            // Out of bounds check/overlap check
+            // Out of bounds and overlap check
             // Returns false if something fails
             if (CheckIfError(ship))
             {

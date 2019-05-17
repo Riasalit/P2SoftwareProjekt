@@ -32,6 +32,12 @@
     <Reference Include="HAPI">
       <HintPath>..\HAPI.dll</HintPath>
     </Reference>
+    <Reference Include="HelloAngular.Views">
+      <HintPath>HelloAngular.Views.dll</HintPath>
+    </Reference>
+    <Reference Include="HelloAngular">
+      <HintPath>HelloAngular.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -58,7 +64,7 @@
     <ItemGroup>
       <DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**" />
       <DistFiles Include="$(SpaRoot)node_modules\**" Condition="'$(BuildServerSideRenderer)' == 'true'" />
-      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+      <ResolvedFileToPublish Include="@(DistFiles-&gt;'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>%(DistFiles.Identity)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>
