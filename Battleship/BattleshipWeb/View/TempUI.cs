@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-/**************************************
- * JEG ER EN TEST CLASS FOR TESTING :3*
- * ************************************/
+/*************************************************
+ * Interface used to play the game in a terminal *
+ * ***********************************************/
 namespace BattleshipWeb
 {
     public class TempUI : IUserInterface
