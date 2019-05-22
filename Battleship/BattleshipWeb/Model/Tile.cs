@@ -29,7 +29,6 @@ namespace BattleshipWeb
             {
                 return ship.IsSunken();
             }
-
             return false;
         }
         public void SetTileState()

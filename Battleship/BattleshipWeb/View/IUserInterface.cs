@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-/******************************************************************************
- * General interface for communicating with the user                          *
- * InitializePlayers(): Allows a user to initialize the players               *
- * GetShips(): Gets a ship from a human player                                *
- * MakeTargetPoint(): Gets a specific coordinate from player to shoot at      *
- * ReturnInformation(): Returns shooting information for a specific tile      *
- * ****************************************************************************/
+/**************************************************************************************
+ * General interface for communicating with the user                                  *
+ * InitializePlayers(): Allows a user to initialize the players                       *
+ * GetShips(): Gets a ship from a human player                                        *
+ * MakeTargetPoint(): Gets a specific coordinate from player to shoot at              *
+ * ReturnInformation(): Returns shooting information for a specific tile              *
+ * GameComplete(): Indorms the user of who won the game and asks if it should restart *
+ * ************************************************************************************/
 namespace BattleshipWeb
 {
     public interface IUserInterface

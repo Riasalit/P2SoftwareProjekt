@@ -10,8 +10,8 @@ namespace BattleshipWeb
         public const int boardWidth = 8;
         public const int dimension = 2;
         public const int boardSize = boardWidth * boardWidth;
-        //largest ships first for ai purposes
-        public static readonly Dictionary<string, int> ships = new Dictionary<string, int>
+        // Largest ships first for ai purposes
+        public static readonly Dictionary<string, int> ships = new Dictionary<string, int> // {shipName, shipLength}
         {
             {"Battleship", 4},
             {"Cruiser", 3},
@@ -20,6 +20,3 @@ namespace BattleshipWeb
         public const int shipCount = 3;
     }
 }
-//"Destroyer",
-//                "battleship"
-//, 2, 4
