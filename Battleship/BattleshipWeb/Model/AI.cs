@@ -27,15 +27,14 @@ namespace BattleshipWeb
             CalculateProbabilities(probabilities);
             probabilitiesReady = true;
         }
-        public Domain InitBayesianNetwork()
+        private void InitBayesianNetwork()
         {
             InitShips();
             // Initializes overlap constraints
             MakeStatesForOverlap(shipList);
             InitTiles();
             battleship.Compile();
-
-            return battleship;
+            
         }
         // Initializes ships
         public void InitShips()
