@@ -14,13 +14,20 @@ namespace BattleshipWeb
         private List<List<BooleanDCNode>> tilesList = new List<List<BooleanDCNode>>();
         private List<Point> previousHits = new List<Point>();
         private SortedDictionary<int, int> indexes = new SortedDictionary<int, int>();
+        private static Random random = new Random();
+        public Dictionary<Point, double> probabilities { get; private set; }
+        public bool probabilitiesReady;
 
         public AI(string name) : base(name)
         {
+            probabilitiesReady = false;
             battleship = new Domain();
+            probabilities = new Dictionary<Point, double>();
             InitBayesianNetwork();
+            CalculateProbabilities(probabilities);
+            probabilitiesReady = true;
         }
-        public Domain InitBayesianNetwork()
+        private void InitBayesianNetwork()
         {
             InitShips();
             // Initializes overlap constraints
@@ -28,7 +35,6 @@ namespace BattleshipWeb
             InitTiles();
             battleship.Compile();
 
-            return battleship;
         }
         // Initializes ships
         public void InitShips()
@@ -202,8 +208,8 @@ namespace BattleshipWeb
                                   (Settings.dimension * Settings.boardWidth);
             int xCoord = name[0] - 'A';
             int yCoord = name[1] - '0';
-            List<Point> firstPoints = new List<Point>();
-            List<Point> secondPoints = new List<Point>();
+            List<Point> firstPoints;
+            List<Point> secondPoints;
             Point tilePlace = new Point(xCoord, yCoord);
             ulong count = 0;
             string firstName, secondName;
@@ -277,10 +283,10 @@ namespace BattleshipWeb
                 {
                     Point point = new Point
                     {
-                        X = random.Next(0, Settings.boardWidth),
-                        Y = random.Next(0, Settings.boardWidth)
+                        X = new Random().Next(0, Settings.boardWidth),
+                        Y = new Random().Next(0, Settings.boardWidth)
                     };
-                    orientation = random.Next(0, 2);
+                    orientation = new Random().Next(0, 2);
                     orientationLetter = orientation == 0 ? 'H' : 'V';
                     correctlyPlaced = board.PlaceShips(new Ship(ship.Key, ship.Value, point, orientationLetter));
                 }
@@ -290,22 +296,19 @@ namespace BattleshipWeb
         {
             Point shootingPoint;
             Tile shootingTile;
-            Dictionary<Point, double> probabilities = new Dictionary<Point, double>();
-
-            CalculateProbabilities(probabilities);
+            probabilitiesReady = false;
             // Finds point with highest probability to contain a ship
             shootingPoint = FindShootingPoint(probabilities);
             pointsShot.Add(shootingPoint);
             // Shoots at the board
             shootingTile = ShootOpponent(shootingPoint);
-            /***************
-            * Slet!!!!!!   *
-            ****************/
-            battleship.SaveAsKB("TestStuffswithevidence.hkb");
             // Inserts evidence to the bayesian network
             SetEvidence(shootingTile, shootingPoint);
             battleship.Propagate(Domain.Equilibrium.H_EQUILIBRIUM_SUM,
                                  Domain.EvidenceMode.H_EVIDENCE_MODE_NORMAL);
+
+            CalculateProbabilities(probabilities);
+            probabilitiesReady = true;
         }
         // Calculates the probablility for each tile and adds the result to the dictionary
         private void CalculateProbabilities(Dictionary<Point, double> probabilities)
@@ -325,6 +328,7 @@ namespace BattleshipWeb
         {
             Dictionary<Point, double> temp = probabilities;
             double maxValue = 0;
+
             // Removes points already shot from the dictionary
             foreach (Point point in pointsShot)
             {
@@ -448,7 +452,7 @@ namespace BattleshipWeb
             List<string> startCoords = new List<string>();
             double bestBelief = 0;
             string startCoord = "";
-            long beliefIndex = 0;
+            long beliefIndex;
             // Runs through all possible ship positions
             foreach (List<Point> list in allPossiblePos)
             {
@@ -484,6 +488,10 @@ namespace BattleshipWeb
         public void DeleteDomain()
         {
             battleship.Delete();
+        }
+        public bool GetDomainStatus()
+        {
+            return battleship.IsAlive();
         }
     }
 }

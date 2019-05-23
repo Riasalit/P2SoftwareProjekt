@@ -7,7 +7,7 @@ namespace BattleshipWeb
 {
     public class TestUI : IUserInterface
     {
-        private int numberOfGames = 5000;
+        private int numberOfGames = 10;
         private int counter = 0;
         private int choice;
         private string playerName;
