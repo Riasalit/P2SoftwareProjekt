@@ -19,7 +19,7 @@ namespace BattleshipWeb
                 }
             }
         }
-
+        // Places ships randomly
         public override void SetShips()
         {
             int orientation;
@@ -41,11 +41,11 @@ namespace BattleshipWeb
                 }
             }
         }
-
+        // Shoots randomly
         public override void YourTurn()
         {
             Point point;
-
+            // finds a random point and checks if already shot
             do
             {
                 point = new Point

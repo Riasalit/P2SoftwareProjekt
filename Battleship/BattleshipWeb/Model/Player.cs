@@ -33,38 +33,42 @@ namespace BattleshipWeb
 
             return opponent.board.ShootAt(point);
         }
-        public abstract void YourTurn();
-        public abstract void SetShips();
-
+        // Places ships in a stack in the middle of the board
         public void SetMidStackShip()
         {
             board.PlaceShips(new Ship("Battleship", 4, new Point(2, 2), 'H'));
             board.PlaceShips(new Ship("Cruiser", 3, new Point(3, 3), 'V'));
             board.PlaceShips(new Ship("Submarine", 3, new Point(4, 3), 'V'));
         }
+        // Places ships in a stack in a corner of the board
         public void SetCornerStackShip()
         {
             board.PlaceShips(new Ship("Battleship", 4, new Point(0, 0), 'H'));
             board.PlaceShips(new Ship("Cruiser", 3, new Point(0, 1), 'H'));
             board.PlaceShips(new Ship("Submarine", 3, new Point(0, 2), 'H'));
         }
+        // Places ships in three corners of the board
         public void SetCornerSpreadShip()
         {
             board.PlaceShips(new Ship("Battleship", 4, new Point(0, 0), 'H'));
             board.PlaceShips(new Ship("Cruiser", 3, new Point(7, 0), 'V'));
             board.PlaceShips(new Ship("Submarine", 3, new Point(0, 7), 'H'));
         }
+        // Places ships so each end touches the previous ship
         public void SetBorderStackShip()
         {
             board.PlaceShips(new Ship("Battleship", 4, new Point(0, 7), 'H'));
             board.PlaceShips(new Ship("Cruiser", 3, new Point(4, 7), 'H'));
             board.PlaceShips(new Ship("Submarine", 3, new Point(7, 5), 'V'));
         }
+        // Places ships in a spread out, but still in the middle of the board
         public void SetMidSpreadShip()
         {
             board.PlaceShips(new Ship("Battleship", 4, new Point(2, 1), 'H'));
             board.PlaceShips(new Ship("Cruiser", 3, new Point(6, 3), 'V'));
             board.PlaceShips(new Ship("Submarine", 3, new Point(1, 4), 'V'));
         }
+        public abstract void YourTurn();
+        public abstract void SetShips();
     }
 }

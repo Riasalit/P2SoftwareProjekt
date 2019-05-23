@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace BattleshipWeb
@@ -16,9 +14,11 @@ namespace BattleshipWeb
  
         public Player[] InitializePlayers(IUserInterface UI)
         {
+            // Takes user input the first time the class is run
+            // Decides which Player type is executed
             if (counter == 0)
             {
-                Console.WriteLine("AI, Random, HumanAI or Hunt/target (0, 1 or 2)");
+                Console.WriteLine("AI, Random or Hunt/target (0, 1 or 2)");
                 choice = int.Parse(playerName + Console.ReadLine());
                 Console.WriteLine("What is your name");
                 playerName = Console.ReadLine();
@@ -34,53 +34,48 @@ namespace BattleshipWeb
             }
             else if (choice == 2)
             {
-                players[0] = new HumanAI(playerName);
-            }
-            else if (choice == 3)
-            {
                 players[0] = new HuntTargetAI(playerName);
             }
             else
             {
-                Console.WriteLine("Type again - you dun goofed capri son");
+                Console.WriteLine("Invalid input");
             }
             return players;
         }
-        public Ship GetShips(bool correctlyPlaced, string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        
+        // Saves results when a game is complete
         public bool GameComplete(Player[] players, int playerWon)
         {
+            // Creates a text file and saves results
             if (counter == 0)
             {
                 File.WriteAllText("BattleshipResult.txt", string.Empty);
                 File.AppendAllText("BattleshipResult.txt", players[0].playerName + Environment.NewLine);
             }
-            //Pass the filepath and filename to the StreamWriter Constructor
+            // Runs if a game failed
             if(players[0].turnCounter > Settings.boardSize)
             {
                 return true;
             }
+            // Saves results to the file
             if (counter < numberOfGames)
             {
-                //Write a second line of text
                 File.AppendAllText("BattleshipResult.txt", players[0].turnCounter + Environment.NewLine);
                 counter++;
                 return true;
             }
+            // Saves results for the last game
             File.AppendAllText("BattleshipResult.txt", players[0].turnCounter + Environment.NewLine);
             return false;
         }
-
         public Point MakeTargetPoint(List<Point> points, string name)
         {
             throw new NotImplementedException();
         }
-
         public void ReturnInformation(Point point, Tile info)
+        {
+            throw new NotImplementedException();
+        }
+        public Ship GetShips(bool correctlyPlaced, string name)
         {
             throw new NotImplementedException();
         }
